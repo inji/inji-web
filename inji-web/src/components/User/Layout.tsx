@@ -40,6 +40,16 @@ export const Layout: React.FC = () => {
     const { removeUser, isUserLoggedIn } = useUser();
     const logoutRequestApi = useApi();
 
+    // Refs to avoid stale closure in popstate handler
+    const locationRef = useRef(location.pathname);
+    const isUserLoggedInRef = useRef(isUserLoggedIn);
+
+    // Update refs when values change
+    useEffect(() => {
+        locationRef.current = location.pathname;
+        isUserLoggedInRef.current = isUserLoggedIn;
+    }, [location.pathname, isUserLoggedIn]);
+
     useEffect(() => {
         const updateHeights = () => {
             const headerHeight =
@@ -64,19 +74,19 @@ export const Layout: React.FC = () => {
                 window.history.replaceState(
                     { injiSentinel: true, injiSentinelInstalled: true },
                     '',
-                    location.pathname
+                    locationRef.current
                 );
                 // push the actual visible page state (no extra flag) so Back lands on sentinel
                 window.history.pushState(
                     { injiSentinelInstalled: true },
                     '',
-                    location.pathname
+                    locationRef.current
                 );
             }
             const onPopState = (e: PopStateEvent) => {
                 const state = e.state as any;
                 if (state?.injiSentinel) {
-                    if (location.pathname === ROUTES.USER_HOME && isUserLoggedIn?.()) {
+                    if (locationRef.current === ROUTES.USER_HOME && isUserLoggedInRef.current?.()) {
                         setShowLogoutModal(true);
                         // Keep user on the active entry without growing history
                         window.history.go(1);

@@ -343,6 +343,9 @@ describe('Layout component - Logout Modal Logic', () => {
     
     it('should handle errors during sentinel setup', () => {
       window.history.state = {};
+      mockUserHook.isUserLoggedIn.mockReturnValue(true);
+      setMockUseLocation({ pathname: ROUTES.USER_HOME });
+      
       mockHistoryReplaceState.mockImplementation(() => {
         throw new Error('History API error');
       });
