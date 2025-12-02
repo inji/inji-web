@@ -551,5 +551,11 @@
     "title": "No matching credentials found",
     "description": "Please download the corresponding credentials and retry the sharing process",
     "goToHomeButton": "Go to Home"
+  },
+  "LogoutConfirmation": {
+    "title": "Are you sure you want to exit?",
+    "message": "Going back now will log you out. You'll need to Log in again to continue. Are you sure you want to exit?",
+    "logoutButton": "Yes, Log Out",
+    "stayButton": "Stay On This Page"
   }
 }

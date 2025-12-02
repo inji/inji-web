@@ -553,5 +553,11 @@
     "title": "Nenhuma credencial correspondente encontrada",
     "description": "Por favor, descarregue as credenciais correspondentes e tente novamente o processo de partilha",
     "goToHomeButton": "Ir para o início"
+  },
+  "LogoutConfirmation": {
+    "title": "Tem certeza de que deseja sair?",
+    "message": "Ao voltar agora, você será desconectado. Será necessário fazer login novamente para continuar. Tem certeza de que deseja sair?",
+    "logoutButton": "Sim, Sair",
+    "stayButton": "Fique nesta página"
   }
 }
