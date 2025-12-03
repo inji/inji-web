@@ -20,6 +20,16 @@ export interface LogoutConfirmationModalProps {
     onStayOnPage: () => void;
     testId: string;
 }
+
+const InfoIcon: React.FC<{ testId: string }> = ({ testId }) => (
+    <div className={LogoutConfirmationModalStyles.iconWrapper}>
+        <ExitWalletInfoIcon
+            className={LogoutConfirmationModalStyles.icon}
+            data-testid={`icon-${testId}-exit-wallet-info`}
+        />
+    </div>
+);
+
 export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = ({
     isOpen,
     onLogout,
@@ -29,30 +39,22 @@ export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = (
     const {t} = useTranslation('LogoutConfirmation');
     if (!isOpen) return null;
     
-    const InfoIcon = () => (
-        <div className={LogoutConfirmationModalStyles.iconWrapper}>
-            <ExitWalletInfoIcon
-                className={LogoutConfirmationModalStyles.icon}
-                data-testid={`${testId}-exit-wallet-info-icon`}
-            />
-        </div>
-    );
     return ReactDOM.createPortal(
         <Clickable
             className={LogoutConfirmationModalStyles.overlay}
             onClick={onStayOnPage}
-            testId={`modal-logout-confirmation-${testId}`}
+            testId={`modal-${testId}`}
         >
             <div 
                 className={LogoutConfirmationModalStyles.modalContainer}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className={LogoutConfirmationModalStyles.container}>
-                    <InfoIcon />
+                    <InfoIcon testId={testId} />
                     <div className={LogoutConfirmationModalStyles.titleWrapper}>
                         <h2
                             className={LogoutConfirmationModalStyles.title}
-                            data-testid={`${testId}-title`}
+                            data-testid={`title-${testId}`}
                         >
                             {t('title')}
                         </h2>
@@ -60,21 +62,21 @@ export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = (
                     <div className={LogoutConfirmationModalStyles.messageWrapper}>
                         <p
                             className={LogoutConfirmationModalStyles.message}
-                            data-testid={`${testId}-message`}
+                            data-testid={`text-${testId}`}
                         >
                             {t('message')}
                         </p>
                     </div>
                     <div className={LogoutConfirmationModalStyles.buttonsContainer}>
                         <SolidButton
-                            testId={`${testId}-logout-button`}
+                            testId={`btn-${testId}-logout`}
                             onClick={onLogout}
                             title={t('logoutButton')}
                             fullWidth
                             className={LogoutConfirmationModalStyles.logoutButton}
                         />
                         <button
-                            data-testid={`${testId}-stay-button`}
+                            data-testid={`btn-${testId}-stay`}
                             onClick={(event: React.MouseEvent) => {
                                 event.stopPropagation();
                                 onStayOnPage();

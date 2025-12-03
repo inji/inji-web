@@ -4,7 +4,7 @@
       "home": "Página inicial",
       "faq": "Perguntas frequentes",
       "login": "Conecte-se",
-      "logout": "வெளியேறு"
+      "logout": "Sair"
     },
     "Footer": {
       "product": "Um produto MOSIP",
@@ -412,7 +412,7 @@
     "ProfileDropdown": {
       "profile": "Perfil",
       "faq": "Perguntas frequentes",
-      "logout": "வெளியேறு"
+      "logout": "Sair"
     },
     "ProfilePage": {
       "title": "Meu Perfil",

@@ -69,23 +69,23 @@ export const Layout: React.FC = () => {
         try {
             const currentState: any = window.history.state || {};
             // install only once per session (per tab) when inside /user/* layout
-            if (!currentState?.injiSentinelInstalled) {
-                // first replace current entry with a sentinel marker.
+            if (!currentState?.navigationGuardInstalled) {
+                // first replace current entry with a logout confirmation guard marker.
                 window.history.replaceState(
-                    { injiSentinel: true, injiSentinelInstalled: true },
+                    { logoutConfirmationGuard: true, navigationGuardInstalled: true },
                     '',
                     locationRef.current
                 );
-                // push the actual visible page state (no extra flag) so Back lands on sentinel
+                // push the actual visible page state (no extra flag) so Back lands on guard
                 window.history.pushState(
-                    { injiSentinelInstalled: true },
+                    { navigationGuardInstalled: true },
                     '',
                     locationRef.current
                 );
             }
             const onPopState = (e: PopStateEvent) => {
                 const state = e.state as any;
-                if (state?.injiSentinel) {
+                if (state?.logoutConfirmationGuard) {
                     if (locationRef.current === ROUTES.USER_HOME && isUserLoggedInRef.current?.()) {
                         setShowLogoutModal(true);
                         // Keep user on the active entry without growing history
@@ -99,7 +99,7 @@ export const Layout: React.FC = () => {
             window.addEventListener('popstate', onPopState);
             return () => window.removeEventListener('popstate', onPopState);
         } catch (err) {
-            console.warn('Sentinel history setup failed:', err);
+            console.warn('Navigation guard setup failed:', err);
         }
     }, []);
 
@@ -243,7 +243,7 @@ export const Layout: React.FC = () => {
                 isOpen={showLogoutModal}
                 onLogout={handleLogout}
                 onStayOnPage={handleStayOnPage}
-                testId="logout-confirm-on-back"
+                testId="logout-confirmation"
             />
 
             <Footer footerRef={footerRef}/>

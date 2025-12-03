@@ -309,8 +309,8 @@ describe('Layout component - Logout Modal Logic', () => {
     });
   });
 
-  describe('History Sentinel Setup', () => {
-    it('should install sentinel when not already installed', () => {
+  describe('History Guard Setup', () => {
+    it('should install guard when not already installed', () => {
       window.history.state = {};
       mockUserHook.isUserLoggedIn.mockReturnValue(true);
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
@@ -318,20 +318,20 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
       
       expect(mockHistoryReplaceState).toHaveBeenCalledWith(
-        { injiSentinel: true, injiSentinelInstalled: true },
+        { logoutConfirmationGuard: true, navigationGuardInstalled: true },
         '',
         ROUTES.USER_HOME
       );
       
       expect(mockHistoryPushState).toHaveBeenCalledWith(
-        { injiSentinelInstalled: true },
+        { navigationGuardInstalled: true },
         '',
         ROUTES.USER_HOME
       );
     });
     
-    it('should not install sentinel when already installed', () => {
-      window.history.state = { injiSentinelInstalled: true };
+    it('should not install guard when already installed', () => {
+      window.history.state = { navigationGuardInstalled: true };
       mockUserHook.isUserLoggedIn.mockReturnValue(true);
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
       
@@ -341,7 +341,7 @@ describe('Layout component - Logout Modal Logic', () => {
       expect(mockHistoryPushState).not.toHaveBeenCalled();
     });
     
-    it('should handle errors during sentinel setup', () => {
+    it('should handle errors during guard setup', () => {
       window.history.state = {};
       mockUserHook.isUserLoggedIn.mockReturnValue(true);
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
@@ -351,26 +351,26 @@ describe('Layout component - Logout Modal Logic', () => {
       });
       
       expect(() => render(<Layout />)).not.toThrow();
-      expect(console.warn).toHaveBeenCalledWith('Sentinel history setup failed:', expect.any(Error));
+      expect(console.warn).toHaveBeenCalledWith('Navigation guard setup failed:', expect.any(Error));
     });
   });
 
   describe('PopState Event Handling', () => {
-    it('should show logout modal when sentinel state detected on USER_HOME and user is logged in', () => {
+    it('should show logout modal when guard state detected on USER_HOME and user is logged in', () => {
       window.history.state = {};
       mockUserHook.isUserLoggedIn.mockReturnValue(true);
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
       
       render(<Layout />);
       
-      // Simulate popstate event with sentinel state
+      // Simulate popstate event with guard state
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       
       fireEvent(window, popStateEvent);
       
-      expect(screen.getByTestId('modal-logout-confirmation-logout-confirm-on-back')).toBeInTheDocument();
+      expect(screen.getByTestId('modal-logout-confirmation')).toBeInTheDocument();
       expect(mockHistoryGo).toHaveBeenCalledWith(1);
     });
     
@@ -382,12 +382,12 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
       
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       
       fireEvent(window, popStateEvent);
       
-      expect(screen.queryByTestId('modal-logout-confirmation-logout-confirm-on-back')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('modal-logout-confirmation')).not.toBeInTheDocument();
       expect(mockHistoryGo).toHaveBeenCalledWith(1);
     });
     
@@ -399,16 +399,16 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
       
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       
       fireEvent(window, popStateEvent);
       
-      expect(screen.queryByTestId('modal-logout-confirmation-logout-confirm-on-back')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('modal-logout-confirmation')).not.toBeInTheDocument();
       expect(mockHistoryGo).toHaveBeenCalledWith(1);
     });
     
-    it('should ignore popstate events without sentinel state', () => {
+    it('should ignore popstate events without guard state', () => {
       window.history.state = {};
       mockUserHook.isUserLoggedIn.mockReturnValue(true);
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
@@ -421,7 +421,7 @@ describe('Layout component - Logout Modal Logic', () => {
       
       fireEvent(window, popStateEvent);
       
-      expect(screen.queryByTestId('modal-logout-confirmation-logout-confirm-on-back')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('modal-logout-confirmation')).not.toBeInTheDocument();
       expect(mockHistoryGo).not.toHaveBeenCalled();
     });
   });
@@ -440,12 +440,12 @@ describe('Layout component - Logout Modal Logic', () => {
       
       // Trigger logout modal
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       fireEvent(window, popStateEvent);
       
       // Click logout button
-      const logoutButton = screen.getByTestId('logout-confirm-on-back-logout-button');
+      const logoutButton = screen.getByTestId('btn-logout-confirmation-logout');
       fireEvent.click(logoutButton);
       
       await waitFor(() => {
@@ -469,11 +469,11 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
       
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       fireEvent(window, popStateEvent);
       
-      const logoutButton = screen.getByTestId('logout-confirm-on-back-logout-button');
+      const logoutButton = screen.getByTestId('btn-logout-confirmation-logout');
       fireEvent.click(logoutButton);
       
       await waitFor(() => {
@@ -488,11 +488,11 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
       
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       fireEvent(window, popStateEvent);
       
-      const logoutButton = screen.getByTestId('logout-confirm-on-back-logout-button');
+      const logoutButton = screen.getByTestId('btn-logout-confirmation-logout');
       fireEvent.click(logoutButton);
       
       await waitFor(() => {
@@ -512,19 +512,19 @@ describe('Layout component - Logout Modal Logic', () => {
       
       // Trigger logout modal
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       fireEvent(window, popStateEvent);
       
       // Verify modal is shown
-      expect(screen.getByTestId('modal-logout-confirmation-logout-confirm-on-back')).toBeInTheDocument();
+      expect(screen.getByTestId('modal-logout-confirmation')).toBeInTheDocument();
       
       // Click stay on page button
-      const stayButton = screen.getByTestId('logout-confirm-on-back-stay-button');
+      const stayButton = screen.getByTestId('btn-logout-confirmation-stay');
       fireEvent.click(stayButton);
       
       // Verify modal is hidden
-      expect(screen.queryByTestId('modal-logout-confirmation-logout-confirm-on-back')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('modal-logout-confirmation')).not.toBeInTheDocument();
     });
     
     it('should close modal when clicking outside modal', () => {
@@ -536,16 +536,16 @@ describe('Layout component - Logout Modal Logic', () => {
       
       // Trigger logout modal
       const popStateEvent = new PopStateEvent('popstate', {
-        state: { injiSentinel: true }
+        state: { logoutConfirmationGuard: true }
       });
       fireEvent(window, popStateEvent);
       
       // Click outside modal (on overlay)
-      const overlay = screen.getByTestId('modal-logout-confirmation-logout-confirm-on-back');
+      const overlay = screen.getByTestId('modal-logout-confirmation');
       fireEvent.click(overlay);
       
       // Verify modal is hidden
-      expect(screen.queryByTestId('modal-logout-confirmation-logout-confirm-on-back')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('modal-logout-confirmation')).not.toBeInTheDocument();
     });
   });
 
