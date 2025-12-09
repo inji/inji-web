@@ -69,15 +69,13 @@ sequenceDiagram
     alt Submission result
         Inji-openid4vp JAR-->>Mimoto: Success
         Mimoto->>Database(PostgreSQL): Store presentation record (status=success)
-        Mimoto-->>InjiWeb: Notify success
+        Mimoto-->>InjiWeb: Notify success, redirect_uri
     else Error
         Inji-openid4vp JAR-->>Mimoto: Error
         Mimoto->>Database(PostgreSQL): Store presentation record (status=error)
-        Mimoto-->>InjiWeb: Notify error
+        Mimoto-->>InjiWeb: Notify error, redirect_uri
     end
 
-    Inji-openid4vp JAR-->>Mimoto: verifier response
-    Mimoto-->>InjiWeb: Send redirect_uri
     InjiWeb->>InjiWeb: Show result to user
     alt redirect_uri from verifier response exists
         InjiWeb->>Verifier: Redirect to redirect_uri
