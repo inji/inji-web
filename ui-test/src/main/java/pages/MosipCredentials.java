@@ -16,7 +16,7 @@ public class MosipCredentials extends BasePage {
 
 	public Boolean isMockVerifiableCredentialDisplayed() {
 
-		return isElementIsVisible(driver, By.xpath("//h3[text()='Mock Verifiable Credential']"), 60);
+		return isElementIsVisible(driver, By.xpath("//h3[text()='Mock Verifiable Credential']"), (BasePage.explicit_timeout)*2);
 	}
 
 	public void clickOnMockVerifiableCredential() {
@@ -50,7 +50,7 @@ public class MosipCredentials extends BasePage {
 	public void clickOnMosipNationalId() {
 		pdfName = getElementAttribute(driver, By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
 				"data-testid").replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), 60);
+		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), (BasePage.explicit_timeout)*2);
 	}
 
 	public Boolean isLoginPageLableDisplayed() {
@@ -60,9 +60,9 @@ public class MosipCredentials extends BasePage {
 
 	public void clickOnLoginWithOtp() {
 
-		if (isElementIsVisible(driver, By.xpath("//*[@id='login_with_otp']"), 60)) {
+		if (isElementIsVisible(driver, By.xpath("//*[@id='login_with_otp']"), (BasePage.explicit_timeout)*2)) {
 			clickOnElement(driver, By.xpath("//*[@id='login_with_otp']"));
-		} else if (isElementIsVisible(driver, By.xpath("//*[@id='get_otp']"), 60)) {
+		} else if (isElementIsVisible(driver, By.xpath("//*[@id='get_otp']"), (BasePage.explicit_timeout)*2)) {
 			clickOnElement(driver, By.xpath("//*[@id='get_otp']"));
 		}
 	}
