@@ -14,7 +14,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Who are issuers?
@@ -69,7 +69,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What are verifiable credentials?
@@ -106,7 +106,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How can I download a credential in Inji Wallet?
@@ -143,7 +143,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What details I need to provide to download my credential?
@@ -180,7 +180,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Where can I find my credential?
@@ -217,7 +217,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What details are present in the PDF credential?
@@ -254,7 +254,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Why I am not finding the list of issuers?
@@ -291,7 +291,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What happens when I generate a Verifiable Credential (VC) in Inji Wallet's Web Interface?
@@ -328,7 +328,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What is the role of the QR code in the credential PDF?
@@ -365,7 +365,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How does Inji Wallet’s Web Interface ensure my VC is stored securely?
@@ -402,7 +402,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How does the online sharing feature work with Inji Verify?
@@ -439,7 +439,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Why embed a URL in the QR code instead of full VC data?
@@ -476,7 +476,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Can I share my VC both online and offline?
@@ -513,7 +513,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How does Inji Wallet verify and authorize the verifier during online sharing?
@@ -550,7 +550,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What is OpenID4VP, and how is it used in Inji Wallet?
@@ -587,7 +587,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How do I know my VC was securely shared using Inji Wallet??
@@ -624,7 +624,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What happens if the QR code is scanned on a different device than where the VC was generated?
@@ -661,7 +661,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Can Inji Wallet support different QR code formats?
@@ -698,7 +698,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How does Inji Wallet handle credential verification after sharing?
@@ -735,7 +735,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           What kind of credential issuers are supported?
@@ -772,7 +772,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           Where can I find more detailed information about the features introduced in this release?
@@ -809,7 +809,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How do I get started with the online sharing feature in Inji Wallet?
@@ -846,7 +846,7 @@ exports[`Testing the layout of Faq Accordion Check if the layout is matching wit
         data-testid="Faq-Item-Title-Button"
       >
         <span
-          class="text-[24px] leading-[32px] font-bold"
+          class="text-[16px] font-bold"
           data-testid="Faq-Item-Title-Text"
         >
           How can I toggle between embedded VC and Online Sharing in Inji Wallet?

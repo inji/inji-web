@@ -18,7 +18,7 @@ export const FAQAccordionItem: React.FC<FAQAccordionItemProps> = (props) => {
                 } focus:outline-none transition-colors`}
                 onClick={() => props.setOpen(isOpen ? -1 : props.id)}
             >
-                <span data-testid="Faq-Item-Title-Text" className="text-[16px] font-bold">{props.title}</span>
+                <span data-testid="Faq-Item-Title-Text" className="text-[16px] leading-[32px] font-bold">{props.title}</span>
                 <span className="ml-2 sm:ml-4">
                     {isOpen ? (
                         <IoIosArrowUp
