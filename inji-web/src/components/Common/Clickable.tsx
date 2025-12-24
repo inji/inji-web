@@ -29,13 +29,13 @@ export const Clickable: React.FC<ClickableProps> = ({
 
     return (
         <div
+            {...rest}
             role="menuitem"
             tabIndex={0}
             className={className}
             onClick={handleClick}
             onKeyDown={handleKeyPress}
             data-testid={testId}
-            {...rest}
         >
             {children}
         </div>
