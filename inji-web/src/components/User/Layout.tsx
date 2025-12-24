@@ -70,14 +70,6 @@ export const Layout: React.FC = () => {
     useEffect(() => {
         let onPopState: ((e: PopStateEvent) => void) | undefined;
         try {
-            const currentState: any = window.history.state || {};
-            // eslint-disable-next-line no-console
-            console.info('[nav-guard] layout effect', {
-                pathname: locationRef.current,
-                historyState: currentState,
-                historyLength: window.history.length,
-            });
-
             let isGuardInstalledInSession = false;
             try {
                 isGuardInstalledInSession = window.sessionStorage.getItem(NAV_GUARD_SESSION_KEY) === 'true';
@@ -87,8 +79,6 @@ export const Layout: React.FC = () => {
             
             // Install guard only once per tab session to avoid growing history on each navigation.
             if (!isGuardInstalledInSession) {
-                // eslint-disable-next-line no-console
-                console.info('[nav-guard] installing guard');
                 window.history.replaceState(
                     { logoutConfirmationGuard: true, navigationGuardInstalled: true },
                     '',
@@ -105,32 +95,19 @@ export const Layout: React.FC = () => {
                 } catch (e) {
                     console.warn('[nav-guard] Unable to persist guard flag in sessionStorage', e);
                 }
-                // eslint-disable-next-line no-console
-                console.info('[nav-guard] guard installed', {
-                    stateAfterPush: (window.history as any).state,
-                    historyLength: window.history.length,
-                });
             } 
 
             onPopState = (e: PopStateEvent) => {
                 const state = e.state as any;
-                // eslint-disable-next-line no-console
-                console.info('[nav-guard] popstate', {
-                    pathname: locationRef.current,
-                    eventState: state,
-                });
+                
                 if (state?.logoutConfirmationGuard) {
                     if (locationRef.current === ROUTES.USER_HOME && isUserLoggedInRef.current?.()) {
-                        // eslint-disable-next-line no-console
-                        console.info('[nav-guard] showing logout modal and bouncing forward');
                         setShowLogoutModal(true);
                         // Keep user on the active entry without growing history
                         window.history.go(1);
                         return;
                     }
                     // Other /user/* routes: silent bounce to block IdP exposure
-                    // eslint-disable-next-line no-console
-                    console.info('[nav-guard] blocking back navigation and bouncing forward');
                     window.history.go(1);
                 }
             };
