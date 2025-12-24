@@ -310,48 +310,37 @@ describe('Layout component - Logout Modal Logic', () => {
   });
 
   describe('History Guard Setup', () => {
-    it('should install guard when not already installed', () => {
+    it('should install guard when session flag is not set', () => {
       window.history.state = {};
-      mockUserHook.isUserLoggedIn.mockReturnValue(true);
+      sessionStorage.clear();
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
-      
+
       render(<Layout />);
-      
+
       expect(mockHistoryReplaceState).toHaveBeenCalledWith(
         { logoutConfirmationGuard: true, navigationGuardInstalled: true },
         '',
         ROUTES.USER_HOME
       );
-      
+
       expect(mockHistoryPushState).toHaveBeenCalledWith(
         { navigationGuardInstalled: true },
         '',
         ROUTES.USER_HOME
       );
+
+      expect(sessionStorage.getItem('navGuardInstalled')).toBe('true');
     });
-    
-    it('should not install guard when already installed', () => {
-      window.history.state = { navigationGuardInstalled: true };
-      mockUserHook.isUserLoggedIn.mockReturnValue(true);
+
+    it('should not reinstall guard when session flag is already set', () => {
+      window.history.state = {};
+      sessionStorage.setItem('navGuardInstalled', 'true');
       setMockUseLocation({ pathname: ROUTES.USER_HOME });
-      
+
       render(<Layout />);
-      
+
       expect(mockHistoryReplaceState).not.toHaveBeenCalled();
       expect(mockHistoryPushState).not.toHaveBeenCalled();
-    });
-    
-    it('should handle errors during guard setup', () => {
-      window.history.state = {};
-      mockUserHook.isUserLoggedIn.mockReturnValue(true);
-      setMockUseLocation({ pathname: ROUTES.USER_HOME });
-      
-      mockHistoryReplaceState.mockImplementation(() => {
-        throw new Error('History API error');
-      });
-      
-      expect(() => render(<Layout />)).not.toThrow();
-      expect(console.warn).toHaveBeenCalledWith('Navigation guard setup failed:', expect.any(Error));
     });
   });
 

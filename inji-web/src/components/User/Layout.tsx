@@ -40,6 +40,8 @@ export const Layout: React.FC = () => {
     const { removeUser, isUserLoggedIn } = useUser();
     const logoutRequestApi = useApi();
 
+    const NAV_GUARD_SESSION_KEY = 'navGuardInstalled';
+
     // Refs to avoid stale closure in popstate handler
     const locationRef = useRef(location.pathname);
     const isUserLoggedInRef = useRef(isUserLoggedIn);
@@ -66,11 +68,27 @@ export const Layout: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        let onPopState: ((e: PopStateEvent) => void) | undefined;
         try {
             const currentState: any = window.history.state || {};
-            // install only once per session (per tab) when inside /user/* layout
-            if (!currentState?.navigationGuardInstalled) {
-                // first replace current entry with a logout confirmation guard marker.
+            // eslint-disable-next-line no-console
+            console.info('[nav-guard] layout effect', {
+                pathname: locationRef.current,
+                historyState: currentState,
+                historyLength: window.history.length,
+            });
+
+            let isGuardInstalledInSession = false;
+            try {
+                isGuardInstalledInSession = window.sessionStorage.getItem(NAV_GUARD_SESSION_KEY) === 'true';
+            } catch (e) {
+                console.warn('[nav-guard] Unable to access sessionStorage', e);
+            }
+            
+            // Install guard only once per tab session to avoid growing history on each navigation.
+            if (!isGuardInstalledInSession) {
+                // eslint-disable-next-line no-console
+                console.info('[nav-guard] installing guard');
                 window.history.replaceState(
                     { logoutConfirmationGuard: true, navigationGuardInstalled: true },
                     '',
@@ -82,26 +100,54 @@ export const Layout: React.FC = () => {
                     '',
                     locationRef.current
                 );
-            }
-            const onPopState = (e: PopStateEvent) => {
+                try {
+                    window.sessionStorage.setItem(NAV_GUARD_SESSION_KEY, 'true');
+                } catch (e) {
+                    console.warn('[nav-guard] Unable to persist guard flag in sessionStorage', e);
+                }
+                // eslint-disable-next-line no-console
+                console.info('[nav-guard] guard installed', {
+                    stateAfterPush: (window.history as any).state,
+                    historyLength: window.history.length,
+                });
+            } 
+
+            onPopState = (e: PopStateEvent) => {
                 const state = e.state as any;
+                // eslint-disable-next-line no-console
+                console.info('[nav-guard] popstate', {
+                    pathname: locationRef.current,
+                    eventState: state,
+                });
                 if (state?.logoutConfirmationGuard) {
                     if (locationRef.current === ROUTES.USER_HOME && isUserLoggedInRef.current?.()) {
+                        // eslint-disable-next-line no-console
+                        console.info('[nav-guard] showing logout modal and bouncing forward');
                         setShowLogoutModal(true);
                         // Keep user on the active entry without growing history
                         window.history.go(1);
                         return;
                     }
                     // Other /user/* routes: silent bounce to block IdP exposure
+                    // eslint-disable-next-line no-console
+                    console.info('[nav-guard] blocking back navigation and bouncing forward');
                     window.history.go(1);
                 }
             };
+
             window.addEventListener('popstate', onPopState);
             return () => window.removeEventListener('popstate', onPopState);
         } catch (err) {
             console.warn('Navigation guard setup failed:', err);
         }
-    }, []);
+
+        return () => {
+            if (onPopState) {
+                window.removeEventListener('popstate', onPopState);
+            }
+        };
+        // Install/refresh whenever the current /user/* location changes
+    }, [location.pathname]);
 
     const handleLogout = async () => {
         try {
@@ -109,6 +155,7 @@ export const Layout: React.FC = () => {
                 apiConfig: api.userLogout,
             });
             if (response.ok()) {
+                window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
                 removeUser?.();
                 setShowLogoutModal(false);
                 window.location.replace(ROUTES.ROOT);
@@ -116,6 +163,7 @@ export const Layout: React.FC = () => {
                 const parsedErrors = (response.error as any)?.response?.data?.errors;
                 const errorCode = parsedErrors?.[0]?.errorCode;
                 if (errorCode === 'user_logout_error') {
+                    window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
                     removeUser?.();
                     setShowLogoutModal(false);
                     window.location.replace(ROUTES.ROOT);
@@ -125,6 +173,7 @@ export const Layout: React.FC = () => {
             }
         } catch (error) {
             // As a fallback, clear client state and redirect
+            window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
             removeUser?.();
             setShowLogoutModal(false);
             window.location.replace(ROUTES.ROOT);
