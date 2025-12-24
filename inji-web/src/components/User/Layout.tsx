@@ -117,12 +117,6 @@ export const Layout: React.FC = () => {
         } catch (err) {
             console.warn('Navigation guard setup failed:', err);
         }
-
-        return () => {
-            if (onPopState) {
-                window.removeEventListener('popstate', onPopState);
-            }
-        };
         // Install/refresh whenever the current /user/* location changes
     }, [location.pathname]);
 

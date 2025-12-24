@@ -44,6 +44,10 @@ export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = (
             className={LogoutConfirmationModalStyles.overlay}
             onClick={onStayOnPage}
             testId={`modal-${testId}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`title-${testId}`}
+            aria-describedby={`text-${testId}`}
         >
             <div 
                 className={LogoutConfirmationModalStyles.modalContainer}

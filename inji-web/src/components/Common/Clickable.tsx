@@ -1,8 +1,7 @@
 import React from 'react';
 
-export interface ClickableProps {
+export interface ClickableProps extends React.HTMLAttributes<HTMLDivElement> {
     onClick: () => void;
-    children: React.ReactNode;
     testId: string;
     className?: string;
 }
@@ -12,6 +11,7 @@ export const Clickable: React.FC<ClickableProps> = ({
                                                         children,
                                                         testId,
                                                         className = '',
+                                                        ...rest
                                                     }) => {
     const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -35,6 +35,7 @@ export const Clickable: React.FC<ClickableProps> = ({
             onClick={handleClick}
             onKeyDown={handleKeyPress}
             data-testid={testId}
+            {...rest}
         >
             {children}
         </div>
