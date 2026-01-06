@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {HomeBanner} from "../components/Home/HomeBanner";
-import {HomeFeatures} from "../components/Home/HomeFeatures";
-import {HomeQuickTip} from "../components/Home/HomeQuickTip";
-import {toast} from "react-toastify";
-import {useTranslation} from "react-i18next";
-import {useLocation} from 'react-router-dom';
-import {LoginFailedModal} from '../components/Login/LoginFailedModal';
-import {LANDING_VISITED} from "../utils/constants";
+import React, { useEffect, useState } from "react";
+import { HomeBanner } from "../components/Home/HomeBanner";
+import { HomeFeatures } from "../components/Home/HomeFeatures";
+import { HomeQuickTip } from "../components/Home/HomeQuickTip";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import { useLocation } from 'react-router-dom';
+import { LoginFailedModal } from '../components/Login/LoginFailedModal';
+import { LANDING_VISITED } from "../utils/constants";
 
 const Status = {
     SUCCESS: "success",
@@ -14,7 +14,7 @@ const Status = {
 };
 
 export const HomePage: React.FC = () => {
-    const {t} = useTranslation("HomePage");
+    const { t } = useTranslation("HomePage");
     const [toastVisible, setToastVisible] = useState(false);
     const location = useLocation();
     const [isLoginFailed, setIsLoginFailed] = useState(false);
@@ -54,19 +54,20 @@ export const HomePage: React.FC = () => {
         setToastVisible(true);
         toast.warning(message, {
             onClose: () => setToastVisible(false),
-            toastId: "toast-wrapper"
+            toastId: "toast-wrapper",
+            autoClose: false
         });
     };
 
     return (
         <div>
             <div className={"pb-20 flex flex-col gap-y-4 "}>
-                <HomeBanner/>
-                <HomeFeatures/>
-                <HomeQuickTip onClick={() => showToast(t("QuickTip.toastText"))}/>
+                <HomeBanner />
+                <HomeFeatures />
+                <HomeQuickTip onClick={() => showToast(t("QuickTip.toastText"))} />
             </div>
 
-            {isLoginFailed && <LoginFailedModal/>}
+            {isLoginFailed && <LoginFailedModal />}
         </div>
 
     );
