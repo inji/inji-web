@@ -556,7 +556,7 @@
   },
   "LogoutConfirmation": {
     "title": "Êtes-vous sûr de vouloir partir ?",
-    "message": "Revenir en arrière vous déconnectera. Vous devrez vous reconnecter pour continuer. Êtes-vous sûr de vouloir quitter?",
+    "message": "Si vous revenez en arrière maintenant, vous serez déconnecté et devrez vous reconnecter pour continuer.",
     "logoutButton": "Oui, se déconnecter",
     "stayButton": "Rester sur cette page"
   }

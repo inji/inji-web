@@ -554,7 +554,7 @@
   },
   "LogoutConfirmation": {
     "title": "Are you sure you want to exit?",
-    "message": "Going back now will log you out. You'll need to Log in again to continue. Are you sure you want to exit?",
+    "message": "If you go back now, you will be logged out and must log in again to continue.",
     "logoutButton": "Yes, Log Out",
     "stayButton": "Stay On This Page"
   }

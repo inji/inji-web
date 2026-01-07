@@ -556,7 +556,7 @@
   },
   "LogoutConfirmation": {
     "title": "Tem certeza de que deseja sair?",
-    "message": "Ao voltar agora, você será desconectado. Será necessário fazer login novamente para continuar. Tem certeza de que deseja sair?",
+    "message": "Se você voltar agora, será desconectado e precisará fazer login novamente para continuar.",
     "logoutButton": "Sim, Sair",
     "stayButton": "Fique nesta página"
   }
