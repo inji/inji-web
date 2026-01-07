@@ -19,29 +19,29 @@ public class FaqPage extends BasePage {
     }
 
     public boolean isFaqPageFAQDescriptionTextDisplayed() {
-        return isElementIsVisible(driver, By.xpath("//*[@data-testid='Faq-Item-Content-Text']"));
+        return isElementIsVisible(driver, By.xpath("//p[@data-testid='Faq-Item-Content-Text']"));
     }
 
     public boolean isFaqPageFAQTitelTextDisplayed() {
-        return isElementIsVisible(driver, By.xpath("//*[@data-testid='Faq-Item-Title-Text']"));
+        return isElementIsVisible(driver, By.xpath("//h3[@data-testid='Faq-Item-Title-Text']"));
     }
 
     public boolean isUpArrowDisplayed() {
-        return isElementIsVisible(driver, By.xpath("//*[@data-testid='Faq-Item-UpArrow']"));
+        return isElementIsVisible(driver, By.xpath("//button[@data-testid='Faq-Item-UpArrow']"));
     }
 
     public int getUpArrowCount() {
-        List<WebElement> upArrowElements = driver.findElements(By.xpath("//*[@data-testid='Faq-Item-UpArrow']"));
+        List<WebElement> upArrowElements = driver.findElements(By.xpath("//button[@data-testid='Faq-Item-UpArrow']"));
         return upArrowElements.size();
     }
 
     public int getDownArrowCount() {
-        List<WebElement> upArrowElements = driver.findElements(By.xpath("//*[@data-testid='Faq-Item-DownArrow']"));
+        List<WebElement> upArrowElements = driver.findElements(By.xpath("//button[@data-testid='Faq-Item-DownArrow']"));
         return upArrowElements.size();
     }
 
     public void ClickOnDownArrow() {
-        clickOnElement(driver, By.xpath("//*[@data-testid='Faq-Item-DownArrow']"));
+        clickOnElement(driver, By.xpath("//button[@data-testid='Faq-Item-DownArrow']"));
     }
 
 

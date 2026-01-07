@@ -27,7 +27,7 @@ public class SunbirdCredentials extends BasePage {
 
 	public void clickOnSunbirdInsurance() {
 		pdfNameInsurance = getElementAttribute(driver,
-				By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), "data-testid")
+				By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), "data-testid")
 				.replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
 		logger.info("Pdf Name for Insurance: " + pdfNameInsurance);
 		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
@@ -68,7 +68,7 @@ public class SunbirdCredentials extends BasePage {
 	}
 
 	public Boolean isLoginFailedDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[contains(text(), 'Login failed')]"));
+		return isElementIsVisible(driver, By.xpath("//div[contains(text(), 'Login failed')]"));
 	}
 
 	public void clickOnLifeInsurance() {
