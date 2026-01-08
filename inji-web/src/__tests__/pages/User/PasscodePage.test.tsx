@@ -503,10 +503,10 @@ describe('Passcode', () => {
 
             // Enter complete but mismatched passcodes
             const passcodeInputs = await screen.findAllByTestId('input-passcode');
-            for (const input of passcodeInputs.slice(0, 6)) {
+            for (const input of passcodeInputs) {
                 await userEvent.type(input, '1');
             }
-            const confirmPasscodeInputs = screen.getAllByTestId('input-passcode').slice(6);
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
             for (const input of confirmPasscodeInputs) {
                 await userEvent.type(input, '2');
             }

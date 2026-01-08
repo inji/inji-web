@@ -175,7 +175,7 @@ export const PasscodePage: React.FC = () => {
             console.error("Error occurred while creating Wallet:", response.error);
             const isErrorHandled = handleCommonErrors(response)
             if(!isErrorHandled) {
-                const errorMessage = ((response.error as ApiError)?.response?.data as ErrorType).errorMessage ?? t('Common.error.unknownError');
+                const errorMessage = ((response.error as ApiError)?.response?.data as ErrorType).errorMessage ?? t('Common:error.unknownError.message');
                 setError(`${t('error.createWalletError')}: ${errorMessage}`);
             }
         } else {
