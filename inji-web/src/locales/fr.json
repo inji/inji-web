@@ -373,7 +373,7 @@
     "title": "Validité du partage",
     "subTitle": "Veuillez donner votre consentement pour définir une validité pour le partage du {{credentialName}}",
     "content": {
-      "selectedDocument": "Document sélectionné",
+      "selectedDocument": "Identifiant sélectionné",
       "consent": "Validité du consentement *",
       "validityTimesHeader": "Nombre de fois",
       "validityTimesOptions": {

@@ -373,7 +373,7 @@
     "title": "صلاحية المشاركة",
     "subTitle": "يرجى تقديم موافقتك على تعيين صلاحية مشاركة {{credentialName}}",
     "content": {
-      "selectedDocument": "المستند المحدد",
+      "selectedDocument": "بيانات الاعتماد المختارة",
       "consent": "صلاحية الموافقة *",
       "validityTimesHeader": "عدد المرات",
       "validityTimesOptions": {

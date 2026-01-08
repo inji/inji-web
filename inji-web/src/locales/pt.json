@@ -373,7 +373,7 @@
     "title": "Compartilhar Validade",
     "subTitle": "Por favor, dê seu consentimento para definir uma validade para compartilhar o {{credentialName}}",
     "content": {
-      "selectedDocument": "Documento selecionado",
+      "selectedDocument": "Credencial selecionada",
       "consent": "Consentimento Validade *",
       "validityTimesHeader": "Número de vezes",
       "validityTimesOptions": {
