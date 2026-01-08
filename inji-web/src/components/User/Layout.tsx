@@ -80,13 +80,13 @@ export const Layout: React.FC = () => {
             // Install guard only once per tab session to avoid growing history on each navigation.
             if (!isGuardInstalledInSession) {
                 window.history.replaceState(
-                    { logoutConfirmationGuard: true, navigationGuardInstalled: true },
+                    { logoutConfirmationGuard: true},
                     '',
                     locationRef.current
                 );
                 // push the actual visible page state (no extra flag) so Back lands on guard
                 window.history.pushState(
-                    { navigationGuardInstalled: true },
+                    {},
                     '',
                     locationRef.current
                 );
