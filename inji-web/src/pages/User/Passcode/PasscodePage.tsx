@@ -160,7 +160,6 @@ export const PasscodePage: React.FC = () => {
 
     const createWallet = async () => {
         const pin = passcode.join('');
-        const confirmPin = confirmPasscode.join('');
 
         const response = await createWalletApi.fetchData({
             apiConfig: api.createWalletWithPin,
@@ -236,10 +235,7 @@ export const PasscodePage: React.FC = () => {
             else if (passcode.includes('') || 
                      confirmPasscode.includes('') ||
                      passcode.join('') === confirmPasscode.join('')) {
-                setError(prevError => {
-                    const mismatchError = t('error.passcodeMismatchError');
-                    return prevError === mismatchError ? null : prevError;
-                });
+                setError(null);
             }
         }
     }, [passcode, confirmPasscode, wallets, t]);
