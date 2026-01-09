@@ -28,7 +28,13 @@ const LoginSessionStatusChecker = () => {
         removeUser()
         if (!isRootPage()) {
             console.warn("Redirecting to / page as accessing protected route without login from ", location.pathname);
-            navigate(ROUTES.ROOT)
+            navigate(ROUTES.ROOT, {
+                state: {
+                    from: {
+                        pathname: location.pathname
+                    }
+                }
+            });
         }
     }, [isRootPage, location.pathname, navigate, removeUser]);
 
