@@ -12,23 +12,22 @@ import {useApi} from "../hooks/useApi";
 import {RequestStatus} from "../utils/constants";
 import {useUser} from "../hooks/User/useUser";
 
-export const IssuersPage: React.FC<IssuerPageProps> = ({className}) => {
+export const IssuersPage: React.FC = () => {
     const {state, fetchData} = useApi();
     const dispatch = useDispatch();
     const {t} = useTranslation("IssuersPage");
-    const {isUserLoggedIn, fetchUserProfile} = useUser()
+  const {isUserLoggedIn, fetchUserProfile} = useUser();
 
     useEffect(() => {
         async function fetchIssuers() {
             const apiRequest: ApiRequest = api.fetchIssuers;
-            const {data: response, state: issuerResponseState} = await fetchData(
-                {
+      const {data: response, state: issuerResponseState} = await fetchData({
                     apiConfig: apiRequest,
                 }
             );
             if (issuerResponseState === RequestStatus.ERROR) {
                 toast.error(t("errorContent"));
-                return
+        return;
             }
 
             const ignoredIssuerIds = window._env_.IGNORED_ISSUER_IDS
@@ -36,9 +35,9 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className}) => {
                 : [];
             const issuers = response?.response?.issuers.filter(
                 (issuer: IssuerObject) =>
-                    // Excludes issuers with protocol 'OTP' and those whose issuer_id is in the ignoredIssuersFromRendering list (or contains any ignored issuer id as a substring).
-                    issuer.protocol !== 'OTP' &&
-                    (ignoredIssuerIds.length === 0 || !ignoredIssuerIds.some((ignoredIssuerId) =>
+          issuer.protocol !== "OTP" &&
+          (ignoredIssuerIds.length === 0 ||
+            !ignoredIssuerIds.some((ignoredIssuerId) =>
                         issuer.issuer_id.includes(ignoredIssuerId)
                     ))
             );
@@ -67,8 +66,8 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className}) => {
 
     return (
         <div data-testid="Home-Page-Container">
-            <div className="container mx-auto mt-8 flex flex-col px-4 sm:px-6 md:px-10 lg:px-20">
-                <div className={className}>
+      <div className="container mx-auto mt-8 px-4 sm:px-6 md:px-10 lg:px-20">
+        <div className="flex flex-col gap-6">
                     <IntroBox/>
                     <SearchIssuer/>
                 </div>
