@@ -318,13 +318,13 @@ describe('Layout component - Logout Modal Logic', () => {
       render(<Layout />);
 
       expect(mockHistoryReplaceState).toHaveBeenCalledWith(
-        { logoutConfirmationGuard: true, navigationGuardInstalled: true },
+        { logoutConfirmationGuard: true },
         '',
         ROUTES.USER_HOME
       );
 
       expect(mockHistoryPushState).toHaveBeenCalledWith(
-        { navigationGuardInstalled: true },
+        {},
         '',
         ROUTES.USER_HOME
       );

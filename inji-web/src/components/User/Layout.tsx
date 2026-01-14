@@ -120,34 +120,32 @@ export const Layout: React.FC = () => {
         // Install/refresh whenever the current /user/* location changes
     }, [location.pathname]);
 
+    const logoutCleanup = () => {
+        window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
+        removeUser?.();
+        setShowLogoutModal(false);
+        window.location.replace(ROUTES.ROOT);
+    };
+
     const handleLogout = async () => {
         try {
             const response = await logoutRequestApi.fetchData({
                 apiConfig: api.userLogout,
             });
             if (response.ok()) {
-                window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
-                removeUser?.();
-                setShowLogoutModal(false);
-                window.location.replace(ROUTES.ROOT);
+                logoutCleanup();
             } else {
                 const parsedErrors = (response.error as any)?.response?.data?.errors;
                 const errorCode = parsedErrors?.[0]?.errorCode;
                 if (errorCode === 'user_logout_error') {
-                    window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
-                    removeUser?.();
-                    setShowLogoutModal(false);
-                    window.location.replace(ROUTES.ROOT);
+                    logoutCleanup();
                 } else {
                     throw new Error(parsedErrors?.[0]?.errorMessage || 'Logout failed');
                 }
             }
         } catch (error) {
             // As a fallback, clear client state and redirect
-            window.sessionStorage.removeItem(NAV_GUARD_SESSION_KEY);
-            removeUser?.();
-            setShowLogoutModal(false);
-            window.location.replace(ROUTES.ROOT);
+            logoutCleanup();
         }
     };
     const handleStayOnPage = () => {
