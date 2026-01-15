@@ -108,7 +108,7 @@
     }
   },
   "ResetPasscodePage": {
-    "title": "Réinitialiser votre mot de passe ?",
+    "title": "Réinitialiser votre code d'accès ?",
     "subTitle": "Réinitialisez votre portefeuille pour récupérer l'accès et re-télécharger vos cartes.",
     "resetInstruction": {
       "question": "Que se passe-t-il lorsque vous oubliez votre code d'accès ?",
