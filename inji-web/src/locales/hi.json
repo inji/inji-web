@@ -407,7 +407,8 @@
   "User": {
     "Home": {
       "title": "घर",
-      "welcome": "स्वागत"
+      "welcome": "स्वागत",
+      "loginSuccess": "लॉगिन सफल!"
     },
     "ProfileDropdown": {
       "profile": "प्रोफ़ाइल",
