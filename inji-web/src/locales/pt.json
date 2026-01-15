@@ -108,7 +108,7 @@
     }
   },
   "ResetPasscodePage": {
-    "title": "Esqueceu seu código de acesso?",
+    "title": "Redefinir sua senha?",
     "subTitle": "Redefina sua carteira para recuperar o acesso e baixar novamente seus cartões.",
     "resetInstruction": {
       "question": "O que acontece quando você esquece seu código de acesso?",
