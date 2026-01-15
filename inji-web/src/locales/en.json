@@ -108,7 +108,7 @@
     }
   },
   "ResetPasscodePage": {
-    "title": "Forgot Your Passcode?",
+    "title": "Reset Your Passcode?",
     "subTitle":"Reset your wallet to regain access and re-download your cards.",
     "resetInstruction": {
       "question": "What happens when you forget your passcode?",
