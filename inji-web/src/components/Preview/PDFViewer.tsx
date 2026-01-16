@@ -36,7 +36,7 @@ export function PDFViewer(props: Readonly<{ previewContent: Blob; className?: st
     }
 
     return (
-        <div ref={containerRef} className={"${PDFViewerStyles.container} ${props.className ??}"} >    
+        <div ref={containerRef} className={`${PDFViewerStyles.container} ${props.className ?? ''}`} >
             <Document
                 file={blobUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
