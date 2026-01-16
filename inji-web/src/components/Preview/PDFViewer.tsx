@@ -7,7 +7,7 @@ import {PDFViewerStyles} from "./PDFViewerStyles";
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerSource(pdfjs.version);
 
-export function PDFViewer(props: Readonly<{ previewContent: Blob }>) {
+export function PDFViewer(props: Readonly<{ previewContent: Blob; className?: string}>) {
     const blobUrl = useMemo(() => URL.createObjectURL(props.previewContent), [props.previewContent]);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -28,15 +28,15 @@ export function PDFViewer(props: Readonly<{ previewContent: Blob }>) {
             // cleanup the observer and URL
             observer.disconnect();
             URL.revokeObjectURL(blobUrl);
-        }
-    }, []);
+        };
+    }, [blobUrl]);
 
     function onDocumentLoadSuccess({numPages}: { numPages: number }) {
         setNumPages(numPages);
     }
 
     return (
-        <div ref={containerRef} className={PDFViewerStyles.container}>
+        <div ref={containerRef} className={"${PDFViewerStyles.container} ${props.className ??}"} >    
             <Document
                 file={blobUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
