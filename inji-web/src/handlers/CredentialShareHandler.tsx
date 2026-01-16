@@ -27,6 +27,7 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
     const {t} = useTranslation("ShareHandlerLoadingModal");
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
+    const [redirectUri, setRedirectUri] = useState<string | null>(null);
     const hasSubmittedRef = useRef<boolean>(false);
 
     const {
@@ -50,7 +51,11 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
         return response;
     }, [fetchData, presentationId, selectedCredentials]);
 
-    const handleRetrySuccess = useCallback(() => {
+    const handleRetrySuccess = useCallback((response: any) => {
+        const responseRedirectUri = response.data?.redirectUri;
+        if (responseRedirectUri) {
+            setRedirectUri(responseRedirectUri);
+        }
         setIsSuccess(true);
     }, []);
 
@@ -61,17 +66,21 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
             const response = await submitPresentationCallback();
 
             if (response.ok()) {
+                const responseRedirectUri = response.data?.redirectUri;
+                if (responseRedirectUri) {
+                    setRedirectUri(responseRedirectUri);
+                }
                 setIsSuccess(true);
             } else {
                 const errorMessage = response.error?.message || 'Failed to submit presentation';
                 const error = response.error || new Error(errorMessage);
-                handleApiError(error, "submitPresentation", submitPresentationCallback, handleRetrySuccess);
+                handleApiError(error, "submitPresentation", submitPresentationCallback, (response) => handleRetrySuccess(response));
                 setIsSuccess(false);
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
             const error = err instanceof Error ? err : new Error(errorMessage);
-            handleApiError(error, "submitPresentation", submitPresentationCallback, handleRetrySuccess);
+            handleApiError(error, "submitPresentation", submitPresentationCallback, (response) => handleRetrySuccess(response));
             setIsSuccess(false);
         } finally {
             setIsLoading(false);
@@ -87,7 +96,8 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
     }, [submitPresentation, selectedCredentials, presentationId]);
 
     const handleSuccessClose = () => {
-        if (returnUrl) window.location.href = returnUrl;
+        const finalRedirectUri = redirectUri || returnUrl;
+        if (finalRedirectUri) window.location.href = finalRedirectUri;
         else if (onClose) onClose();
     };
 
@@ -96,7 +106,7 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
             isOpen: true,
             verifierName,
             credentials: selectedCredentials,
-            returnUrl,
+            returnUrl: redirectUri || returnUrl,
             onClose: handleSuccessClose
         };
         return <CredentialShareSuccessModal {...successModalProps} />;
