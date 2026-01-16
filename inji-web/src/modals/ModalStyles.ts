@@ -17,7 +17,7 @@ export const ModalStyles = {
         separator: "flex-shrink-0",
         content: {
             wrapper: "flex flex-col flex-1 relative sm:bg-transparent bg-white sm:mb-4 pb-0 min-h-0",
-            container: "overflow-y-auto flex-1 min-h-0 sm:mx-5 sm:m-0 m-2 sm:bg-transparent bg-white sm:rounded-none rounded-xl"
+            container: "flex-1 min-h-0 sm:mx-5 sm:m-0 m-2 sm:bg-transparent bg-white sm:rounded-none rounded-xl overflow-hidden"
         },
         action: "sm:absolute sm:right-6 sm:bottom-0 sm:mr-10 sm:pb-8 sm:bg-transparent sm:w-auto static bg-white flex px-2 w-full py-2 sm:rounded-b-lg"
     },
