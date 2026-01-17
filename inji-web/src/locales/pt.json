@@ -93,6 +93,10 @@
     "confirmPasscodeLabel": "Confirme o código de acesso",
     "forgotPasscode": "Esqueceu a senha",
     "passcodeWarning": "Certifique-se de lembrar a senha para login futuro",
+    "forgotPasscodeConfirmation": {
+      "title": "Redefinir seu código de acesso?",
+      "message": "Tem certeza de que deseja redefinir seu código de acesso? Isso excluirá todos os seus cartões armazenados e você precisará baixá-los novamente dos emissores originais."
+    },
     "error": {
       "walletNotFoundError": "Nenhuma carteira encontrada. Crie uma.",
       "passcodeLengthError": "O PIN deve ter 6 dígitos.",

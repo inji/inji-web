@@ -93,6 +93,10 @@
     "confirmPasscodeLabel": "Confirmez le code d'accès",
     "forgotPasscode": "Mot de passe oublié",
     "passcodeWarning": "Assurez-vous de vous souvenir du mot de passe pour une future connexion",
+    "forgotPasscodeConfirmation": {
+      "title": "Réinitialiser votre code d'accès ?",
+      "message": "Êtes-vous sûr de vouloir réinitialiser votre code d'accès ? Cela supprimera toutes vos cartes stockées et vous devrez les télécharger à nouveau depuis les émetteurs d'origine."
+    },
     "error": {
       "walletNotFoundError": "Aucun portefeuille trouvé. Veuillez en créer un.",
       "passcodeLengthError": "Le code PIN doit comporter 6 chiffres.",
