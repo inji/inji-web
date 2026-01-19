@@ -4,34 +4,25 @@ package stepdefinitions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.mosip.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
-import io.mosip.testrig.apirig.utils.AdminTestUtil;
-
 import org.junit.Assert;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
-import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
-
 import pages.FaqPage;
 import pages.HomePage;
+import pages.Loginpage;
 import pages.SetNetwork;
 import utils.BaseTest;
 import utils.ExtentReportManager;
 import utils.GlobelConstants;
 import utils.ScreenshotUtil;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import base.BasePage;
 
 public class StepDef {
@@ -39,6 +30,7 @@ public class StepDef {
 	private HomePage homePage;
 	private FaqPage faqPage;
 	private SetNetwork setNetwork;
+	private Loginpage loginpage;
 	private WebDriver driver;
 	String pageTitle;
 	ExtentTest test = ExtentReportManager.getTest();
@@ -54,17 +46,13 @@ public class StepDef {
 		this.homePage = new HomePage(driver);
 		this.faqPage = new FaqPage(driver);
 		this.setNetwork = new SetNetwork();
+		this.loginpage = new Loginpage(driver);
 
 	}
 
 	@Given("User gets the title of the page")
 	public void getTheTitleOfThePage() {
-		try {
-
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+		loginpage.waituntilpagecompletelyloaded();
 		pageTitle = baseTest.getDriver().getTitle();
 	}
 
@@ -133,6 +121,24 @@ public class StepDef {
 		}
 	}
 
+	@When("User clicks on the Faq button from hamburger menu")
+	public void clicksOnFaqButtonFromHamburger() {
+		try {
+			homePage.clickOnFaqMobileView();
+			test.log(Status.PASS, "User successfully clicked on the Faq button");
+		} catch (NoSuchElementException e) {
+			test.log(Status.FAIL, "Faq button not found: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Unexpected error while clicking the Faq button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
 	@When("User click on download mosip credentials button")
 	public void user_click_on_download_mosip_credentials_button() {
 		try {
@@ -168,7 +174,6 @@ public class StepDef {
 	@When("User click on verify button")
 	public void user_click_on_verify_button() {
 		try {
-			homePage.waitForseconds();
 			homePage.clickOnVerify();
 			test.log(Status.PASS, "User clicked on verify button");
 		} catch (NoSuchElementException e) {
@@ -182,7 +187,6 @@ public class StepDef {
 	@Then("User verify Download Success text displayed")
 	public void user_verify_download_success_text_displayed() throws Exception {
 		try {
-			baseTest.getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			Assert.assertTrue(homePage.isSuccessMessageDisplayed());
 			test.log(Status.PASS, "Verified that Download Success text is displayed");
 		} catch (AssertionError e) {
@@ -225,7 +229,6 @@ public class StepDef {
 	@Then("User search the issuers with {string}")
 	public void user_search_the_issuers_with(String string) throws Exception {
 		try {
-			Thread.sleep(6000);
 			homePage.enterIssuersInSearchBox(string);
 			test.log(Status.PASS, "Searched issuers with: " + string);
 		} catch (NoSuchElementException e) {
@@ -292,7 +295,6 @@ public class StepDef {
 	@Then("User verify go home button")
 	public void user_verify_go_home_button() throws Exception {
 		try {
-			Thread.sleep(2000);
 			Assert.assertTrue(homePage.isGoHomeButtonDisplayed());
 			test.log(Status.PASS, "Verified that Go Home button is displayed");
 		} catch (AssertionError e) {
@@ -1278,8 +1280,7 @@ public class StepDef {
 	@When("User verify the logo of the issuer")
 	public void user_verify_the_logo_of_the_issuer() {
 		try {
-			boolean isDisplayed = homePage.isIssuerLogoDisplayed();
-			assertTrue(isDisplayed, "Issuer logo is not displayed");
+			assertTrue(homePage.isIssuerLogoDisplayed(), "Issuer logo is not displayed");
 			test.log(Status.PASS, "User successfully verified that the issuer logo is displayed");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed: " + e.getMessage());
@@ -1734,11 +1735,8 @@ public class StepDef {
 	@Then("User clicks on proceed button")
 	public void user_clicks_on_proceed_button() {
 		try {
-
-			homePage.waitForseconds();
 			homePage.clickOnProccedCustomButton();
 			test.log(Status.PASS, "User clicked on 'Proceed Custom' button");
-
 			homePage.clickOnProccedConsentButton();
 			test.log(Status.PASS, "User clicked on 'Proceed Consent' button");
 		} catch (NoSuchElementException e) {
@@ -1757,9 +1755,7 @@ public class StepDef {
 	@Then("Use click on procced button")
 	public void use_click_on_procced_button() {
 		try {
-			homePage.waitForseconds();
 			homePage.clickOnProccedCustomButton();
-			homePage.waitForseconds();
 			homePage.clickOnProccedConsentButton();
 			test.log(Status.PASS, "User successfully clicked on the Proceed button.");
 		} catch (NoSuchElementException e) {
@@ -2009,6 +2005,86 @@ public class StepDef {
 			throw e;
 		} catch (Exception e) {
 			test.log(Status.FAIL, "Unexpected error while clicking the continue as guest button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("User verify navigation button")
+	public void user_verify_navigation_button() {
+		try {
+			assertTrue(homePage.isNavButtonsDisplayed(), "Navigation Button is not displayed");
+			test.log(Status.PASS, "User verified that the Navigation Button is displayed successfully");
+		} catch (AssertionError e) {
+			test.log(Status.FAIL, "Assertion failed: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (NoSuchElementException e) {
+			test.log(Status.FAIL, "Element not found while verifying Navigation Button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Unexpected error while verifying the Navigation Button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("user click on hamburger menu")
+	public void user_click_on_hamburger_menu() {
+		try {
+			homePage.clickOnHamburgerMenu();
+			test.log(Status.PASS, "User successfully clicked on hamburger menu");
+		} catch (NoSuchElementException e) {
+			test.log(Status.FAIL, "hamburger menu button not found: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Unexpected error while clicking hamburger menu button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("User verify search and title are appeare in the same line")
+	public void user_verify_search_title_appeare_diff_lines() {
+		try {
+			assertTrue((homePage.getXCoordinateForSearch() - homePage.getXCoordinateForCredentialHeading()) <= 30,
+					"Search and title are NOT aligned in the same line as expected.");
+
+			test.log(Status.PASS, "Search and title heading appear on the same line");
+		} catch (NoSuchElementException e) {
+			test.log(Status.FAIL, "Search or heading element not present: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Unexpected error while verifying alignment: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("User verify inji web text in FAQ page")
+	public void user_verify_injiweb_text_in_FAQ_page() {
+		try {
+			assertTrue(homePage.verifyFaqTitlesDoNotContainInjiWeb(),
+					"injiweb text is present in one or more FAQ titles");
+			test.log(Status.PASS, "Verified that FAQ titles do not contain 'inji web'.");
+		} catch (NoSuchElementException e) {
+			test.log(Status.FAIL, "FAQ titles not found: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Error during FAQ title verification: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
 			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
 			throw e;

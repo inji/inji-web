@@ -136,7 +136,6 @@ public class StepDefSunbirdCredentials {
 	@Then("User enter the policy number")
 	public void user_enter_the_policy_number() {
 		try {
-			Thread.sleep(3000); // Consider using WebDriverWait instead of Thread.sleep for better efficiency.
 			sunbirdCredentials.enterPolicyNumer(policynumber);
 			test.log(Status.PASS, "User successfully entered the policy number: " + policynumber);
 		} catch (NoSuchElementException e) {
@@ -144,11 +143,6 @@ public class StepDefSunbirdCredentials {
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
 			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
 			throw e;
-		} catch (InterruptedException e) {
-			test.log(Status.FAIL, "Thread was interrupted while waiting to enter the policy number: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			Thread.currentThread().interrupt(); // Restore interrupted state
-			throw new RuntimeException(e);
 		} catch (Exception e) {
 			test.log(Status.FAIL, "Unexpected error while entering the policy number: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
@@ -216,7 +210,7 @@ public class StepDefSunbirdCredentials {
 		int retryCount = 0;
 
 		while (retryCount < 3 && sunbirdCredentials.isLoginButtonDisplayed()) {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 			sunbirdCredentials.clickOnLogin();
 			if (!sunbirdCredentials.isLoginFailedDisplayed()) {
 				break;
@@ -287,35 +281,25 @@ public class StepDefSunbirdCredentials {
 		}
 	}
 
-
 	@Then("User verify pdf is downloaded for Insurance")
 	public String user_verify_pdf_is_downloaded_for_insurance() throws IOException {
-		
-		String pdfName =sunbirdCredentials.pdfNameInsurance;
-	    baseTest.getJse().executeScript(
-	            "browserstack_executor: {\"action\": \"fileExists\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
+		String pdfName = sunbirdCredentials.pdfNameInsurance;
+		String base64EncodedFile = (String) baseTest.getJse().executeScript(
+				"browserstack_executor: {\"action\": \"getFileContent\", \"arguments\": {\"fileName\": \"" + pdfName
+						+ "\"}}");
 
-	    baseTest.getJse().executeScript(
-	            "browserstack_executor: {\"action\": \"getFileProperties\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
+		byte[] data = Base64.getDecoder().decode(base64EncodedFile);
 
-	    String base64EncodedFile = (String) baseTest.getJse().executeScript(
-	            "browserstack_executor: {\"action\": \"getFileContent\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
+		try (OutputStream os = new FileOutputStream(pdfName)) {
+			os.write(data);
+		}
 
-	    byte[] data = Base64.getDecoder().decode(base64EncodedFile);
-	    OutputStream stream = new FileOutputStream(pdfName);
-	    stream.write(data);
-
-	    System.out.println(stream);
-	    stream.close();
-
-	    File pdfFile = new File(System.getProperty("user.dir") + "/" + pdfName);
-	    PDDocument document = PDDocument.load(pdfFile);
-
-	    PDFTextStripper stripper = new PDFTextStripper();
-	    String text = stripper.getText(document);
-	    return text;
+		File pdfFile = new File(System.getProperty("user.dir") + "/" + pdfName);
+		try (PDDocument document = PDDocument.load(pdfFile)) {
+			PDFTextStripper stripper = new PDFTextStripper();
+			return stripper.getText(document);
+		}
 	}
-
 
 	@Then("User verify policy number input box header")
 	public void user_verify_policy_number_input_box_header() {
