@@ -6,6 +6,7 @@ import {DownloadResult} from '../components/Redirection/DownloadResult';
 import {api} from '../utils/api';
 import {SessionObject, TokenRequestBody} from '../types/data';
 import {useTranslation} from 'react-i18next';
+import i18next from 'i18next';
 import {downloadCredentialPDF, getErrorObject, getTokenRequestBody} from '../utils/misc';
 import {getIssuerDisplayObjectForCurrentLanguage} from '../utils/i18n';
 import {useUser} from '../hooks/User/useUser';
@@ -14,6 +15,7 @@ import {useDownloadSessionDetails} from "../hooks/User/useDownloadSession";
 import {useApi} from "../hooks/useApi";
 import {useSelector} from "react-redux";
 import {RootState} from "../types/redux";
+import {showToast} from "../components/Common/toast/ToastWrapper";
 
 export const RedirectionPage: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -34,7 +36,6 @@ export const RedirectionPage: React.FC = () => {
 
     const handleLoggedInDownloadFlow = async (issuerId: string, requestBody: TokenRequestBody) => {
         const downloadId = addSession(credentialTypeDisplayObj, RequestStatus.LOADING);
-        navigate(ROUTES.USER_ISSUER(issuerId))
         const credentialDownloadResponse = await vcDownloadApi.fetchData({
             body: requestBody,
             apiConfig: api.downloadVCInloginFlow,
@@ -43,8 +44,10 @@ export const RedirectionPage: React.FC = () => {
 
         if (credentialDownloadResponse.ok()) {
             updateSession(downloadId, RequestStatus.DONE)
+            setCompletedDownload(true);
         } else {
             updateSession(downloadId, RequestStatus.ERROR)
+            setCompletedDownload(true);
         }
     }
 
@@ -102,6 +105,20 @@ export const RedirectionPage: React.FC = () => {
         void fetchToken();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (completedDownload) {
+            const isError = vcDownloadApi.state === RequestStatus.ERROR;
+            showToast({
+                message: i18next.t(`VCDownload.${isError ? 'error' : 'success'}`, {
+                    ns: 'Layout',
+                    cardType: credentialTypeDisplayObj?.[0]?.name || credentialType
+                }),
+                type: isError ? 'error' : 'success',
+                testId: `download-${isError ? 'error' : 'success'}-toast`
+            });
+        }
+    }, [completedDownload, vcDownloadApi.state, credentialType, credentialTypeDisplayObj]);
 
     const loadStatusOfRedirection = () => {
         if (!session) {
