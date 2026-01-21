@@ -208,18 +208,7 @@ public class Runner extends AbstractTestNGCucumberTests {
     @Override
     @DataProvider(parallel = true, name = "scenarios")
     public Object[][] scenarios() {
-
-        int threadCount = 3;
-        String threadCountStr = ConfigManager.getproperty("threadCount");
-
-        if (threadCountStr != null && !threadCountStr.trim().isEmpty()) {
-            try {
-                threadCount = Integer.parseInt(threadCountStr.trim());
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid threadCount in config, using default " + threadCount);
-            }
-        }
-
+    	
         Object[][] scenarios = super.scenarios();
         System.out.println("Number of scenarios provided: " + scenarios.length);
 
