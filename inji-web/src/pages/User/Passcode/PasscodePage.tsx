@@ -42,6 +42,8 @@ export const PasscodePage: React.FC = () => {
     const unlockWalletApi = useApi<Wallet>();
     const [canUnlockWallet, setCanUnlockWallet] = useState<boolean>(true);
     const [testIdSuffix, setTestIdSuffix] = useState("");
+    const maxAttempts = 5;
+    const [localAttemptsLeft, setLocalAttemptsLeft] = useState(maxAttempts);
 
     const handleWalletStatusError = (errorCode: string, fallBackError: string | undefined = undefined, httpStatusCode: number | null = null) => {
         if (
@@ -109,6 +111,7 @@ export const PasscodePage: React.FC = () => {
                 const walletStatus = wallets[0].walletStatus;
                 handleWalletStatusError(walletStatus);
             }
+            setLocalAttemptsLeft(maxAttempts);
         } catch (error) {
             console.error('Error occurred while fetching Wallets:', error);
             setError(t('error.fetchWalletsError'));
@@ -145,8 +148,22 @@ export const PasscodePage: React.FC = () => {
                 console.error("Error occurred while unlocking Wallet:", response.error);
                 const isErrorHandled = handleCommonErrors(response);
                 if (!isErrorHandled) {
-                    const errorCode = ((response.error as ApiError)?.response?.data as ErrorType).errorCode;
-                    handleWalletStatusError(errorCode, "error.incorrectPasscodeError", response.status);
+                    const errorData = (response.error as ApiError)?.response?.data as ErrorType & { remainingAttempts?: number };
+                    const errorCode = errorData.errorCode;
+                    const attemptsLeft = errorData.remainingAttempts;
+
+                    if (attemptsLeft !== undefined) {
+                        setError(t("error.incorrectPasscodeWithAttempts", { count: attemptsLeft }));
+                    } else {
+                        const nextCount = Math.max(localAttemptsLeft - 1, 0);
+                        setLocalAttemptsLeft(nextCount);
+
+                        if (nextCount > 0) {
+                            setError(t("error.incorrectPasscodeWithAttempts", { count: nextCount }));
+                        } else {
+                   handleWalletStatusError(errorCode, "error.incorrectPasscodeError", response.status);
+                        }
+                    }
 
                     // Reset passcode field when incorrect passcode is entered
                     setPasscode(initialPasscodeArray);
@@ -185,7 +202,7 @@ export const PasscodePage: React.FC = () => {
     };
 
     const handleUnlockSuccess = () => {
-        // If the user was asked to re-login due to an expired session, redirect them to the page they were trying to access
+        setLocalAttemptsLeft(maxAttempts)
         let redirectPath: string = ROUTES.USER_HOME
         const storedRedirectPath = AppStorage.getItem(KEYS.REDIRECT_TO, true);
         if (storedRedirectPath) {

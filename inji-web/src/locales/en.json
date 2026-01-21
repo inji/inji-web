@@ -99,6 +99,7 @@
       "passcodeMismatchError":"Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.",
       "createWalletError":"Wallet creation unsuccessful",
       "incorrectPasscodeError":"The passcode doesn’t seem right. Please try again, or tap ‘Forgot Passcode’ if you need help resetting it",
+      "incorrectPasscodeWithAttempts":"Incorrect passcode. {{count}} attempts remaining.",
       "fetchWalletsError":"Error in fetching wallets",
       "walletStatus": {
         "temporarily_locked": "You've reached the maximum number of attempts. Your wallet is now temporarily locked. Please try again later",
