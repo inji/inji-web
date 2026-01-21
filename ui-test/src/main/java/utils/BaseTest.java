@@ -197,79 +197,102 @@ public class BaseTest {
 
 	@After
 	public void afterScenario(Scenario scenario) {
-		WebDriver driver = getDriver();
-		String publicUrl = null;
-		String videoUrl = null;
-		if (driver instanceof RemoteWebDriver) {
-			RemoteWebDriver remoteDriver = (RemoteWebDriver) driver;
-			String sessionId = remoteDriver.getSessionId().toString();
-			try {
-				String jsonUrl = "https://api.browserstack.com/automate/sessions/" + sessionId + ".json";
-				String auth = username + ":" + accessKey;
-				String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
-				HttpURLConnection conn = (HttpURLConnection) new URL(jsonUrl).openConnection();
-				conn.setConnectTimeout(10_000);
-				conn.setReadTimeout(30_000);
-				conn.setRequestMethod("GET");
-				conn.setRequestProperty("Authorization", basicAuth);
-				if (conn.getResponseCode() == 200) {
-					StringBuilder response = new StringBuilder();
-					try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-						String inputLine;
-						while ((inputLine = in.readLine()) != null)
-							response.append(inputLine);
-					}
-					JSONObject jsonResponse = new JSONObject(response.toString());
-					JSONObject session = jsonResponse.getJSONObject("automation_session");
-					publicUrl = session.getString("public_url");
-					videoUrl = session.getString("video_url");
-					ExtentTest test = ExtentReportManager.getTest();
-					if (test != null && publicUrl != null) {
-						test.info("<a href='" + publicUrl + "' target='_blank'>View on BrowserStack</a>");
-					}
 
-					if (test != null && videoUrl != null) {
-						test.info("<a href='" + videoUrl + "' target='_blank'>Click here to view only Video</a>");
-					}
-				} else {
-					ExtentReportManager.getTest().warning(
-							"Failed to fetch BrowserStack session JSON, response code: " + conn.getResponseCode());
-				}
-			} catch (Exception e) {
-				ExtentReportManager.getTest()
-						.warning("Failed to fetch BrowserStack build/session info:" + e.getMessage());
-			}
-		}
-		try {
-			if (isScenarioSkipped()) {
-				skippedCount++;
-				ExtentReportManager.getTest()
-						.skip("⏭ Scenario Skipped: " + scenario.getName() + " — " + getSkipReason());
-			} else if (scenario.isFailed()) {
-				failedCount++;
-				ExtentReportManager.getTest().fail("❌ Scenario Failed: " + scenario.getName());
-			} else {
-				passedCount++;
-				ExtentReportManager.getTest().pass("✅ Scenario Passed: " + scenario.getName());
-			}
-		} finally {
-			if (driver != null) {
-				try {
-					LOGGER.info("Closing WebDriver session...");
-					driver.quit();
-				} catch (Exception e) {
-					LOGGER.warn("Error while closing WebDriver: " + e.getMessage());
-				} finally {
-					driverThreadLocal.remove();
-					jseThreadLocal.remove();
-				}
-			}
-		}
-		ExtentReportManager.flushReport();
-		ExtentReportManager.getTest(); // optional: just for reference
-		ExtentReportManager.removeTest(); // <-- add this method in ExtentReportManager
-		clearSkip();
-		clearMobileView();
+	    WebDriver driver = getDriver();
+	    String publicUrl = null;
+	    String videoUrl = null;
+
+	    if (driver instanceof RemoteWebDriver) {
+	        RemoteWebDriver remoteDriver = (RemoteWebDriver) driver;
+	        String sessionId = remoteDriver.getSessionId().toString();
+	        ExtentTest test = ExtentReportManager.getTest();
+
+	        try {
+	            String jsonUrl = "https://api.browserstack.com/automate/sessions/" + sessionId + ".json";
+	            String auth = username + ":" + accessKey;
+	            String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+
+	            HttpURLConnection conn = (HttpURLConnection) new URL(jsonUrl).openConnection();
+	            conn.setConnectTimeout(10_000);
+	            conn.setReadTimeout(30_000);
+	            conn.setRequestMethod("GET");
+	            conn.setRequestProperty("Authorization", basicAuth);
+
+	            int responseCode = conn.getResponseCode();
+
+	            if (responseCode == 200) {
+	                StringBuilder response = new StringBuilder();
+	                try (BufferedReader in = new BufferedReader(
+	                        new InputStreamReader(conn.getInputStream()))) {
+
+	                    String inputLine;
+	                    while ((inputLine = in.readLine()) != null) {
+	                        response.append(inputLine);
+	                    }
+	                }
+
+	                JSONObject jsonResponse = new JSONObject(response.toString());
+	                JSONObject session = jsonResponse.getJSONObject("automation_session");
+
+	                publicUrl = session.optString("public_url", null);
+	                videoUrl = session.optString("video_url", null);
+
+	                if (test != null && publicUrl != null) {
+	                    test.info("<a href='" + publicUrl + "' target='_blank'>View on BrowserStack</a>");
+	                }
+
+	                if (test != null && videoUrl != null) {
+	                    test.info("<a href='" + videoUrl + "' target='_blank'>Click here to view only Video</a>");
+	                }
+
+	            } else {
+	                if (test != null) {
+	                    test.warning("Failed to fetch BrowserStack session JSON. Response code: " + responseCode);
+	                } else {
+	                    LOGGER.warn("Failed to fetch BrowserStack session JSON. Response code: " + responseCode);
+	                }
+	            }
+
+	        } catch (Exception e) {
+	            if (test != null) {
+	                test.warning("Failed to fetch BrowserStack build/session info: " + e.getMessage());
+	            } else {
+	                LOGGER.warn("Failed to fetch BrowserStack build/session info", e);
+	            }
+	        }
+	    }
+
+	    try {
+	        if (isScenarioSkipped()) {
+	            skippedCount++;
+	            ExtentReportManager.getTest()
+	                    .skip("⏭ Scenario Skipped: " + scenario.getName() + " — " + getSkipReason());
+	        } else if (scenario.isFailed()) {
+	            failedCount++;
+	            ExtentReportManager.getTest().fail("❌ Scenario Failed: " + scenario.getName());
+	        } else {
+	            passedCount++;
+	            ExtentReportManager.getTest().pass("✅ Scenario Passed: " + scenario.getName());
+	        }
+
+	    } finally {
+	        if (driver != null) {
+	            try {
+	                LOGGER.info("Closing WebDriver session...");
+	                driver.quit();
+	            } catch (Exception e) {
+	                LOGGER.warn("Error while closing WebDriver: " + e.getMessage());
+	            } finally {
+	                driverThreadLocal.remove();
+	                jseThreadLocal.remove();
+	            }
+	        }
+	    }
+
+	    ExtentReportManager.flushReport();
+	    ExtentReportManager.removeTest();
+	    clearSkip();
+	    clearMobileView();
 	}
 
 	private String getStepName(Scenario scenario) {
