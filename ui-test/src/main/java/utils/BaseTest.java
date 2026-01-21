@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
@@ -12,9 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-
 import org.json.JSONObject;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -26,13 +23,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
-
-import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import com.browserstack.local.Local;
-
 import api.InjiWebConfigManager;
 import api.InjiWebUtil;
 import io.cucumber.java.After;
@@ -46,12 +39,6 @@ import io.cucumber.plugin.event.TestStep;
 import io.mosip.testrig.apirig.utils.ConfigManager;
 import io.mosip.testrig.apirig.utils.S3Adapter;
 import java.util.Base64;
-import runnerfiles.Runner;
-
-import org.openqa.selenium.Dimension;
-import io.mosip.testrig.apirig.utils.ConfigManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BaseTest {
 	private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
