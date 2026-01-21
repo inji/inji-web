@@ -1,4 +1,4 @@
-Feature: Inji web homepage testing
+Feature: Inji web mobile view testing
 
   @smoke @verifyingHomepage @mobileview
   Scenario: Verify the Inji web homepage

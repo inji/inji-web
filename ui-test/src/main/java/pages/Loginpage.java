@@ -42,7 +42,7 @@ public class Loginpage extends BasePage {
 	public void enterPasscode(String string) {
 		if (!isElementIsVisible(driver,
 				By.xpath("//div[@data-testid='passcode-container']//input[@type='password' and @maxlength='1']"), (BasePage.explicit_timeout)*2)) {
-			throw new NoSuchElementException("passcode input field not found — cannot enter passcode.");
+			throw new NoSuchElementException("passcode input field not found â€” cannot enter passcode.");
 
 		}
 
@@ -71,7 +71,7 @@ public class Loginpage extends BasePage {
 				By.xpath(
 						"//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']"),
 				60)) {
-			throw new NoSuchElementException("passcode input field not found — cannot enter passcode.");
+			throw new NoSuchElementException("passcode input field not found â€” cannot enter passcode.");
 
 		}
 

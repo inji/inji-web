@@ -95,7 +95,7 @@ Feature: download mosip cridentials
       | 3        |
    
   @smoke @VerifyAndDownloadVcViaMosipNatinalId @mobileview
-  Scenario Outline: Mosip Natonal Id by e-Signet
+  Scenario Outline: Mosip Natonal Id by e-Signet(mobile)
     Then User gets the title of the page
     Then User click on continue as guest
     And User search the issuers mosip

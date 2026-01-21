@@ -187,7 +187,7 @@ public class Runner extends AbstractTestNGCucumberTests {
                     BaseTestCase.setReportName("injiweb");
                     suitefiles.add(file.getAbsolutePath());
                     runner.setTestSuites(suitefiles);
-                    System.getProperties().setProperty("testng.outpur.dir", "testng-report");
+                    System.getProperties().setProperty("testng.output.dir", "testng-report");
                     runner.setOutputDirectory("testng-report");
                     runner.run();
                 }
