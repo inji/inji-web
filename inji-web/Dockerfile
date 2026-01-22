@@ -1,8 +1,8 @@
 # Use a more recent and secure Node.js version
 FROM node:lts AS build
 
-# Set the working directory in the container to /home/mosip
-ARG container_user=mosip
+# Set the working directory in the container to /home/inji
+ARG container_user=inji
 WORKDIR /home/${container_user}
 
 # Set build-time environment variables
