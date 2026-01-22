@@ -48,8 +48,8 @@ LABEL commit_id=${COMMIT_ID}
 LABEL build_time=${BUILD_TIME}
 
 # Define a non-root user
-ARG container_user=mosip
-ARG container_user_group=mosip
+ARG container_user=inji
+ARG container_user_group=inji
 ARG container_user_uid=1001
 ARG container_user_gid=1001
 
