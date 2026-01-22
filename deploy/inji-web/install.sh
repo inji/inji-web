@@ -49,7 +49,7 @@ helm repo update
 
 ./copy_cm.sh
 
-INJI_HOST=$(kubectl get cm inji-stack-config -o jsonpath={.data.injiweb-host})
+INJIWEB_HOST=$(kubectl get cm inji-stack-config -o jsonpath={.data.injiweb-host})
 echo "Installing INJIWEB"
 helm -n $NS install injiweb inji/injiweb \
   --set inji_web.configmaps.injiweb-ui.MIMOTO_URL=https://$INJIWEB_HOST/v1/mimoto \
