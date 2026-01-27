@@ -102,18 +102,20 @@ describe('HomePage', () => {
         window.sessionStorage.setItem('showLoginSuccessToast', 'true');
         const removeItemSpy = jest.spyOn(Storage.prototype, 'removeItem');
 
-        render(
-            <MemoryRouter>
-                <HomePage />
-            </MemoryRouter>
-        );
+        try {
+            render(
+                <MemoryRouter>
+                    <HomePage />
+                </MemoryRouter>
+            );
 
-        await waitFor(() => {
+            await waitFor(() => {
+                expect(removeItemSpy).toHaveBeenCalledWith('showLoginSuccessToast');
+            });
             expect(showToast).toHaveBeenCalled();
-        });
-
-        expect(removeItemSpy).toHaveBeenCalledWith('showLoginSuccessToast');
-        removeItemSpy.mockRestore();
+        } finally {
+            removeItemSpy.mockRestore();
+        }
     });
     
     it('matches snapshot when user is undefined', () => {
