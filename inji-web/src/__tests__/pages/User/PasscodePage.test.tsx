@@ -179,14 +179,19 @@ describe('Passcode', () => {
     })
 
     test("should redirect to home when successfully unlocked wallet", async () => {
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
         mockApiResponseSequence([{data: successWalletResponse}, {data: successWalletResponse}])
         renderWithProviders(<PasscodePage/>);
 
         await enterPasscode()
         userEvent.click(screen.getByTestId("btn-submit-passcode"));
 
-        await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1))
-        expect(mockNavigate).toHaveBeenCalledWith("/user/home");
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
+
+        expect(setItemSpy).toHaveBeenCalledWith('showLoginSuccessToast', 'true');
+        expect(mockNavigate).toHaveBeenCalledWith("/user/home", { state: { loginSuccess: true } });
+        setItemSpy.mockRestore();
     })
 
     const walletLockErrorMessages = [
@@ -276,6 +281,8 @@ describe('Passcode', () => {
 
 // Testing for re-login scenario in case of session expiry
     test("should redirect to previous url post unlock if available", async () => {
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
         (AppStorage.getItem as jest.Mock).mockReturnValue("/previous-url");
         mockApiResponseSequence([{data: successWalletResponse}, {data: successWalletResponse}])
 
@@ -286,9 +293,12 @@ describe('Passcode', () => {
 
         await waitFor(() =>
             expect(AppStorage.removeItem).toHaveBeenCalledWith("redirectTo", true)
-        )
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-        expect(mockNavigate).toHaveBeenCalledWith("/previous-url");
+        );
+
+        expect(setItemSpy).toHaveBeenCalledWith('showLoginSuccessToast', 'true');
+        expect(mockNavigate).toHaveBeenCalledTimes(1);
+        expect(mockNavigate).toHaveBeenCalledWith("/previous-url", { state: { loginSuccess: true } });
+        setItemSpy.mockRestore();
     })
 
     test("should clear passcode input fields when wrong passcode is entered during unlock wallet", async () => {
