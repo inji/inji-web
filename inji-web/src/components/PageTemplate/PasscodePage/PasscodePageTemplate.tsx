@@ -48,12 +48,16 @@ export const PasscodePageTemplate: React.FC<PasscodePageTemplateProps> = ({
                                     {user.profilePictureUrl ? (
                                         <img
                                             src={user.profilePictureUrl}
-                                            alt="Profile"
+                                            alt={user.displayName ? `Profile picture for ${convertStringIntoPascalCase(user.displayName)}` : 'Profile'}
                                             className={PasscodePageTemplateStyles.userProfilePicture}
                                             referrerPolicy="no-referrer"
                                         />
                                     ) : (
-                                        <div className={PasscodePageTemplateStyles.userProfileInitials}>
+                                        <div
+                                            className={PasscodePageTemplateStyles.userProfileInitials}
+                                            role="img"
+                                            aria-label={user.displayName ? `Profile initials for ${convertStringIntoPascalCase(user.displayName)}` : 'Profile initials'}
+                                        >
                                             {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
                                         </div>
                                     )}
