@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
         >
             <div
                 data-testid="Header-Container"
-                className="container mx-auto flex justify-between items-center px-4"
+                className="w-full px-4 flex justify-between items-center"
             >
                 <div
                     data-testid="Header-InjiWeb-Logo-Container"
@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
             {isOpen && (
                 <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
                     <div
-                        className="container sm:hidden mx-auto px-4 flex flex-col justify-start items-start font-semibold"
+                        className="w-full sm:hidden px-4 flex flex-col justify-start items-start font-semibold"
                         role="button"
                         tabIndex={0}
                         onMouseDown={() => setIsOpen(false)}

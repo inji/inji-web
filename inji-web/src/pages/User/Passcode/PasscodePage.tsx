@@ -160,33 +160,28 @@ export const PasscodePage: React.FC = () => {
 
     const createWallet = async () => {
         const pin = passcode.join('');
-        const confirmPin = confirmPasscode.join('');
 
-        if (pin !== confirmPin) {
-            console.error("Passcode and Confirm Passcode mismatch");
-            setError(t('error.passcodeMismatchError'));
-        } else {
-            const response = await createWalletApi.fetchData({
-                apiConfig: api.createWalletWithPin,
-                body: {
-                    walletPin: pin,
-                    confirmWalletPin: confirmPasscode.join(''),
-                    walletName: null
-                },
-            })
+        const response = await createWalletApi.fetchData({
+            apiConfig: api.createWalletWithPin,
+            body: {
+                walletPin: pin,
+                confirmWalletPin: confirmPasscode.join(''),
+                walletName: null
+            },
+        })
 
-            if (!response.ok()) {
-                console.error("Error occurred while creating Wallet:", response.error);
-                const isErrorHandled = handleCommonErrors(response)
-                if(!isErrorHandled) {
-                    const errorMessage = ((response.error as ApiError)?.response?.data as ErrorType).errorMessage ?? t('Common.error.unknownError');
-                    setError(`${t('error.createWalletError')}: ${errorMessage}`);
-                }
-            } else {
-                const createdWallet = response.data!;
-                await unlockWallet(createdWallet.walletId, pin);
+        if (!response.ok()) {
+            console.error("Error occurred while creating Wallet:", response.error);
+            const isErrorHandled = handleCommonErrors(response)
+            if(!isErrorHandled) {
+                const errorMessage = ((response.error as ApiError)?.response?.data as ErrorType).errorMessage ?? t('Common:error.unknownError.message');
+                setError(`${t('error.createWalletError')}: ${errorMessage}`);
             }
+        } else {
+            const createdWallet = response.data!;
+            await unlockWallet(createdWallet.walletId, pin);
         }
+        
     };
 
     const handleUnlockSuccess = () => {
@@ -223,11 +218,27 @@ export const PasscodePage: React.FC = () => {
 
     const isButtonDisabled =
         passcode.includes('') ||
-        (isUserCreatingWallet() && confirmPasscode.includes(''));
+        (isUserCreatingWallet() && (confirmPasscode.includes('') || passcode.join('') !== confirmPasscode.join('')));
 
     function isUserCreatingWallet() {
         return wallets?.length === 0;
     }
+
+    useEffect(() => {
+        if (isUserCreatingWallet()) {
+            if (!passcode.includes('') && 
+                !confirmPasscode.includes('') &&
+                passcode.join('') !== confirmPasscode.join('')) {
+                setError(t('error.passcodeMismatchError'));
+            } 
+            // Clear error if either field is incomplete OR they match
+            else if (passcode.includes('') || 
+                     confirmPasscode.includes('') ||
+                     passcode.join('') === confirmPasscode.join('')) {
+                setError(null);
+            }
+        }
+    }, [passcode, confirmPasscode, wallets, t]);
 
     const pageTitle = isUserCreatingWallet() ? t('setPasscode') : t('enterPasscode');
     const pageSubtitle = isUserCreatingWallet() ? t('setPasscodeDescription') : t('enterPasscodeDescription');

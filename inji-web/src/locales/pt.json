@@ -4,7 +4,7 @@
       "home": "Página inicial",
       "faq": "Perguntas frequentes",
       "login": "Conecte-se",
-      "logout": "வெளியேறு"
+      "logout": "Sair"
     },
     "Footer": {
       "product": "Um produto MOSIP",
@@ -412,7 +412,7 @@
     "ProfileDropdown": {
       "profile": "Perfil",
       "faq": "Perguntas frequentes",
-      "logout": "வெளியேறு"
+      "logout": "Sair"
     },
     "ProfilePage": {
       "title": "Meu Perfil",
@@ -553,5 +553,11 @@
     "title": "Nenhuma credencial correspondente encontrada",
     "description": "Por favor, descarregue as credenciais correspondentes e tente novamente o processo de partilha",
     "goToHomeButton": "Ir para o início"
+  },
+  "LogoutConfirmation": {
+    "title": "Tem certeza de que deseja sair?",
+    "message": "Se você voltar agora, será desconectado e precisará fazer login novamente para continuar.",
+    "logoutButton": "Sim, Sair",
+    "stayButton": "Fique nesta página"
   }
 }

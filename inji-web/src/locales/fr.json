@@ -553,5 +553,11 @@
     "title": "Aucune information d'identification correspondante trouvée",
     "description": "Veuillez télécharger les informations d'identification correspondantes et réessayer le processus de partage",
     "goToHomeButton": "Aller à l'accueil"
+  },
+  "LogoutConfirmation": {
+    "title": "Êtes-vous sûr de vouloir partir ?",
+    "message": "Si vous revenez en arrière maintenant, vous serez déconnecté et devrez vous reconnecter pour continuer.",
+    "logoutButton": "Oui, se déconnecter",
+    "stayButton": "Rester sur cette page"
   }
 }
