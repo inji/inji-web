@@ -15,7 +15,7 @@ import {successWalletResponse} from "../../../test-utils/mockObjects";
 // Mocking the useTranslation hook from react-i18next
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
-        t: (key: string) => {
+        t: (key: string, options?: Record<string, number | string>) => {
             const translations: Record<string, string> = {
                 "setPasscode": "Set Passcode",
                 "enterPasscode": "Enter Passcode",
@@ -29,9 +29,16 @@ jest.mock('react-i18next', () => ({
                 "error.walletStatus.permanently_locked": "Your wallet has been permanently locked due to multiple failed attempts. Please click on forgot password to reset your wallet to continue",
                 "error.walletStatus.last_attempt_before_lockout": "Incorrect passcode. Last attempt remaining before your wallet is permanently locked",
                 "error.incorrectPasscodeError": "The passcode doesn't seem right. Please try again, or tap 'Forgot Passcode' if you need help resetting it",
+                "error.incorrectPasscodeWithAttempts": "The passcode doesn't seem right. Attempt {{attempt}} of {{maxAttempts}}. {{remainingAttempts}} attempt(s) remaining before temporary lock. Please try again, or tap 'Forgot Passcode' if you need help resetting it",
                 "error.passcodeMismatchError": "Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.",
             };
-            return translations[key] || key;
+            let result = translations[key] || key;
+            if (options && typeof options === 'object') {
+                Object.entries(options).forEach(([k, v]) => {
+                    result = result.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+                });
+            }
+            return result;
         }
     })
 }));
@@ -291,8 +298,8 @@ describe('Passcode', () => {
         expect(mockNavigate).toHaveBeenCalledWith("/previous-url");
     })
 
-    test("should clear passcode input fields when wrong passcode is entered during unlock wallet", async () => {
-        const expectedErrorMsg = "The passcode doesn't seem right. Please try again, or tap 'Forgot Passcode' if you need help resetting it";
+    test("should clear passcode input fields and show attempt count when wrong passcode is entered during unlock wallet", async () => {
+        const expectedErrorMsg = "The passcode doesn't seem right. Attempt 1 of 5. 4 attempt(s) remaining before temporary lock. Please try again, or tap 'Forgot Passcode' if you need help resetting it";
         // Mock wallet exists
         mockApiResponseSequence([
             { data: successWalletResponse }, // fetchWallets
@@ -355,34 +362,108 @@ describe('Passcode', () => {
         expect(forgotPasscodeButton).toBeInTheDocument();
     }
 
-    test("should clear passcode input fields when wrong passcode is entered during unlock wallet", async () => {
-        const expectedErrorMsg = "The passcode doesn't seem right. Please try again, or tap 'Forgot Passcode' if you need help resetting it";
-        // Mock wallet exists
-        mockApiResponseSequence([
-            { data: successWalletResponse }, // fetchWallets
-            { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 } // unlockWallet
-        ]);
+    describe('Failed passcode attempts and attempt count', () => {
+        test('should display attempt count and remaining tries when incorrect passcode is entered on first failure', async () => {
+            mockApiResponseSequence([
+                { data: successWalletResponse },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+            ]);
 
-        renderWithProviders(<PasscodePage />);
+            renderWithProviders(<PasscodePage />);
 
-        await waitFor(() => {
-            expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                const errorMsg = screen.getByTestId("error-msg-passcode");
+                expect(errorMsg).toHaveTextContent("Attempt 1 of 5");
+                expect(errorMsg).toHaveTextContent("4 attempt(s) remaining before temporary lock");
+            });
         });
 
-        // Enter passcode
-        await enterPasscode();
-        const inputs = screen.getAllByTestId('input-passcode');
-        inputs.forEach(input => expect(input).toHaveValue('1'));
+        test('should increment attempt count on successive incorrect passcodes', async () => {
+            mockApiResponseSequence([
+                { data: successWalletResponse },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+            ]);
 
-        // Submit
-        userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            renderWithProviders(<PasscodePage />);
 
-        // Wait for error and check inputs are cleared
-        await waitFor(() => {
-            inputs.forEach(input => expect(input).toHaveValue(''));
+            await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
+                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("4 attempt(s) remaining");
+            });
+
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                const errorMsg = screen.getByTestId("error-msg-passcode");
+                expect(errorMsg).toHaveTextContent("Attempt 2 of 5");
+                expect(errorMsg).toHaveTextContent("3 attempt(s) remaining before temporary lock");
+            });
         });
 
-        await verifyPasscodeErrorAndInteractiveElementStatus(expectedErrorMsg, false, "", true, "error-msg-passcode");
+        test('should reset failed attempts on successful unlock after incorrect passcode', async () => {
+            mockApiResponseSequence([
+                { data: successWalletResponse },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
+                { data: successWalletResponse }
+            ]);
+
+            renderWithProviders(<PasscodePage />);
+
+            await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
+            });
+
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/user/home"));
+        });
+
+        test('should reset failed attempts when fetchWallets returns normal wallet status after storage event', async () => {
+            mockApiResponseSequence([
+                { data: successWalletResponse },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
+                { data: successWalletResponse },
+                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+            ]);
+
+            renderWithProviders(<PasscodePage />);
+
+            await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
+            });
+
+            window.dispatchEvent(new StorageEvent('storage', { key: 'walletId' }));
+
+            await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(3));
+
+            await enterPasscode();
+            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+
+            await waitFor(() => {
+                const errorMsg = screen.getByTestId("error-msg-passcode");
+                expect(errorMsg).toHaveTextContent("Attempt 1 of 5");
+                expect(errorMsg).toHaveTextContent("4 attempt(s) remaining");
+            });
+        });
     });
 
     describe('Passcode mismatch validation', () => {
