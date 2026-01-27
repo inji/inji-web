@@ -70,6 +70,11 @@ jest.mock("../../../hooks/User/useUser.tsx", () => ({
 describe('Passcode', () => {
     const mockNavigate = jest.fn();
 
+    const incorrectPasscodeUnlockResponse = {
+        error: { response: { data: { errorCode: "incorrect_passcode" } } },
+        status: 400
+    };
+
     const renderWithProviders = (ui: React.ReactElement) => {
         return render(
             <CookiesProvider>
@@ -302,8 +307,8 @@ describe('Passcode', () => {
         const expectedErrorMsg = "The passcode doesn't seem right. Attempt 1 of 5. 4 attempt(s) remaining before temporary lock. Please try again, or tap 'Forgot Passcode' if you need help resetting it";
         // Mock wallet exists
         mockApiResponseSequence([
-            { data: successWalletResponse }, // fetchWallets
-            { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 } // unlockWallet
+            { data: successWalletResponse },
+            incorrectPasscodeUnlockResponse
         ]);
 
         renderWithProviders(<PasscodePage />);
@@ -332,7 +337,12 @@ describe('Passcode', () => {
         await screen.findByTestId("passcode-container");
         const inputs = screen.getAllByTestId('input-passcode');
         inputs.map((input) => userEvent.type(input, '1'));
-    }
+    };
+
+    const submitPasscode = async () => {
+        await enterPasscode();
+        userEvent.click(screen.getByTestId("btn-submit-passcode"));
+    };
 
     const verifyPasscodeErrorAndInteractiveElementStatus = async (expectedError: string, inputsDisabled: boolean, expectedInputValue: string | null, submitButtonDisabled: boolean, testId: string) => {
         const errorSpan = await screen.findByTestId(testId);
@@ -363,72 +373,60 @@ describe('Passcode', () => {
     }
 
     describe('Failed passcode attempts and attempt count', () => {
+        const expectErrorShowsAttemptCount = (attempt: number, remaining: number) => {
+            const el = screen.getByTestId("error-msg-passcode");
+            expect(el).toHaveTextContent(`Attempt ${attempt} of 5`);
+            expect(el).toHaveTextContent(`${remaining} attempt(s) remaining`);
+        };
+
         test('should display attempt count and remaining tries when incorrect passcode is entered on first failure', async () => {
             mockApiResponseSequence([
                 { data: successWalletResponse },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+                incorrectPasscodeUnlockResponse
             ]);
 
             renderWithProviders(<PasscodePage />);
 
             await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                const errorMsg = screen.getByTestId("error-msg-passcode");
-                expect(errorMsg).toHaveTextContent("Attempt 1 of 5");
-                expect(errorMsg).toHaveTextContent("4 attempt(s) remaining before temporary lock");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(1, 4));
         });
 
         test('should increment attempt count on successive incorrect passcodes', async () => {
             mockApiResponseSequence([
                 { data: successWalletResponse },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+                incorrectPasscodeUnlockResponse,
+                incorrectPasscodeUnlockResponse
             ]);
 
             renderWithProviders(<PasscodePage />);
 
             await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
-                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("4 attempt(s) remaining");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(1, 4));
 
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                const errorMsg = screen.getByTestId("error-msg-passcode");
-                expect(errorMsg).toHaveTextContent("Attempt 2 of 5");
-                expect(errorMsg).toHaveTextContent("3 attempt(s) remaining before temporary lock");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(2, 3));
         });
 
         test('should reset failed attempts on successful unlock after incorrect passcode', async () => {
             mockApiResponseSequence([
                 { data: successWalletResponse },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
+                incorrectPasscodeUnlockResponse,
                 { data: successWalletResponse }
             ]);
 
             renderWithProviders(<PasscodePage />);
 
             await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(1, 4));
 
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
             await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/user/home"));
         });
@@ -436,33 +434,25 @@ describe('Passcode', () => {
         test('should reset failed attempts when fetchWallets returns normal wallet status after storage event', async () => {
             mockApiResponseSequence([
                 { data: successWalletResponse },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 },
+                incorrectPasscodeUnlockResponse,
                 { data: successWalletResponse },
-                { error: { response: { data: { errorCode: "incorrect_passcode" } } }, status: 400 }
+                incorrectPasscodeUnlockResponse
             ]);
 
             renderWithProviders(<PasscodePage />);
 
             await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                expect(screen.getByTestId("error-msg-passcode")).toHaveTextContent("Attempt 1 of 5");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(1, 4));
 
             window.dispatchEvent(new StorageEvent('storage', { key: 'walletId' }));
 
             await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(3));
 
-            await enterPasscode();
-            userEvent.click(screen.getByTestId("btn-submit-passcode"));
+            await submitPasscode();
 
-            await waitFor(() => {
-                const errorMsg = screen.getByTestId("error-msg-passcode");
-                expect(errorMsg).toHaveTextContent("Attempt 1 of 5");
-                expect(errorMsg).toHaveTextContent("4 attempt(s) remaining");
-            });
+            await waitFor(() => expectErrorShowsAttemptCount(1, 4));
         });
     });
 
