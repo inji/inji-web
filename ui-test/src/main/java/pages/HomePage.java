@@ -1,26 +1,58 @@
 package pages;
 
-import base.BasePage;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import base.BasePage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HomePage extends BasePage {
 
 	private WebDriver driver;
+	private static final Logger logger = LoggerFactory.getLogger(HomePage.class);
 
 	public HomePage(WebDriver driver) {
 		this.driver = driver;
 	}
 
 	public void clickOnFaq() {
-		clickOnElement(driver, By.xpath("//button[@data-testid='Header-Menu-FAQ']"));
+			clickOnElement(driver, By.xpath("//button[@data-testid='Header-Menu-FAQ']"));
+
+	}
+
+	public boolean verifyFaqTitlesDoNotContainInjiWeb() {
+		try {
+			List<String> faqTitles = getElementTexts(driver, By.xpath("//span[@data-testid='Faq-Item-Title-Text']"));
+			for (String title : faqTitles) {
+				if (title.toLowerCase().contains("inji web")) {
+					return false;
+				}
+			}
+			return true;
+		} catch (TimeoutException e) {
+			logger.error("Timeout while verifying FAQ titles", e);
+			return false;
+		}
+	}
+	
+
+	public void clickOnFaqMobileView() {
+		clickOnElement(driver, By.xpath("//div[@data-testid='Header-Menu-Faq']"));
+	}
+
+	public int getXCoordinateForSearch() {
+		return getXCoordinateValue(driver, By.xpath("//div[@data-testid='Search-Issuer-Container']"));
+	}
+
+	public int getXCoordinateForCredentialHeading() {
+		return getXCoordinateValue(driver, By.xpath("//div/*[@data-testid='NavBar-Back-Arrow']"));
 	}
 
 	public boolean isFaqPageDisplayed() {
@@ -52,7 +84,7 @@ public class HomePage extends BasePage {
 	}
 
 	public boolean isIssuerLogoDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[@data-testid='ItemBox-Logo']"));
+		return isElementIsVisible(driver, By.xpath("//*[@data-testid='ItemBox-Logo']"), (BasePage.explicit_timeout)*2);
 	}
 
 	public void clickOnAboutInji() {
@@ -88,15 +120,16 @@ public class HomePage extends BasePage {
 	}
 
 	public void clickOnVerify() {
-		clickOnElement(driver, By.xpath("//button[@id='verify_otp']"));
+		clickOnElement(driver, By.xpath("//button[@id='verify_otp']"), (BasePage.explicit_timeout)*2);
 	}
 
 	public Boolean isSuccessMessageDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//p[@data-testid='title-download-result']"));
+		return isElementIsVisible(driver, By.xpath("//p[@data-testid='title-download-result']"), (BasePage.explicit_timeout)*2);
 	}
 
 	public Boolean isMosipNationalIdDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
+				60);
 	}
 
 	public Boolean isIssuersDisplayed() {
@@ -112,7 +145,11 @@ public class HomePage extends BasePage {
 	}
 
 	public Boolean isGoHomeButtonDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[text()='Go To Home']"));
+		return isElementIsVisible(driver, By.xpath("//*[text()='Go To Home']"), (BasePage.explicit_timeout)*2);
+	}
+
+	public Boolean isBackButtonDisplayed() {
+		return isElementIsVisible(driver, By.xpath("//*[@class='cursor-pointer']"));
 	}
 
 	public Boolean isLanguageDisplayed() {
@@ -139,8 +176,12 @@ public class HomePage extends BasePage {
 		return new HashSet<>(expectedLanguages).equals(new HashSet<>(actualLanguages));
 	}
 
+	public void selectOtherLanguage() {
+		clickOnElement(driver, By.xpath("(//button[@type='button'])[3]"));
+	}
+
 	public Boolean isNoIssuerFoundMessageDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//p[@data-testid='EmptyList-Text']"));
+		return isElementIsVisible(driver, By.xpath("//p[@data-testid='EmptyList-Text']"), (BasePage.explicit_timeout)*2);
 	}
 
 	public void clickOnArabicLanguage() {
@@ -302,6 +343,10 @@ public class HomePage extends BasePage {
 		clickOnElement(driver, By.xpath("//button[@data-testid='home-banner-guest-login']"));
 	}
 
+	public void clickOnHamburgerMenu() {
+		clickOnElement(driver, By.xpath("(//div[@role='button'])[1]"));
+	}
+
 	public boolean isCredentialsSimplifiedDescriptionTextDisplayed() {
 		return isElementIsVisible(driver, By.xpath("//*[@data-testid='HomeFeatureItem1-FirstFeature-Description']"));
 	}
@@ -355,11 +400,11 @@ public class HomePage extends BasePage {
 	}
 
 	public void clickOnProccedCustomButton() {
-		clickOnElement(driver, By.xpath("(//*[@data-testid='DataShareFooter-Success-Button'])[2]"));
+		clickOnElement(driver, By.xpath("(//*[@data-testid='DataShareFooter-Success-Button'])[2]"), (BasePage.explicit_timeout)*2);
 	}
 
 	public void clickOnProccedConsentButton() {
-		clickOnElement(driver, By.xpath("(//*[@data-testid='DataShareFooter-Success-Button'])[1]"));
+		clickOnElement(driver, By.xpath("(//*[@data-testid='DataShareFooter-Success-Button'])[1]"), (BasePage.explicit_timeout)*2);
 	}
 
 	public boolean isAccessYourCredentialsImageDisplayed() {
@@ -378,12 +423,11 @@ public class HomePage extends BasePage {
 		return isElementIsVisible(driver, By.xpath("//*[@data-testid='HomeFeatureItem4-Image']"));
 	}
 
+	public boolean isNavButtonsDisplayed() {
+		return isElementIsVisible(driver, By.xpath("//div[@data-testid='HomeFeatures-NavButtons']"));
+	}
+
 	public boolean isWiderAccessAndCompatibilityImageDisplayed() {
 		return isElementIsVisible(driver, By.xpath("//*[@data-testid='HomeFeatureItem5-Image']"));
 	}
-
-	public void waitForseconds() {
-		waitForSeconds(driver, 15);
-	}
-
 }

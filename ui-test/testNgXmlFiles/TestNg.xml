@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="Cucumber Test Suite">
+<suite name="Cucumber Test Suite" parallel="methods" thread-count="5" data-provider-thread-count="5">
     <test name="Cucumber Tests">
         <classes>
             <class name="runnerfiles.Runner"/>

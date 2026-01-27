@@ -95,9 +95,9 @@ public class StepDefOIDCLogin {
 
 		Cookie myCookie = new Cookie.Builder(sessionCookieName, sessionCookieValue).path("/v1/mimoto").isHttpOnly(true)
 				.isSecure(true).build();
-		BasePage.waitForSeconds(driver, 10);
+		// BasePage.waitForSeconds(driver, 10);
 		driver.manage().addCookie(myCookie);
-		BasePage.waitForSeconds(driver, 10);
+		// BasePage.waitForSeconds(driver, 10);
 		driver.navigate().refresh();
 	}
 
@@ -231,6 +231,11 @@ public class StepDefOIDCLogin {
 	@Then("User click on cards button")
 	public void clickonAddCardsButton() {
 		loginpage.clickOnElement(driver, By.xpath("//button[@data-testid='btn-add-cards']"));
+	}
+
+	@Then("User click on cards button for mobile")
+	public void clickonAddCardsButtonforMobile() {
+		loginpage.clickOnElement(driver, By.xpath("(//button[@data-testid='btn-add-cards'])[2]"));
 	}
 
 	@Then("user verify current url userhome")
@@ -417,6 +422,21 @@ public class StepDefOIDCLogin {
 	@Then("user selects profile option")
 	public void user_selects_profile_option() {
 		loginpage.clickOnProfileOption();
+	}
+
+	@Then("user selects profile option for mobile")
+	public void user_selects_profile_option_for_mobileView() {
+		loginpage.clickOnProfileOptionMobileView();
+	}
+
+	@Then("user click on logout button for mobile")
+	public void user_selects_logout_option_for_mobileView() {
+		loginpage.clickOnLogoutOptionMobileView();
+	}
+
+	@Then("user click on FAQ button for mobile")
+	public void user_selects_faq_option_for_mobileView() {
+		loginpage.clickOnFaqOptionMobileView();
 	}
 
 	@Then("user verify My Profile Text")
@@ -784,6 +804,21 @@ public class StepDefOIDCLogin {
 		}
 	}
 
+	@Then("user verifies {string} option is present in dropdown for mobile")
+	public void verifyOptionInDropdownForMobile(String optionText) {
+		try {
+			boolean isDisplayed = loginpage.isMobileMenuOptionPresent(optionText);
+			assertTrue(isDisplayed, "profile drop down options" + optionText + " is visible");
+			test.log(Status.PASS,
+					"User successfully verified that profile drop down options" + optionText + "is visible");
+		} catch (AssertionError | NoSuchElementException e) {
+			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
 	@And("user click on FAQ link")
 	public void user_click_on_faq_link() {
 		loginpage.clickonFAQLink();
@@ -935,7 +970,76 @@ public class StepDefOIDCLogin {
 	@Then("user verify the wallet permanently locked")
 	public void user_verify_the_wallet_permanently_locked() throws InterruptedException {
 		assertTrue(!loginpage.isPermLockMsgDisplayed(), "Permanent lock message is not displayed");
-
 	}
 
+	@Then("user click on hamburger menu from user account")
+	public void user_click_on_hamburger_menu() {
+		loginpage.clickOnHamburgerMenu();
+	}
+
+	@Then("user verify menu option on downloaded cards")
+	public void user_verify_menu_option_on_downloaded_cards() {
+		try {
+			assertTrue(loginpage.isDownloadedCardMenubuttonDisplayed(), "Menu button is not displayed on stored cards");
+			test.log(Status.PASS, "User successfully verified that Menu button is displayed on stored cards");
+		} catch (AssertionError | NoSuchElementException e) {
+			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("user click menu option on downloaded cards")
+	public void user_click_menu_option_on_downloaded_cards() {
+		loginpage.clickOnDownloadedCardMenubutton();
+	}
+
+	@Then("user click view card option")
+	public void user_click_view_card_option() {
+		loginpage.clickOnViewCardMenubutton();
+	}
+
+	@Then("user verify cards details from view option")
+	public void user_verify_cards_details_from_view_option() {
+		try {
+			assertTrue(loginpage.isDownloadedCardViewDisplayed(), "Card details are not displayed from view option");
+			test.log(Status.PASS, "User successfully verified that ard details are displayed from view option");
+		} catch (AssertionError | NoSuchElementException e) {
+			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		}
+	}
+
+	@Then("user click view card back option")
+	public void user_click_view_back_card_option() {
+		loginpage.clickOnViewCardBackbutton();
+	}
+
+	@Then("user click on delete card option")
+	public void user_click_delete_card_option() {
+		loginpage.clickOnDeleteCardMenubutton();
+	}
+
+	@Then("user click on confirm delete card option")
+	public void user_click_confirm_delete_card_option() {
+		loginpage.clickOnConfirmDeleteCardOption();
+	}
+
+	@Then("user click on download card option")
+	public void user_click_on_download_card_option() {
+		loginpage.clickOnDownloadCardMenubutton();
+	}
+
+	@Then("user click on download card option from view page")
+	public void user_click_on_download_card_option_from_view_page() {
+		loginpage.clickOnDownloadCardFromViewbutton();
+	}
+
+	@Then("user click on cancel delete card option")
+	public void user_click_on_cancel_delete_card_option() {
+		loginpage.clickOnCancelDeleteCardOption();
+	}
 }

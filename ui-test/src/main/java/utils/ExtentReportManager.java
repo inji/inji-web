@@ -13,7 +13,7 @@ import com.aventstack.extentreports.reporter.configuration.Theme;
 
 public class ExtentReportManager {
 	private static ExtentReports extent;
-	private static ExtentTest test;
+    private static final ThreadLocal<ExtentTest> testThread = new ThreadLocal<>();
 
 	public static String currentReportFileName;
 	private static String timestamp;
@@ -54,7 +54,7 @@ public class ExtentReportManager {
 			extent.setSystemInfo("Git BRANCH", branch);
 			extent.setSystemInfo("COMMIT ID", commitId);
 			extent.setSystemInfo("TEST URL", testUrl);
-			extent.setSystemInfo("EXECUTIOM TIME", timestamp);
+            extent.setSystemInfo("EXECUTION TIME", timestamp);
 		}
 	}
 
@@ -83,15 +83,14 @@ public class ExtentReportManager {
 		}
 	}
 
-	public static void createTest(String testName) {
-		test = extent.createTest(testName);
+    public static synchronized void createTest(String testName) {
+        ExtentTest test = extent.createTest(testName);
+        testThread.set(test);
 	}
 
-	public static void logStep(String message) {
-		if (test != null) {
-			test.info(message);
+    public static ExtentTest getTest() {
+        return testThread.get();
 		}
-	}
 
 	public static void flushReport() {
 		if (extent != null) {
@@ -99,7 +98,13 @@ public class ExtentReportManager {
 		}
 	}
 
-	public static ExtentTest getTest() {
-		return test;
+    public static void removeTest() {
+        testThread.remove();
 	}
+    public static void logStep(String message) {
+        ExtentTest test = testThread.get(); 
+        if (test != null) {
+            test.info(message);
+        }
+    }
 }

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
@@ -12,10 +11,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-
 import org.json.JSONObject;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -25,13 +23,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
-
-import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import com.browserstack.local.Local;
-
 import api.InjiWebConfigManager;
 import api.InjiWebUtil;
 import io.cucumber.java.After;
@@ -44,21 +38,34 @@ import io.cucumber.plugin.event.PickleStepTestStep;
 import io.cucumber.plugin.event.TestStep;
 import io.mosip.testrig.apirig.utils.ConfigManager;
 import io.mosip.testrig.apirig.utils.S3Adapter;
+import java.util.Base64;
 
 public class BaseTest {
+	private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+	private static final ThreadLocal<JavascriptExecutor> jseThreadLocal = new ThreadLocal<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseTest.class);
+
 	public void setDriver(WebDriver driver) {
-		this.driver = driver;
+		driverThreadLocal.set(driver);
+	}
+
+	public void setJse(JavascriptExecutor jse) {
+		jseThreadLocal.set(jse);
+	}
+
+	public static WebDriver getDriver() {
+		return driverThreadLocal.get();
+	}
+
+	public static JavascriptExecutor getJse() {
+		return jseThreadLocal.get();
 	}
 
 	private static int passedCount = 0;
 	private static int failedCount = 0;
 	private static int totalCount = 0;
 	private static int skippedCount = 0;
-	public static WebDriver driver;
 	private long scenarioStartTime;
-	public static JavascriptExecutor jse;
-	private static ExtentReports extent;
-	private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
 	String username = System.getenv("BROWSERSTACK_USERNAME");
 	String accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
 	public final String URL = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
@@ -66,6 +73,19 @@ public class BaseTest {
 	private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
 	private static ThreadLocal<Boolean> skipScenario = ThreadLocal.withInitial(() -> false);
 	private static ThreadLocal<String> skipReason = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> mobileViewFlag = ThreadLocal.withInitial(() -> false);
+
+	public static void setMobileView(boolean isMobile) {
+		mobileViewFlag.set(isMobile);
+	}
+
+	public static boolean isMobileView() {
+		return mobileViewFlag.get();
+	}
+
+	public static void clearMobileView() {
+		mobileViewFlag.remove();
+	}
 
 	public static final String url = System.getenv("TEST_URL") != null && !System.getenv("TEST_URL").isEmpty()
 			? System.getenv("TEST_URL")
@@ -112,11 +132,28 @@ public class BaseTest {
 		browserstackOptions.put("local", true);
 		browserstackOptions.put("interactiveDebugging", true);
 		capabilities.setCapability("bstack:options", browserstackOptions);
-
-		driver = new RemoteWebDriver(new URL(URL), capabilities);
-		jse = (JavascriptExecutor) driver;
-		driver.manage().window().maximize();
-		driver.get(url);
+		WebDriver driver = new RemoteWebDriver(new URL(URL), capabilities);
+		setDriver(driver); // sets ThreadLocal
+		setJse((JavascriptExecutor) driver); // sets ThreadLocal
+		setMobileView(scenario.getSourceTagNames().contains("@mobileview"));
+		if (isMobileView()) {
+			String dim = ConfigManager.getproperty("dimensions");
+			if (dim != null && dim.contains(",")) {
+				String[] parts = dim.split(",");
+				int width = Integer.parseInt(parts[0].trim());
+				int height = Integer.parseInt(parts[1].trim());
+				getDriver().manage().window().setSize(new Dimension(width, height));
+				logger.info("📱 Running in Mobile View ({}, {}) for scenario: {}", width, height, scenario.getName());
+			} else {
+				getDriver().manage().window().maximize();
+				logger.warn("⚠️ dimensions not set in properties, defaulting to maximize for Mobile View scenario: {}",
+						scenario.getName());
+			}
+		} else {
+			getDriver().manage().window().maximize();
+			logger.info("💻 Running in Desktop View for scenario: {}", scenario.getName());
+		}
+		getDriver().get(url);
 	}
 
 	@Before("@skipBasedOnThreshold")
@@ -140,60 +177,122 @@ public class BaseTest {
 
 	@BeforeStep
 	public void beforeStep(Scenario scenario) {
-		String stepName = getStepName(scenario);
-		if (isScenarioSkipped()) {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.SKIP,
-					"⏭ Step Skipped: " + stepName + " — " + getSkipReason());
-			throw new io.cucumber.java.PendingException("Scenario skipped: " + getSkipReason());
+		if (BaseTest.isScenarioSkipped()) {
+			ExtentReportManager.logStep("⏭ Step Skipped: — " + BaseTest.getSkipReason());
+			throw new io.cucumber.java.PendingException("Scenario skipped: " + BaseTest.getSkipReason());
 		}
-		ExtentCucumberAdapter.getCurrentStep().log(Status.INFO, "➡️ Step Started: " + stepName);
 	}
 
 	@AfterStep
 	public void afterStep(Scenario scenario) {
-		String stepName = getStepName(scenario);
-		if (isScenarioSkipped()) {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.SKIP,
-					"⏭ Step Skipped: " + stepName + " — " + getSkipReason());
+		if (BaseTest.isScenarioSkipped()) {
+			ExtentReportManager.logStep("⏭ Step Skipped — " + BaseTest.getSkipReason());
 			return;
 		}
 
 		if (scenario.isFailed()) {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.FAIL, "❌ Step Failed: " + stepName);
 			captureScreenshot();
-		} else {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.PASS, "✅ Step Passed: " + stepName);
 		}
 	}
 
 	@After
 	public void afterScenario(Scenario scenario) {
-		try {
-			if (isScenarioSkipped()) {
-				skippedCount++;
-				ExtentReportManager.getTest()
-						.skip("⏭ Scenario Skipped: " + scenario.getName() + " — " + getSkipReason());
-			} else if (scenario.isFailed()) {
-				failedCount++;
-				ExtentReportManager.getTest().fail("❌ Scenario Failed: " + scenario.getName());
-			} else {
-				passedCount++;
-				ExtentReportManager.getTest().pass("✅ Scenario Passed: " + scenario.getName());
-			}
-		} finally {
-			if (driver != null) {
-				try {
-					driver.quit();
-					logger.info("✅ WebDriver instance quit successfully after scenario: {}", scenario.getName());
-				} catch (Exception e) {
-					logger.error("❌ Error while quitting WebDriver after scenario: {}", scenario.getName(), e);
-				} finally {
-					driver = null; // ensure cleanup
-				}
-			}
-			ExtentReportManager.flushReport();
-			clearSkip();
-		}
+
+	    WebDriver driver = getDriver();
+	    String publicUrl = null;
+	    String videoUrl = null;
+
+	    if (driver instanceof RemoteWebDriver) {
+	        RemoteWebDriver remoteDriver = (RemoteWebDriver) driver;
+	        String sessionId = remoteDriver.getSessionId().toString();
+	        ExtentTest test = ExtentReportManager.getTest();
+
+	        try {
+	            String jsonUrl = "https://api.browserstack.com/automate/sessions/" + sessionId + ".json";
+	            String auth = username + ":" + accessKey;
+	            String basicAuth = "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+
+	            HttpURLConnection conn = (HttpURLConnection) new URL(jsonUrl).openConnection();
+	            conn.setConnectTimeout(10_000);
+	            conn.setReadTimeout(30_000);
+	            conn.setRequestMethod("GET");
+	            conn.setRequestProperty("Authorization", basicAuth);
+
+	            int responseCode = conn.getResponseCode();
+
+	            if (responseCode == 200) {
+	                StringBuilder response = new StringBuilder();
+	                try (BufferedReader in = new BufferedReader(
+	                        new InputStreamReader(conn.getInputStream()))) {
+
+	                    String inputLine;
+	                    while ((inputLine = in.readLine()) != null) {
+	                        response.append(inputLine);
+	                    }
+	                }
+
+	                JSONObject jsonResponse = new JSONObject(response.toString());
+	                JSONObject session = jsonResponse.getJSONObject("automation_session");
+
+	                publicUrl = session.optString("public_url", null);
+	                videoUrl = session.optString("video_url", null);
+
+	                if (test != null && publicUrl != null) {
+	                    test.info("<a href='" + publicUrl + "' target='_blank'>View on BrowserStack</a>");
+	                }
+
+	                if (test != null && videoUrl != null) {
+	                    test.info("<a href='" + videoUrl + "' target='_blank'>Click here to view only Video</a>");
+	                }
+
+	            } else {
+	                if (test != null) {
+	                    test.warning("Failed to fetch BrowserStack session JSON. Response code: " + responseCode);
+	                } else {
+	                    LOGGER.warn("Failed to fetch BrowserStack session JSON. Response code: " + responseCode);
+	                }
+	            }
+
+	        } catch (Exception e) {
+	            if (test != null) {
+	                test.warning("Failed to fetch BrowserStack build/session info: " + e.getMessage());
+	            } else {
+	                LOGGER.warn("Failed to fetch BrowserStack build/session info", e);
+	            }
+	        }
+	    }
+
+	    try {
+	        if (isScenarioSkipped()) {
+	            skippedCount++;
+	            ExtentReportManager.getTest()
+	                    .skip("⏭ Scenario Skipped: " + scenario.getName() + " — " + getSkipReason());
+	        } else if (scenario.isFailed()) {
+	            failedCount++;
+	            ExtentReportManager.getTest().fail("❌ Scenario Failed: " + scenario.getName());
+	        } else {
+	            passedCount++;
+	            ExtentReportManager.getTest().pass("✅ Scenario Passed: " + scenario.getName());
+	        }
+
+	    } finally {
+	        if (driver != null) {
+	            try {
+	                LOGGER.info("Closing WebDriver session...");
+	                driver.quit();
+	            } catch (Exception e) {
+	                LOGGER.warn("Error while closing WebDriver: " + e.getMessage());
+	            } finally {
+	                driverThreadLocal.remove();
+	                jseThreadLocal.remove();
+	            }
+	        }
+	    }
+
+	    ExtentReportManager.flushReport();
+	    ExtentReportManager.removeTest();
+	    clearSkip();
+	    clearMobileView();
 	}
 
 	private String getStepName(Scenario scenario) {
@@ -215,10 +314,17 @@ public class BaseTest {
 	}
 
 	private void captureScreenshot() {
+		WebDriver driver = getDriver(); // ✅ get ThreadLocal WebDriver
 		if (driver != null) {
-			byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-			ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromBase64String(
-					java.util.Base64.getEncoder().encodeToString(screenshot), "Failure Screenshot");
+			try {
+				byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+				ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromBase64String(
+						java.util.Base64.getEncoder().encodeToString(screenshot), "Failure Screenshot");
+			} catch (Exception e) {
+				LOGGER.warn("Failed to capture screenshot: {}", e.getMessage());
+			}
+		} else {
+			LOGGER.warn("WebDriver is null, cannot capture screenshot.");
 		}
 	}
 
@@ -226,25 +332,10 @@ public class BaseTest {
 	public static void afterAll() {
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			utils.HttpUtils.cleanupWallets();
-			utils.HttpUtils.cleanupWallets();
-			if (extent != null) {
-				extent.flush();
-			}
-			try {
-				Thread.sleep(5000); // ensure report file is flushed before rename
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			ExtentReportManager.flushReport();
+
 			pushReportsToS3();
 		}));
-	}
-
-	public WebDriver getDriver() {
-		return driver;
-	}
-
-	public JavascriptExecutor getJse() {
-		return jse;
 	}
 
 	public static void pushReportsToS3() {
@@ -260,14 +351,14 @@ public class BaseTest {
 				+ skippedCount + ".html";
 		File newReportFile = new File(System.getProperty("user.dir") + "/test-output/" + newFileName);
 
-		System.out.println("Attempting to rename report file...");
-		System.out.println("Original: " + originalReportFile.getAbsolutePath());
-		System.out.println("Target:   " + newReportFile.getAbsolutePath());
+		LOGGER.info("Attempting to rename report file...");
+		LOGGER.info("Original: " + originalReportFile.getAbsolutePath());
+		LOGGER.info("Target:" + newReportFile.getAbsolutePath());
 
 		if (originalReportFile.renameTo(newReportFile)) {
-			System.out.println("✅ Report renamed to: " + newFileName);
+			LOGGER.info("✅ Report renamed to: " + newFileName);
 		} else {
-			System.out.println("❌ Failed to rename the report file.");
+			LOGGER.info("❌ Failed to rename the report file.");
 		}
 
 		executeLsCommand(newReportFile.getAbsolutePath());

@@ -20,7 +20,7 @@ public class SunbirdCredentials extends BasePage {
 
 	public Boolean isSunbirdInsuranceDisplayed() {
 		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
-				60);
+				(BasePage.explicit_timeout)*2);
 	}
 
 	public String pdfNameInsurance;
