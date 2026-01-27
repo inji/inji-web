@@ -22,6 +22,8 @@ jest.mock('react-i18next', () => ({
                 "enterPasscodeLabel": "Enter Passcode",
                 "confirmPasscodeLabel": "Confirm Passcode",
                 "forgotPasscode": "Forgot Passcode",
+                "forgotPasscodeConfirmation.title": "Reset Your Passcode?",
+                "forgotPasscodeConfirmation.message": "Are you sure you want to reset your passcode? This will delete all your stored cards and you'll need to re-download them from the original issuers.",
                 "setPasscodeDescription": "Set your passcode to get started",
                 "enterPasscodeDescription": "Enter your 6 digit passcode",
                 "passcodeWarning": "Make sure you remember the password for future login",
@@ -166,16 +168,21 @@ describe('Passcode', () => {
         expect(submitButton).toBeDisabled();
     });
 
-    test("should redirect to forgot passcode page when forgot passcode button is clicked", async () => {
+    test("should redirect to forgot passcode page when forgot passcode button is clicked and user confirms", async () => {
         mockApiResponse({data: successWalletResponse})
         renderWithProviders(<PasscodePage/>);
 
         const forgotPasscodeButton = await screen.findByTestId("btn-forgot-passcode");
         expect(forgotPasscodeButton).toBeInTheDocument();
-        forgotPasscodeButton.click();
+        await userEvent.click(forgotPasscodeButton);
 
-        expect(mockNavigate).toBeCalledWith("/user/reset-passcode", {"state": {"walletId": "2c2e1810-19c8-4c85-910d-aa1622412413"}}
-        );
+        const confirmButton = await screen.findByTestId("btn-confirm");
+        expect(confirmButton).toBeInTheDocument();
+        await userEvent.click(confirmButton);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith("/user/reset-passcode", {"state": {"walletId": "2c2e1810-19c8-4c85-910d-aa1622412413"}});
+        });
     })
 
     test("should redirect to home when successfully unlocked wallet", async () => {
