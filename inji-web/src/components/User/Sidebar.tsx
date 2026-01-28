@@ -84,10 +84,17 @@ type SidebarProps = {
     forceLeftPosition?: boolean;
 };
 
+const MOBILE_BREAKPOINT_PX = 640; // Matches Tailwind 'sm' – below this is mobile
+
+function getInitialSidebarCollapsed(): boolean {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < MOBILE_BREAKPOINT_PX;
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({ disabled = false, forceLeftPosition = false }) => {
     const {t} = useTranslation('User');
     const location = useLocation();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(getInitialSidebarCollapsed);
     const language = useSelector((state: RootState) => state.common.language);
 
     const toggleSidebar = () => {
