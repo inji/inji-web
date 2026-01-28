@@ -7,10 +7,10 @@ exports[`Testing the Layout of Footer Container Check if the layout is matching 
     data-testid="Footer-Container"
   >
     <div
-      class="container mx-auto flex flex-col sm:flex-row justify-between items-end sm:items-center"
+      class="w-full px-0 flex flex-col sm:flex-row justify-between items-end sm:items-center"
     >
       <p
-        class="ps-7 text-[#9E9E9E] transform rotate-180 text-[16px] leading-[24px] font-medium mr-4"
+        class="ps-7 text-[#9E9E9E] transform rotate-180 text-[16px] leading-[24px] font-medium mr-4 ml-4"
         data-testid="Footer-Text"
       >
         Footer.copyRight

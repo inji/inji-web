@@ -29,6 +29,7 @@ jest.mock('react-i18next', () => ({
                 "error.walletStatus.permanently_locked": "Your wallet has been permanently locked due to multiple failed attempts. Please click on forgot password to reset your wallet to continue",
                 "error.walletStatus.last_attempt_before_lockout": "Incorrect passcode. Last attempt remaining before your wallet is permanently locked",
                 "error.incorrectPasscodeError": "The passcode doesn't seem right. Please try again, or tap 'Forgot Passcode' if you need help resetting it",
+                "error.passcodeMismatchError": "Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.",
             };
             return translations[key] || key;
         }
@@ -382,5 +383,181 @@ describe('Passcode', () => {
         });
 
         await verifyPasscodeErrorAndInteractiveElementStatus(expectedErrorMsg, false, "", true, "error-msg-passcode");
+    });
+
+    describe('Passcode mismatch validation', () => {
+        test('should show error when both passcodes are complete but do not match', async () => {
+            mockApiResponse({data: []}); // No wallet exists - creating wallet mode
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter passcode: 111111
+            const passcodeInputs = await screen.findAllByTestId('input-passcode');
+            for (const input of passcodeInputs) {
+                await userEvent.type(input, '1');
+            }
+
+            // Enter confirm passcode: 222222 (different)
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.type(input, '2');
+            }
+
+            // Error should appear when both are complete and don't match
+            await waitFor(() => {
+                const errorMessage = screen.getByTestId('error-msg-passcode');
+                expect(errorMessage).toHaveTextContent('Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.');
+            });
+
+            // Button should be disabled when passcodes don't match
+            const submitButton = screen.getByTestId('btn-submit-passcode');
+            expect(submitButton).toBeDisabled();
+        });
+
+        test('should clear error when user deletes a character (field becomes incomplete)', async () => {
+            mockApiResponse({data: []});
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter mismatched passcodes
+            const passcodeInputs = await screen.findAllByTestId('input-passcode');
+            for (const input of passcodeInputs) {
+                await userEvent.type(input, '1');
+            }
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.type(input, '2');
+            }
+
+            // Wait for error to appear
+            await waitFor(() => {
+                expect(screen.getByTestId('error-msg-passcode')).toHaveTextContent('Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.');
+            });
+
+            // Delete one character from confirm passcode
+            const lastConfirmInput = confirmPasscodeInputs[5];
+            await userEvent.clear(lastConfirmInput);
+
+            // Error should be cleared when field becomes incomplete
+            await waitFor(() => {
+                const errorMessage = screen.queryByTestId('error-msg-passcode');
+                expect(errorMessage).not.toBeInTheDocument();
+            });
+        });
+
+        test('should clear error when passcodes match', async () => {
+            mockApiResponse({data: []});
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter mismatched passcodes
+            const passcodeInputs = await screen.findAllByTestId('input-passcode');
+            for (const input of passcodeInputs) {
+                await userEvent.type(input, '1');
+            }
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.type(input, '2');
+            }
+
+            // Wait for error to appear
+            await waitFor(() => {
+                expect(screen.getByTestId('error-msg-passcode')).toHaveTextContent('Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.');
+            });
+
+            // Change confirm passcode to match
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.clear(input);
+                await userEvent.type(input, '1');
+            }
+
+            // Error should be cleared when they match
+            await waitFor(() => {
+                const errorMessage = screen.queryByTestId('error-msg-passcode');
+                expect(errorMessage).not.toBeInTheDocument();
+            });
+
+            // Button should be enabled when passcodes match and are complete
+            await waitFor(() => {
+                const submitButton = screen.getByTestId('btn-submit-passcode');
+                expect(submitButton).not.toBeDisabled();
+            });
+        });
+
+        test('should keep button disabled when passcodes do not match', async () => {
+            mockApiResponse({data: []});
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter complete but mismatched passcodes
+            const passcodeInputs = await screen.findAllByTestId('input-passcode');
+            for (const input of passcodeInputs) {
+                await userEvent.type(input, '1');
+            }
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.type(input, '2');
+            }
+
+            // Button should remain disabled
+            await waitFor(() => {
+                const submitButton = screen.getByTestId('btn-submit-passcode');
+                expect(submitButton).toBeDisabled();
+            });
+        });
+
+        test('should enable button when passcodes match and are complete', async () => {
+            mockApiResponse({data: []});
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter matching passcodes
+            const passcodeInputs = await screen.findAllByTestId('input-passcode');
+            for (const input of passcodeInputs) {
+                await userEvent.type(input, '1');
+            }
+            
+            const confirmPasscodeInputs = await screen.findAllByTestId('input-confirm-passcode');
+            for (const input of confirmPasscodeInputs) {
+                await userEvent.type(input, '1');
+            }
+
+            // Button should be enabled when passcodes match and are complete
+            await waitFor(() => {
+                const submitButton = screen.getByTestId('btn-submit-passcode');
+                expect(submitButton).not.toBeDisabled();
+            }, { timeout: 3000 });
+        });
+
+        test('should not show mismatch error when unlocking wallet (only when creating)', async () => {
+            mockApiResponse({data: successWalletResponse}); // Wallet exists - unlock mode
+            renderWithProviders(<PasscodePage/>);
+
+            await waitFor(() => {
+                expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+            });
+
+            // Enter passcode (no confirm passcode field in unlock mode)
+            await enterPasscode();
+
+            // No mismatch error should appear (only one field)
+            const errorMessage = screen.queryByTestId('error-msg-passcode');
+            expect(errorMessage).not.toBeInTheDocument();
+        });
     });
 });

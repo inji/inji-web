@@ -45,7 +45,18 @@ export const CredentialItem = memo<CredentialItemProps>(({
                     transform: isSelected ? 'translate(0.2px, 0.2px)' : 'none',
                     height: isSelected ? 'calc(100% - 0.5px)' : '100%',
                     width: isSelected ? 'calc(100% - 0.5px)' : '100%',
+                    cursor: 'pointer'
                 }}
+                onClick={handleToggle}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggle();
+                    }
+                }}
+                aria-label={`${isSelected ? 'Deselect' : 'Select'} ${credentialName} credential`}
             >
                 <div className={CredentialRequestModalStyles.content.credentialContent}>
                     {/* Credential Logo */}
@@ -79,7 +90,10 @@ export const CredentialItem = memo<CredentialItemProps>(({
                 </div>
 
                 {/* Checkbox */}
-                <div className={CredentialRequestModalStyles.content.checkboxContainer}>
+                <div 
+                    className={CredentialRequestModalStyles.content.checkboxContainer}
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <input
                         data-testid={`checkbox-${credential.credentialId}`}
                         type="checkbox"
@@ -90,9 +104,10 @@ export const CredentialItem = memo<CredentialItemProps>(({
                             appearance: 'none',
                             border: isSelected ? 'none' : '1px solid #d1d5db',
                             backgroundColor: isSelected ? 'transparent' : '#f9fafb',
-                            position: 'relative'
+                            position: 'relative',
+                            cursor: 'pointer'
                         }}
-                        aria-label={`Select ${credentialName} credential`}
+                        aria-label={`${isSelected ? 'Deselect' : 'Select'} ${credentialName} credential`}
                         aria-checked={isSelected}
                         role="checkbox"
                     />

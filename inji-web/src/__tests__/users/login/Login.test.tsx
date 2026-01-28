@@ -63,17 +63,17 @@ describe("Login Page Tests", () => {
   });
 
   test("Google login button redirects to Google OAuth URL", () => {
-    const originalHref = window.location.href;
-
     (window as any)._env_ = {
       MIMOTO_URL: "https://example.com",
     };
+    const replaceMock = jest.fn();
 
-    // Mock window.location.href setter
-    const setHref = jest.fn();
     Object.defineProperty(window, "location", {
-      value: { set href(url: string) { setHref(url); } },
-      configurable: true,
+      value: {
+        ...window.location,
+        replace: replaceMock,
+      },
+      writable: true,
     });
 
     render(<MemoryRouter><Login /></MemoryRouter>);
@@ -81,11 +81,6 @@ describe("Login Page Tests", () => {
     const googleButton = screen.getByTestId("google-login-button");
     fireEvent.click(googleButton);
 
-    expect(setHref).toHaveBeenCalledWith("https://example.com/oauth2/authorize/google");
-
-    Object.defineProperty(window, "location", {
-      value: { href: originalHref },
-      configurable: true,
-    });
+    expect(replaceMock).toHaveBeenCalledWith("https://example.com/oauth2/authorize/google");
   });
 });

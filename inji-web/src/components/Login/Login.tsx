@@ -13,7 +13,9 @@ export const Login: React.FC = () => {
   const location = useLocation();
 
   const handleGoogleLogin = () => {
-      window.location.href = `${window._env_.MIMOTO_URL}/oauth2/authorize/google`;
+      // Use replace() instead of href to prevent adding Google IdP to browser history
+      // This way, pressing back won't navigate to Google's OAuth page
+      window.location.replace(`${window._env_.MIMOTO_URL}/oauth2/authorize/google`);
   };
 
   const handleGuestLogin = () => {

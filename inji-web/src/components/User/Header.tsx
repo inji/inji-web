@@ -172,7 +172,7 @@ export const Header: React.FC<UserHeaderProps> = ({
             data-testid="dashboard-header-container"
             className="fixed top-0 left-0 right-0 z-20 bg-iw-background bg-transparent shadow-[0_4px_5px_0_rgba(0,0,0,0.051)]"
         >
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="w-full px-4 py-4 flex justify-between items-center">
                 <div className="flex justify-start items-center gap-2">
                     <div
                         data-testid="hamburger-menu"

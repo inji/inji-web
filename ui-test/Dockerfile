@@ -15,8 +15,8 @@ LABEL commit_id=${COMMIT_ID}
 LABEL build_time=${BUILD_TIME}
 
 # Define build-time arguments for user and group
-ARG container_user=mosip
-ARG container_user_group=mosip
+ARG container_user=inji
+ARG container_user_group=inji
 ARG container_user_uid=1001
 ARG container_user_gid=1001
 
@@ -37,13 +37,13 @@ RUN groupadd -g ${container_user_gid} ${container_user_group} \
 USER ${container_user_uid}:${container_user_gid}
 
 
-RUN mkdir -p /home/mosip/src/test/resources/config/
+RUN mkdir -p /home/inji/src/test/resources/config/
 
-RUN mkdir -p /home/mosip/test-output/SparkReport/
-RUN chmod -R 777 /home/mosip/test-output
+RUN mkdir -p /home/inji/test-output/SparkReport/
+RUN chmod -R 777 /home/inji/test-output
 
-RUN mkdir -p /home/mosip/screenshots/
-RUN chmod -R 777 /home/mosip/screenshots/
+RUN mkdir -p /home/inji/screenshots/
+RUN chmod -R 777 /home/inji/screenshots/
 
 
 
@@ -52,19 +52,19 @@ RUN chmod -R 777 /home/mosip/screenshots/
 COPY --chown=${container_user_uid}:${container_user} --chmod=771 ./entrypoint.sh ${work_dir}/entrypoint.sh
 COPY --chown=${container_user}:${container_user} ./application.properties $work_dir/
 COPY --chown=${container_user}:${container_user} ./target $work_dir/target
-COPY --chown=${container_user}:${container_user} ./src/test/resources/featurefiles/ /home/mosip/featurefiles/
-COPY --chown=${container_user}:${container_user} ./src/main/resources/ /home/mosip/src/test/resources/
-COPY --chown=${container_user}:${container_user} ./src/test/resources/config.properties /home/mosip/src/test/resources/config.properties
-COPY --chown=${container_user}:${container_user} ./src/main/java/utils/ /home/mosip/src/main/java/utils/
-COPY --chown=${container_user}:${container_user} ./screenshots/ /home/mosip/screenshots/
-COPY --chown=${container_user}:${container_user} ./resource/ /home/mosip/resource/
+COPY --chown=${container_user}:${container_user} ./src/test/resources/featurefiles/ /home/inji/featurefiles/
+COPY --chown=${container_user}:${container_user} ./src/main/resources/ /home/inji/src/test/resources/
+COPY --chown=${container_user}:${container_user} ./src/test/resources/config.properties /home/inji/src/test/resources/config.properties
+COPY --chown=${container_user}:${container_user} ./src/main/java/utils/ /home/inji/src/main/java/utils/
+COPY --chown=${container_user}:${container_user} ./screenshots/ /home/inji/screenshots/
+COPY --chown=${container_user}:${container_user} ./resource/ /home/inji/resource/
 COPY --chown=${container_user}:${container_user} ./application.properties $work_dir/
 COPY ["Biometric Devices", "$work_dir/Biometric Devices"]
 
-COPY --chown=${container_user}:${container_user} ./testNgXmlFiles/ /home/mosip/testNgXmlFiles/
+COPY --chown=${container_user}:${container_user} ./testNgXmlFiles/ /home/inji/testNgXmlFiles/
 
 
-COPY --chown=${container_user_uid}:${container_user} ./browserstack.yml /home/mosip/
+COPY --chown=${container_user_uid}:${container_user} ./browserstack.yml /home/inji/
 COPY --chown=${container_user_uid}:${container_user} ./target/*.jar ${work_dir}
 
 # Set working directory

@@ -35,8 +35,13 @@ jest.mock("../../modals/ErrorCard", () => ({
 }));
 
 jest.mock("../../modals/CredentialShareSuccessModal", () => ({
-    CredentialShareSuccessModal: ({ isOpen }: { isOpen: boolean }) =>
-        isOpen ? <div data-testid="success-modal" /> : null,
+    CredentialShareSuccessModal: ({ isOpen, returnUrl, onClose }: { isOpen: boolean; returnUrl?: string; onClose?: () => void }) =>
+        isOpen ? (
+            <div data-testid="success-modal">
+                <div data-testid="modal-return-url">{returnUrl || 'no-url'}</div>
+                {onClose && <button data-testid="modal-close-btn" onClick={onClose}>Close</button>}
+            </div>
+        ) : null,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -225,5 +230,240 @@ describe("CredentialShareHandler", () => {
         expect(screen.getByTestId("modal-loader-card")).toBeInTheDocument();
         expect(screen.queryByTestId("success-modal")).not.toBeInTheDocument();
         expect(screen.queryByTestId("modal-error-card")).not.toBeInTheDocument();
+    });
+
+    describe("redirectUri handling", () => {
+        beforeEach(() => {
+            // Mock window.location.href
+            delete (window as any).location;
+            (window as any).location = { href: '' };
+        });
+
+        it("uses redirectUri from API response when available", async () => {
+            const apiRedirectUri = "https://api-response.com/redirect";
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: { redirectUri: apiRedirectUri },
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const modalReturnUrl = screen.getByTestId("modal-return-url");
+            expect(modalReturnUrl).toHaveTextContent(apiRedirectUri);
+        });
+
+        it("falls back to returnUrl prop when redirectUri is not in API response", async () => {
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: {}, // No redirectUri in response
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const modalReturnUrl = screen.getByTestId("modal-return-url");
+            expect(modalReturnUrl).toHaveTextContent(defaultProps.returnUrl);
+        });
+
+        it("falls back to returnUrl prop when redirectUri is null in API response", async () => {
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: { redirectUri: null },
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const modalReturnUrl = screen.getByTestId("modal-return-url");
+            expect(modalReturnUrl).toHaveTextContent(defaultProps.returnUrl);
+        });
+
+        it("calls onClose when both redirectUri and returnUrl are empty", async () => {
+            const onCloseMock = jest.fn();
+            const propsWithoutReturnUrl = {
+                ...defaultProps,
+                returnUrl: "",
+                onClose: onCloseMock,
+            };
+
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: {}, // No redirectUri
+            });
+
+            render(<CredentialShareHandler {...propsWithoutReturnUrl} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const closeButton = screen.getByTestId("modal-close-btn");
+            fireEvent.click(closeButton);
+
+            expect(onCloseMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("redirects to redirectUri from API response when modal close is clicked", async () => {
+            const apiRedirectUri = "https://api-response.com/redirect";
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: { redirectUri: apiRedirectUri },
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const closeButton = screen.getByTestId("modal-close-btn");
+            fireEvent.click(closeButton);
+
+            expect(window.location.href).toBe(apiRedirectUri);
+        });
+
+        it("redirects to returnUrl prop when redirectUri is not available and modal close is clicked", async () => {
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: {}, // No redirectUri
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const closeButton = screen.getByTestId("modal-close-btn");
+            fireEvent.click(closeButton);
+
+            expect(window.location.href).toBe(defaultProps.returnUrl);
+        });
+
+        it("extracts redirectUri from API response on retry success", async () => {
+            const retryableErrorResponse = {
+                ok: () => false,
+                error: { message: "Retry me" },
+            };
+            const successResponseWithRedirectUri = {
+                ok: () => true,
+                data: { redirectUri: "https://retry-success.com/redirect" },
+            };
+
+            // First call fails
+            mockFetchData.mockResolvedValueOnce(retryableErrorResponse);
+
+            // Store the retry callback and success callback
+            let storedRetryCallback: (() => Promise<any>) | null = null;
+            let storedRetrySuccessCallback: ((response: any) => void) | null = null;
+
+            mockUseApiErrorHandler.mockImplementation(() => {
+                if (mockHandleApiError.mock.calls.length > 0) {
+                    // Extract the retry callback and success callback from handleApiError call
+                    const lastCall = mockHandleApiError.mock.calls[mockHandleApiError.mock.calls.length - 1];
+                    if (lastCall && lastCall.length >= 3) {
+                        storedRetryCallback = lastCall[2]; // retryFn is the 3rd argument
+                        storedRetrySuccessCallback = lastCall[3]; // onRetrySuccess is the 4th argument
+                    }
+
+                    return {
+                        ...mockErrorHandlerReturnValue,
+                        showError: true,
+                        onRetry: async () => {
+                            // Simulate retry: call the retry function which triggers API call
+                            if (storedRetryCallback) {
+                                // Mock the retry API call to succeed
+                                mockFetchData.mockResolvedValueOnce(successResponseWithRedirectUri);
+                                const response = await storedRetryCallback();
+                                // Call the success callback if retry succeeded
+                                if (response && response.ok() && storedRetrySuccessCallback) {
+                                    storedRetrySuccessCallback(response);
+                                }
+                            }
+                        },
+                        onClose: undefined,
+                    };
+                }
+                return mockErrorHandlerReturnValue;
+            });
+
+            render(<CredentialShareHandler {...defaultProps} />);
+            await waitFor(() => expect(mockHandleApiError).toHaveBeenCalled());
+
+            // Wait for error card to appear
+            await waitFor(() =>
+                expect(screen.getByTestId("modal-error-card")).toBeInTheDocument()
+            );
+
+            // Trigger retry
+            const retryButton = screen.getByRole('button', { name: 'Retry' });
+            fireEvent.click(retryButton);
+
+            // Wait for success modal with redirectUri from retry
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument(),
+                { timeout: 3000 }
+            );
+
+            const modalReturnUrl = screen.getByTestId("modal-return-url");
+            expect(modalReturnUrl).toHaveTextContent("https://retry-success.com/redirect");
+        });
+
+        it("prioritizes redirectUri from API response over returnUrl prop", async () => {
+            const apiRedirectUri = "https://api-response.com/redirect";
+            const propReturnUrl = "https://prop-url.com/callback";
+
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: { redirectUri: apiRedirectUri },
+            });
+
+            const propsWithDifferentReturnUrl = {
+                ...defaultProps,
+                returnUrl: propReturnUrl,
+            };
+
+            render(<CredentialShareHandler {...propsWithDifferentReturnUrl} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const modalReturnUrl = screen.getByTestId("modal-return-url");
+            expect(modalReturnUrl).toHaveTextContent(apiRedirectUri);
+            expect(modalReturnUrl).not.toHaveTextContent(propReturnUrl);
+        });
+
+        it("passes onClose handler to success modal", async () => {
+            const onCloseMock = jest.fn();
+            const propsWithOnClose = {
+                ...defaultProps,
+                onClose: onCloseMock,
+            };
+
+            mockFetchData.mockResolvedValueOnce({
+                ok: () => true,
+                data: {},
+            });
+
+            render(<CredentialShareHandler {...propsWithOnClose} />);
+
+            await waitFor(() =>
+                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+            );
+
+            const closeButton = screen.getByTestId("modal-close-btn");
+            expect(closeButton).toBeInTheDocument();
+        });
     });
 });
