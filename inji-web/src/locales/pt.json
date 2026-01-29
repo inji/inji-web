@@ -100,6 +100,7 @@
       "createWalletError": "Falha na criação da carteira.",
       "incorrectPasscodeError": "A senha não parece correta. Tente novamente ou toque em \"Esqueci a senha\" se precisar de ajuda para redefini-la.",
       "fetchWalletsError": "Erro ao buscar carteiras.",
+      "lockedTryAgainIn": "Bloqueado. Tente novamente em",
       "walletStatus": {
         "temporarily_locked": "Você atingiu o número máximo de tentativas. Sua carteira está temporariamente bloqueada. Tente novamente mais tarde.",
         "permanently_locked": "Sua carteira foi bloqueada permanentemente devido a várias tentativas frustradas. Clique em \"Esqueceu a senha?\" para redefinir sua carteira e continuar.",
