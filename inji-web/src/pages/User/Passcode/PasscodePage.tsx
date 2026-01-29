@@ -262,8 +262,13 @@ export const PasscodePage: React.FC = () => {
                 apiConfig: api.userLogout,
             });
             if (!response.ok()) {
-                const parsedErrors = (response.error as ApiError)?.response?.data?.errors;
-                const errorCode = parsedErrors?.[0]?.errorCode;
+                const data = (response.error as ApiError)?.response?.data as
+                    | { errors?: ErrorType[] }
+                    | ErrorType
+                    | undefined;
+                const errorCode = Array.isArray(data?.errors)
+                    ? data.errors[0]?.errorCode
+                    : (data as ErrorType)?.errorCode;
                 if (errorCode !== 'user_logout_error') {
                     // Non-fatal logout error; still clear session and redirect
                 }
@@ -296,7 +301,7 @@ export const PasscodePage: React.FC = () => {
                 <TertiaryButton
                     onClick={handleLoginWithDifferentAccount}
                     title={t('loginWithDifferentAccount')}
-                    testId="btn-login-different-account"
+                    testId="login-different-account"
                     className={PasscodePageStyles.forgotPasscodeButton}
                 />
             </div>
