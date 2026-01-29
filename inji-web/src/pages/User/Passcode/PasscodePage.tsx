@@ -71,7 +71,15 @@ export const PasscodePage: React.FC = () => {
                 useEffect(()=>{
                   let timer:NodeJS.Timeout;
                   if(remainingTime>0){
-                  timer=setInterval(()=>{setRemainingTime(prev=>prev>0?prev-1:0)},1000);
+                  timer=setInterval(()=>{setRemainingTime(prev=>{const next = prev > 0 ? prev - 1 : 0;
+        if (next === 0) {
+          setCanUnlockWallet(true); 
+        }
+        return next;
+      });
+    }, 1000);
+  } else {
+    setCanUnlockWallet(true); 
                   }
                   return()=>{if(timer)clearInterval(timer);}
                 },[remainingTime]);
