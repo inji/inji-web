@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "பாஸ்கோடு உள்ளிடவும்",
     "confirmPasscodeLabel": "பாஸ்கோடு உறுதிப்படுத்தவும்",
     "forgotPasscode": "கடவுக்குறியீட்டை மறந்துவிட்டேன்",
+    "loginWithDifferentAccount": "வேறு கணக்கில் உள்நுழையுங்கள்",
     "passcodeWarning": "எதிர்கால உள்நுழைவுக்கு பாஸ்கோடு நினைவில் வைக்கவும்",
     "error": {
       "walletNotFoundError": "பணப்பை காணவில்லை. தயவுசெய்து ஒன்றை உருவாக்கவும்.",

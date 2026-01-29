@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "Entrez le code d'accès",
     "confirmPasscodeLabel": "Confirmez le code d'accès",
     "forgotPasscode": "Mot de passe oublié",
+    "loginWithDifferentAccount": "Se connecter avec un autre compte",
     "passcodeWarning": "Assurez-vous de vous souvenir du mot de passe pour une future connexion",
     "error": {
       "walletNotFoundError": "Aucun portefeuille trouvé. Veuillez en créer un.",

@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "Digite o código de acesso",
     "confirmPasscodeLabel": "Confirme o código de acesso",
     "forgotPasscode": "Esqueceu a senha",
+    "loginWithDifferentAccount": "Entrar com outra conta",
     "passcodeWarning": "Certifique-se de lembrar a senha para login futuro",
     "error": {
       "walletNotFoundError": "Nenhuma carteira encontrada. Crie uma.",

@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "أدخل رمز المرور",
     "confirmPasscodeLabel": "تأكيد رمز المرور",
     "forgotPasscode": "نسيت رمز المرور",
+    "loginWithDifferentAccount": "تسجيل الدخول بحساب مختلف",
     "passcodeWarning": "تأكد من تذكر كلمة المرور لتسجيل الدخول في المستقبل",
     "error": {
       "walletNotFoundError": "لم يتم العثور على محفظة. يرجى إنشاء واحدة.",
