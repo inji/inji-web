@@ -8,7 +8,7 @@ Feature: OIDC Login for InjiWeb
     Then user click on toggle button
     Then user verify the toggle button
     And user enters the passcode for confirmation "<wrongConfirmation1>"
-    And user click on submit button
+    #And user click on submit button
     Then user verify error message for mismatch
     And user enters the passcode for confirmation "<stringPasscode>"
     Then user click on toggle button for confirmation
@@ -160,7 +160,7 @@ Feature: OIDC Login for InjiWeb
     Then user click on forget passcode button
     And user enters the passcode "<resetPasscode>"
     And user enters the passcode for confirmation "<wrongConfirmation1>"
-    And user click on submit button
+    #And user click on submit button
     Then user verify error message for mismatch
     And user enters the passcode for confirmation "<resetPasscode>"
     And user click on submit button
