@@ -68,7 +68,7 @@ jobs:
   sonar-analysis-inji-web:
     if: "${{ github.event_name != 'pull_request' }}"
     needs: build-dockers-inji-web
-    uses: mosip/kattu/.github/workflows/npm-sonar-analysis.yml@master-java21
+    uses: mosip/kattu/.github/workflows/npm-sonar-analysis.yml@dsd9685
     with:
       SERVICE_LOCATION: ./inji-web
     secrets:
