@@ -28,7 +28,7 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className}) => {
             );
             if (issuerResponseState === RequestStatus.ERROR) {
                 toast.error(t("errorContent"));
-            return
+                return
             }
 
             const ignoredIssuerIds = window._env_.IGNORED_ISSUER_IDS
