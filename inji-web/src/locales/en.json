@@ -93,6 +93,10 @@
     "confirmPasscodeLabel":"Confirm Passcode",
     "forgotPasscode":"Forgot Passcode",
     "passcodeWarning":"Make sure you remember the password for future login",
+    "forgotPasscodeConfirmation": {
+      "title": "Reset Your Passcode?",
+      "message": "Are you sure you want to reset your passcode? This will delete all your stored cards and you'll need to re-download them from the original issuers."
+    },
     "error":{
       "walletNotFoundError":"Wallet not found",
       "passcodeLengthError":"Please Enter 6 digits in the Pin",
