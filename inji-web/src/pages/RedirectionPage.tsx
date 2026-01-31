@@ -6,7 +6,6 @@ import {DownloadResult} from '../components/Redirection/DownloadResult';
 import {api} from '../utils/api';
 import {SessionObject, TokenRequestBody} from '../types/data';
 import {useTranslation} from 'react-i18next';
-import i18next from 'i18next';
 import {downloadCredentialPDF, getErrorObject, getTokenRequestBody} from '../utils/misc';
 import {getIssuerDisplayObjectForCurrentLanguage} from '../utils/i18n';
 import {useUser} from '../hooks/User/useUser';
@@ -25,6 +24,7 @@ export const RedirectionPage: React.FC = () => {
     const credentialTypeDisplayObj =
         activeSessionInfo?.selectedCredentialType?.displayObj;
     const {t} = useTranslation("RedirectionPage");
+    const {t: tLayout} = useTranslation("Layout");
     const [session, setSession] = useState<SessionObject | null>(activeSessionInfo);
     const [completedDownload, setCompletedDownload] = useState<boolean>(false);
     const displayObject = getIssuerDisplayObjectForCurrentLanguage(session?.selectedIssuer?.display ?? []);
@@ -112,8 +112,7 @@ export const RedirectionPage: React.FC = () => {
         if (completedDownload) {
             const isError = vcDownloadApi.state === RequestStatus.ERROR;
             showToast({
-                message: i18next.t(`VCDownload.${isError ? 'error' : 'success'}`, {
-                    ns: 'Layout',
+                message: tLayout(`VCDownload.${isError ? 'error' : 'success'}`, {
                     cardType: credentialTypeDisplayObj?.[0]?.name || credentialType
                 }),
                 type: isError ? 'error' : 'success',
