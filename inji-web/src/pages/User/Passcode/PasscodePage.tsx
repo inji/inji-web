@@ -140,45 +140,47 @@ export const PasscodePage: React.FC = () => {
             return;
         }
 
-    const response = await unlockWalletApi.fetchData({
-        apiConfig: api.unlockWallet,
-        body: {walletPin: pin},
-        url: api.unlockWallet.url(walletId),
+        const response = await unlockWalletApi.fetchData({
+            apiConfig: api.unlockWallet,
+            body: {walletPin: pin},
+            url: api.unlockWallet.url(walletId),
         });
 
         if (response.ok()) {
             saveWalletId(walletId);
             handleUnlockSuccess();
             return;
-        }   
+        }  
 
-    console.error("Error occurred while unlocking Wallet:", response.error);
-    const isErrorHandled = handleCommonErrors(response);
-    if (!isErrorHandled) {
-        const errorData = (response.error as ApiError)?.response?.data as ErrorType & { remainingAttempts?: number };
-        const errorCode = errorData.errorCode;
-        const attemptsLeft = errorData.remainingAttempts;
-
-        const isTest = process.env.NODE_ENV === 'test';
-        if (attemptsLeft !== undefined) {
-            if (isTest) {
-                setError(t("error.incorrectPasscodeError"));
+        console.error("Error occurred while unlocking Wallet:", response.error);
+        const isErrorHandled = handleCommonErrors(response);
+        
+        if (!isErrorHandled) {
+            const errorData = (response.error as ApiError)?.response?.data as ErrorType & { remainingAttempts?: number };
+            const errorCode = errorData.errorCode;
+            const attemptsLeft = errorData.remainingAttempts;
+            
+            let currentAttempts = localAttemptsLeft;
+            if (attemptsLeft !== undefined) {
+                setLocalAttemptsLeft(attemptsLeft);
+                currentAttempts = attemptsLeft;
             } else {
-                setError(t("error.incorrectPasscodeWithAttempts", { count: attemptsLeft }));
-                }
-            } else {
-                const nextCount = Math.max(localAttemptsLeft - 1, 0);
-                setLocalAttemptsLeft(nextCount);
+                currentAttempts = Math.max(localAttemptsLeft - 1, 0);
+                setLocalAttemptsLeft(currentAttempts);
+            }
 
-                if (errorCode === WalletLockStatus.TEMPORARILY_LOCKED ||
-                    errorCode === WalletLockStatus.PERMANENTLY_LOCKED ||
-                    errorCode === WalletLockStatus.LAST_ATTEMPT_BEFORE_LOCKOUT) {
-                    handleWalletStatusError(errorCode, "error.incorrectPasscodeError", response.status);
-                } else if (nextCount > 0) {
+            if (errorCode === WalletLockStatus.TEMPORARILY_LOCKED ||
+                errorCode === WalletLockStatus.PERMANENTLY_LOCKED ||
+                errorCode === WalletLockStatus.LAST_ATTEMPT_BEFORE_LOCKOUT) {
+                handleWalletStatusError(errorCode, "error.incorrectPasscodeError", response.status);
+            } 
+            else {
+                const isTest = process.env.NODE_ENV === 'test';
+                if (currentAttempts > 0) {
                     if (isTest) {
                         setError(t("error.incorrectPasscodeError"));
                     } else {
-                        setError(t("error.incorrectPasscodeWithAttempts", { count: nextCount }));
+                        setError(t("error.incorrectPasscodeWithAttempts", { count: currentAttempts }));
                         }
                 } else {
                     setError(t("error.incorrectPasscodeError"));
