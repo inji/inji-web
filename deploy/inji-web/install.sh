@@ -13,7 +13,6 @@ DEFAULT_INJIWEB_HOST=$( kubectl get cm inji-stack-config -n config-server -o jso
 # Check if INJIWEB_HOST is present under configmap/inji-stack-config of configserver
 if echo "$DEFAULT_INJIWEB_HOST" | grep -q "INJIWEB_HOST"; then
     echo "INJIWEB_HOST is already present in configmap/inji-stack-config of configserver"
-    MOSIP_INJIWEB_HOST=DEFAULT_INJIWEB_HOST
 else
     read -p "Please provide injiwebhost (eg: injiweb.sandbox.xyz.net ) : " INJIWEB_HOST
 
@@ -45,14 +44,14 @@ function installing_inji-web() {
 echo "Labeling namespace for Istio"
 kubectl label ns $NS istio-injection=enabled --overwrite
 
-helm repo add mosip https://mosip.github.io/mosip-helm
+helm repo add inji https://inji.github.io/helm
 helm repo update
 
 ./copy_cm.sh
 
-INJI_HOST=$(kubectl get cm inji-stack-config -o jsonpath={.data.injiweb-host})
+INJIWEB_HOST=$(kubectl get cm inji-stack-config -o jsonpath={.data.injiweb-host})
 echo "Installing INJIWEB"
-helm -n $NS install injiweb mosip/injiweb \
+helm -n $NS install injiweb inji/injiweb \
   --set inji_web.configmaps.injiweb-ui.MIMOTO_URL=https://$INJIWEB_HOST/v1/mimoto \
   --set istio.hosts[0]=$INJIWEB_HOST \
   --version $CHART_VERSION
