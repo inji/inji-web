@@ -110,7 +110,7 @@ cd ../inji-web-test
 mvn clean package
 ```
 
-6. Execute the test suite using the following command.Update the JAR version and environment details as required.
+6. Execute the test suite using the following command. Update the JAR version and environment details as required.
 
 ```bash
 java -cp target/uitest-injiweb-0.12.0-SNAPSHOT.jar   -Dmodules=ui-test   -Denv.user=api-internal.released   -Denv.endpoint=https://api-internal.released.mosip.net   -Denv.testLevel=smokeAndRegression   runnerfiles.Runner testNgXmlFiles/masterSuite.xml
