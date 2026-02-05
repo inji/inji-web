@@ -1,6 +1,6 @@
 apiVersion: v2
 name: injiweb
-description: A Helm chart for MOSIP injiweb UI module
+description: A Helm chart for INJI injiweb UI module
 type: application
 version: 0.0.1-develop
 appVersion: ""
@@ -10,10 +10,10 @@ dependencies:
     tags:
       - bitnami-common
     version: 1.x.x
-home: https://mosip.io
+home: https://inji.io
 keywords:
   - mosip
   - inji-web
 maintainers:
-  - email: info@mosip.io
-    name: MOSIP
+  - email: info@inji.io
+    name: INJI
