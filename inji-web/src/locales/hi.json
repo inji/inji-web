@@ -373,7 +373,7 @@
     "title": "वैधता साझा करें",
     "subTitle": "कृपया साझा करने की वैधता निर्धारित करने के लिए अपनी सहमति प्रदान करें {{credentialName}}",
     "content": {
-      "selectedDocument": "चयनित दस्तावेज़",
+      "selectedDocument": "चयनित क्रेडेंशियल",
       "consent": "सहमति की वैधता *",
       "validityTimesHeader": "कितनी बार",
       "validityTimesOptions": {

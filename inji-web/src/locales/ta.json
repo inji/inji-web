@@ -373,7 +373,7 @@
     "title": "பங்கு செல்லுபடியாகும்",
     "subTitle": "பகிர்வதற்கான செல்லுபடியை அமைக்க உங்கள் ஒப்புதலை வழங்கவும் {{credentialName}}",
     "content": {
-      "selectedDocument": "தேர்ந்தெடுக்கப்பட்ட ஆவணம்",
+      "selectedDocument": "தேர்ந்தெடுக்கப்பட்ட நற்சான்றிதழ்",
       "consent": "ஒப்புதல் செல்லுபடியாகும் *",
       "validityTimesHeader": "முறைகளின் எண்ணிக்கை",
       "validityTimesOptions": {
