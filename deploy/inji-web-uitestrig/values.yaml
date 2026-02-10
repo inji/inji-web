@@ -21,7 +21,7 @@ modules:
     image:
       registry: docker.io
       repository: mosipqa/uitest-web
-      tag: develop
+      tag: 0.16.x
       pullPolicy: Always
 
 crontime: "0 3 * * *"    ## run cronjob every day at 3 AM (time hr: 0-23 )
