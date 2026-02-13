@@ -20,9 +20,9 @@ Ensure the following software is installed on the machine from where the automat
 Set the environment variables as follows:
 
 ```bash
-export MOSIP_INJIWEB_GOOGLE_REFRESH_TOKEN=<<refresh_token>>
-export MOSIP_INJIWEB_GOOGLE_CLIENT_ID=<<google_client_id>>
-export MOSIP_INJIWEB_GOOGLE_CLIENT_SECRET=<<client_secret>>
+export INJIWEB_GOOGLE_REFRESH_TOKEN=<<refresh_token>>
+export INJIWEB_GOOGLE_CLIENT_ID=<<google_client_id>>
+export INJIWEB_GOOGLE_CLIENT_SECRET=<<client_secret>>
 export TEST_URL=<<url>>
 ```
 
@@ -30,10 +30,13 @@ export TEST_URL=<<url>>
 
 ## Configuration
 
-Update the following configurations according to the environment details:
+Update Configuration Files as per Environment
+Update the below configuration files by replacing the environment-specific values with the target environment details.
 
 ```
-update src\main\resources\config\injiVerify.properties
+Example(for dev environment):
+
+update src\main\resources\config\injiweb.properties
 apiEnvUser=api-internal.dev
 apiInternalEndPoint=https://api-internal.dev.mosip.net
 injiverify=https://injiverify.dev.mosip.net/
@@ -107,10 +110,10 @@ cd ../inji-web-test
 mvn clean package
 ```
 
-6. Run the test suite using:
+6. Execute the test suite using the following command. Update the JAR version and environment details as required.
 
 ```bash
-java -cp target/uitest-injiweb-0.12.0-SNAPSHOT.jar   -Dmodules=ui-test   -Denv.user=api-internal.released   -Denv.endpoint=https://api-internal.released.mosip.net   -Denv.testLevel=smokeAndRegression   runnerfiles.Runner testNgXmlFiles/masterSuite.xml
+java -Denv.user=api-internal.released -Denv.endpoint=https://api-internal.released.mosip.net -Denv.testLevel=smokeAndRegression -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
 ```
 
 ---

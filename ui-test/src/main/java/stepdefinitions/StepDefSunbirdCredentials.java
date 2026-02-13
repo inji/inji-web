@@ -2,7 +2,7 @@
 package stepdefinitions;
 
 import io.cucumber.java.en.Then;
-import io.mosip.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
+import io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
 import io.mosip.testrig.apirig.utils.AdminTestUtil;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
