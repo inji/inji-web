@@ -30,9 +30,9 @@ public class HttpUtils {
 	}
 
 	public static String getIdToken() throws IOException {
-		String clientId = get("MOSIP_INJIWEB_GOOGLE_CLIENT_ID");
-		String clientSecret = get("MOSIP_INJIWEB_GOOGLE_CLIENT_SECRET");
-		String refreshToken = get("MOSIP_INJIWEB_GOOGLE_REFRESH_TOKEN");
+		String clientId = get("INJIWEB_GOOGLE_CLIENT_ID");
+		String clientSecret = get("INJIWEB_GOOGLE_CLIENT_SECRET");
+		String refreshToken = get("INJIWEB_GOOGLE_REFRESH_TOKEN");
 
 		URL url = new URL("https://oauth2.googleapis.com/token");
 		String urlParameters = "client_id=" + URLEncoder.encode(clientId, "UTF-8") +

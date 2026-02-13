@@ -6,7 +6,7 @@
 		<parameter name="ymlFile" value="injiweb/AddIdentity/AddIdentity.yml" />
 		<parameter name="prerequisite" value="Yes" />
 		<classes>
-			<class name="io.mosip.testrig.apirig.injiweb.testscripts.AddIdentity" />
+			<class name="io.inji.testrig.apirig.injiweb.testscripts.AddIdentity" />
 		</classes>
 	</test>
 	<test name="CreatePolicySunBirdR">
@@ -15,7 +15,7 @@
 		<parameter name="idKeyName" value="osid" />
 		<parameter name="prerequisite" value="Yes" />
 		<classes>
-			<class name="io.mosip.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId" />
+			<class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId" />
 		</classes>
 	</test>
 	<test name="GetPolicySunBirdR">
@@ -23,7 +23,7 @@
 			value="injiweb/SunBirdR/GetPolicySunBirdR/GetPolicySunBirdR.yml" />
 			<parameter name="prerequisite" value="Yes" />
 		<classes>
-			<class name="io.mosip.testrig.apirig.injiweb.testscripts.GetWithParam" />
+			<class name="io.inji.testrig.apirig.injiweb.testscripts.GetWithParam" />
 		</classes>
 	</test>
 	<test name="SearchPolicySunBirdR">
@@ -31,7 +31,7 @@
 			value="injiweb/SunBirdR/SearchPolicySunBirdR/SearchPolicySunBirdR.yml" />
 			<parameter name="prerequisite" value="Yes" />
 		<classes>
-			<class name="io.mosip.testrig.apirig.injiweb.testscripts.SimplePost" />
+			<class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePost" />
 		</classes>
 	</test>
 	
