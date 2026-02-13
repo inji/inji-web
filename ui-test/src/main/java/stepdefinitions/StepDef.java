@@ -4,7 +4,7 @@ package stepdefinitions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.mosip.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
+import io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
 import io.mosip.testrig.apirig.utils.AdminTestUtil;
 
 import org.junit.Assert;
