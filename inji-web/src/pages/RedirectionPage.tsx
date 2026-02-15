@@ -56,9 +56,14 @@ export const RedirectionPage: React.FC = () => {
         })
 
         if (credentialDownloadResponse.state !== RequestStatus.ERROR) {
+            const contentType = credentialDownloadResponse?.headers?.get
+            ? credentialDownloadResponse.headers.get('content-type')
+            : null;
+            const extension = contentType === 'image/svg+xml' ? 'svg' : 'pdf';
+
             await downloadCredentialPDF(
                 credentialDownloadResponse.data,
-                credentialType + ".pdf"
+                `${credentialType}.${extension}`
             );
             setCompletedDownload(true);
         }
