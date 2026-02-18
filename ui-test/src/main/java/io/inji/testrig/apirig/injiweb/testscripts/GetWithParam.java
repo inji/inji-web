@@ -81,7 +81,7 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 	 * @throws AdminTestException
 	 */
 	@Test(dataProvider = "testcaselist")
-	public void test(TestCaseDTO testCaseDTO) throws AuthenticationTestException, AdminTestException {
+	public void test(TestCaseDTO testCaseDTO) throws Exception {
 		testCaseName = testCaseDTO.getTestCaseName();
 		testCaseDTO = InjiWebUtil.isTestCaseValidForTheExecution(testCaseDTO);
 		testCaseDTO = InjiWebUtil.changeContextURLByFlag(testCaseDTO);

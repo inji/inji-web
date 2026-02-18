@@ -89,7 +89,7 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 	 */
 	@Test(dataProvider = "testcaselist")
 	public void test(TestCaseDTO testCaseDTO)
-			throws AuthenticationTestException, AdminTestException, NoSuchAlgorithmException {
+			throws Exception {
 		testCaseName = testCaseDTO.getTestCaseName();
 		if (HealthChecker.signalTerminateExecution) {
 			throw new SkipException(
