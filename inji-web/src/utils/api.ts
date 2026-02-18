@@ -24,7 +24,7 @@ export class api {
     static authorizationRedirectionUrl = window.location.origin + ROUTES.REDIRECT;
 
     static fetchIssuers: ApiRequest = {
-        url: () => api.mimotoHost + "/issuers",
+        url: () => api.mimotoHost + "/v2/issuers",
         methodType: MethodType.GET,
         headers: () => {
             return {
@@ -33,7 +33,7 @@ export class api {
         }
     };
     static fetchSpecificIssuer: ApiRequest = {
-        url: (issuerId: string) => api.mimotoHost + `/issuers/${issuerId}`,
+        url: (issuerId: string) => api.mimotoHost + `/v2/issuers/${issuerId}`,
         methodType: MethodType.GET,
         headers: () => {
             return {
