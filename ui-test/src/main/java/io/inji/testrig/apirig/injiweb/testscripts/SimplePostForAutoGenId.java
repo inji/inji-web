@@ -1,4 +1,4 @@
-package io.mosip.testrig.apirig.injiweb.testscripts;
+package io.inji.testrig.apirig.injiweb.testscripts;
 
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +34,7 @@ import io.mosip.testrig.apirig.utils.AuthenticationTestException;
 import io.mosip.testrig.apirig.utils.GlobalConstants;
 import io.mosip.testrig.apirig.utils.OutputValidationUtil;
 import io.mosip.testrig.apirig.utils.ReportUtil;
+import io.mosip.testrig.apirig.utils.SecurityXSSException;
 import io.restassured.response.Response;
 
 public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
@@ -89,7 +90,7 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 	 */
 	@Test(dataProvider = "testcaselist")
 	public void test(TestCaseDTO testCaseDTO)
-			throws AuthenticationTestException, AdminTestException, NoSuchAlgorithmException {
+			throws AuthenticationTestException, AdminTestException, NoSuchAlgorithmException, SecurityXSSException {
 		testCaseName = testCaseDTO.getTestCaseName();
 		if (HealthChecker.signalTerminateExecution) {
 			throw new SkipException(

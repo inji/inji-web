@@ -3,7 +3,7 @@ package stepdefinitions;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.mosip.testrig.apirig.injiweb.testscripts.AddIdentity;
+import io.inji.testrig.apirig.injiweb.testscripts.AddIdentity;
 import io.mosip.testrig.apirig.utils.AdminTestUtil;
 
 import org.apache.pdfbox.pdmodel.PDDocument;

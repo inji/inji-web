@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.mosip.injiweb</groupId>
+    <groupId>io.inji.injiweb</groupId>
     <artifactId>uitest-injiweb</artifactId>
-    <version>0.15.0-SNAPSHOT</version>
+    <version>0.16.0-SNAPSHOT</version>
     <name>inji-web-test</name>
     <description>Parent project of ui automation of injiweb</description>
-    <url>https://github.com/mosip/inji-web</url>
+    <url>https://github.com/inji/inji-web</url>
 
     <licenses>
         <license>
@@ -21,8 +21,8 @@
         <developer>
             <name>Mosip</name>
             <email>mosip.emailnotifier@gmail.com</email>
-            <organization>io.mosip</organization>
-            <organizationUrl>https://github.com/mosip/inji-web</organizationUrl>
+            <organization>io.inji</organization>
+            <organizationUrl>https://github.com/inji/inji-web</organizationUrl>
         </developer>
     </developers>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>io.mosip.testrig.apitest.commons</groupId>
             <artifactId>apitest-commons</artifactId>
-            <version>1.3.2</version>
+            <version>1.3.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

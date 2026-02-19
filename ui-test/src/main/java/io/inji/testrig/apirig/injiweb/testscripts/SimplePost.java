@@ -1,4 +1,4 @@
-package io.mosip.testrig.apirig.injiweb.testscripts;
+package io.inji.testrig.apirig.injiweb.testscripts;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -33,10 +33,11 @@ import io.mosip.testrig.apirig.utils.AuthenticationTestException;
 import io.mosip.testrig.apirig.utils.GlobalConstants;
 import io.mosip.testrig.apirig.utils.OutputValidationUtil;
 import io.mosip.testrig.apirig.utils.ReportUtil;
+import io.mosip.testrig.apirig.utils.SecurityXSSException;
 import io.restassured.response.Response;
 
-public class GetWithParam extends InjiWebUtil implements ITest {
-	private static final Logger logger = Logger.getLogger(GetWithParam.class);
+public class SimplePost extends InjiWebUtil implements ITest {
+	private static final Logger logger = Logger.getLogger(SimplePost.class);
 	protected String testCaseName = "";
 	public Response response = null;
 	public boolean sendEsignetToken = false;
@@ -81,10 +82,12 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 	 * @throws AdminTestException
 	 */
 	@Test(dataProvider = "testcaselist")
-	public void test(TestCaseDTO testCaseDTO) throws AuthenticationTestException, AdminTestException {
+	public void test(TestCaseDTO testCaseDTO) throws AuthenticationTestException, AdminTestException, SecurityXSSException {
 		testCaseName = testCaseDTO.getTestCaseName();
 		testCaseDTO = InjiWebUtil.isTestCaseValidForTheExecution(testCaseDTO);
 		testCaseDTO = InjiWebUtil.changeContextURLByFlag(testCaseDTO);
+		auditLogCheck = testCaseDTO.isAuditLogCheck();
+		String[] templateFields = testCaseDTO.getTemplateFields();
 		if (HealthChecker.signalTerminateExecution) {
 			throw new SkipException(
 					GlobalConstants.TARGET_ENV_HEALTH_CHECK_FAILED + HealthChecker.healthCheckFailureMapS);
@@ -96,27 +99,15 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 				throw new SkipException(GlobalConstants.VID_FEATURE_NOT_SUPPORTED);
 			}
 		}
-		auditLogCheck = testCaseDTO.isAuditLogCheck();
-		String[] templateFields = testCaseDTO.getTemplateFields();
 
-		if (testCaseDTO.getInputTemplate().contains(GlobalConstants.$PRIMARYLANG$))
-			testCaseDTO.setInputTemplate(testCaseDTO.getInputTemplate().replace(GlobalConstants.$PRIMARYLANG$,
-					BaseTestCase.languageList.get(0)));
-		if (testCaseDTO.getOutputTemplate().contains(GlobalConstants.$PRIMARYLANG$))
-			testCaseDTO.setOutputTemplate(testCaseDTO.getOutputTemplate().replace(GlobalConstants.$PRIMARYLANG$,
-					BaseTestCase.languageList.get(0)));
-		if (testCaseDTO.getInput().contains(GlobalConstants.$PRIMARYLANG$))
-			testCaseDTO.setInput(
-					testCaseDTO.getInput().replace(GlobalConstants.$PRIMARYLANG$, BaseTestCase.languageList.get(0)));
-		if (testCaseDTO.getOutput().contains(GlobalConstants.$PRIMARYLANG$))
-			testCaseDTO.setOutput(
-					testCaseDTO.getOutput().replace(GlobalConstants.$PRIMARYLANG$, BaseTestCase.languageList.get(0)));
+		String inputJson = getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate());
+		inputJson = InjiWebUtil.inputstringKeyWordHandeler(inputJson, testCaseName);
 
 		if (testCaseDTO.getTemplateFields() != null && templateFields.length > 0) {
 			ArrayList<JSONObject> inputtestCases = AdminTestUtil.getInputTestCase(testCaseDTO);
 			ArrayList<JSONObject> outputtestcase = AdminTestUtil.getOutputTestCase(testCaseDTO);
 			for (int i = 0; i < languageList.size(); i++) {
-				response = getWithPathParamAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
+				response = postWithBodyAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
 						getJsonFromTemplate(inputtestCases.get(i).toString(), testCaseDTO.getInputTemplate()),
 						COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName());
 
@@ -132,20 +123,13 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 		}
 
 		else {
-			String inputJson = getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate());
-
-			inputJson = InjiWebUtil.inputstringKeyWordHandeler(inputJson, testCaseName);
-			
-			String outputJson = getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate());
-			outputJson = InjiWebUtil.inputstringKeyWordHandeler(outputJson, testCaseName);
-			
 			if (testCaseName.contains("ESignet_")) {
 				if (InjiWebConfigManager.isInServiceNotDeployedList(GlobalConstants.ESIGNET)) {
 					throw new SkipException("esignet is not deployed hence skipping the testcase");
 				}
 
 				String tempUrl = ApplnURI;
-
+				
 				if (testCaseDTO.getEndPoint().startsWith("$SUNBIRDBASEURL$") && testCaseName.contains("SunBirdR")) {
 
 					if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
@@ -153,17 +137,16 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 
 					if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
 						tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
-						testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
-					}
-
-					response = getWithPathParamAndCookie(tempUrl + testCaseDTO.getEndPoint(), inputJson, auditLogCheck,
+					testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
+					
+					response = postWithBodyAndCookie(tempUrl + testCaseDTO.getEndPoint(), inputJson, auditLogCheck,
 							COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
-
-				} else {
-					response = getWithPathParamAndCookie(ApplnURI + testCaseDTO.getEndPoint(), inputJson, auditLogCheck,
-							COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
+					
 				}
-				
+			} else {
+				response = postWithBodyAndCookie(ApplnURI + testCaseDTO.getEndPoint(), inputJson, auditLogCheck,
+						COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
+			}
 			Map<String, List<OutputValidationDto>> ouputValid = null;
 			if (testCaseName.contains("_StatusCode")) {
 
@@ -173,14 +156,22 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 				ouputValid = new HashMap<>();
 				ouputValid.put(GlobalConstants.EXPECTED_VS_ACTUAL, List.of(customResponse));
 			} else {
-				ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(), outputJson, testCaseDTO,
+				ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(),
+						getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate()), testCaseDTO,
 						response.getStatusCode());
 			}
 
 			Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
-			if (!OutputValidationUtil.publishOutputResult(ouputValid))
-				throw new AdminTestException("Failed at output validation");
+
+			if (!OutputValidationUtil.publishOutputResult(ouputValid)) {
+				if (response.asString().contains("IDA-OTA-001"))
+					throw new AdminTestException(
+							"Exceeded number of OTP requests in a given time, Increase otp.request.flooding.max-count");
+				else
+					throw new AdminTestException("Failed at otp output validation");
+			}
 		}
+
 	}
 
 	/**
