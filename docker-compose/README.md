@@ -168,33 +168,33 @@ The mimoto-issuers-config.json file defines the list of Credential Issuers that 
 ```json
 {
   "issuers": [
-     {
-        "issuer_id": "StayProtected",
-        "credential_issuer": "StayProtected",
-        "display": [
-           {
-              "name": "StayProtected Insurance",
-              "logo": {
-                 "url": "https://raw.githubusercontent.com/tw-mosip/file-server/master/StayProtectedInsurance.png",
-                 "alt_text": "a square logo of a Sunbird"
-              },
-              "language": "en",
-              "title": "Download StayProtected Insurance Credentials",
-              "description": "Download insurance credential"
-           }
-        ],
-        "protocol": "OpenId4VCI",
-        "client_id": "esignet-sunbird-partner",
-        "client_alias": "esignet-sunbird-partner",
-        "wellknown_endpoint": "https://injicertify-insurance.collab.mosip.net/v1/certify/issuance/.well-known/openid-credential-issuer",
-        "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
-        "authorization_audience": "https://esignet-insurance.collab.mosip.net/v1/esignet/oauth/v2/token",
-        "token_endpoint": "https://localhost:8099/v1/mimoto/get-token/StayProtected",
-        "proxy_token_endpoint": "https://esignet-insurance.collab.mosip.net/v1/esignet/oauth/v2/token",
-        "qr_code_type": "OnlineSharing",
-        "credential_issuer_host": "https://injicertify-insurance.collab.mosip.net",
-        "enabled": "true"
-     }
+    {
+      "issuer_id": "Mock",
+      "protocol": "OpenId4VCI",
+      "display": [
+        {
+          "name": "Mock Identity",
+          "logo": {
+            "url": "https://inji.github.io/inji-config/logos/mosipid-logo.png",
+            "alt_text": "mosip-logo"
+          },
+          "title": "Mock Identity",
+          "description": "Download Mock Identity Credential",
+          "language": "en"
+        }
+      ],
+      "client_id": "wallet-demo",
+      "wellknown_endpoint": "https://injicertify-mock.collab.mosip.net/v1/certify/issuance/.well-known/openid-credential-issuer",
+      "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
+      "authorization_audience": "https://esignet-mock.released.mosip.net/v1/esignet/oauth/v2/token",
+      "token_endpoint": "https://api.collab.mosip.net/v1/mimoto/get-token/Mock",
+      "proxy_token_endpoint": "https://esignet-mock.released.mosip.net/v1/esignet/oauth/v2/token",
+      "client_alias": "wallet-demo-client",
+      "qr_code_type": "OnlineSharing",
+      "enabled": "true",
+      "credential_issuer": "Mock",
+      "credential_issuer_host": "https://injicertify-mock.collab.mosip.net"
+    }
   ]
 }
 ```
