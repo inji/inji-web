@@ -228,6 +228,8 @@ The mimoto-issuers-config.json file defines the list of Credential Issuers that 
    - `client_alias` for each Issuer is correctly configured and available in the oidckeystore.p12 file.
 3. For step-by-step guidance on how to add a new Issuer and generate the oidckeystore.p12 file, refer to the [Customization Overview](https://docs.inji.io/inji-wallet/inji-mobile/technical-overview/customization-overview/credential_providers) documentation.
 
+4. For sample UINs, refer to the [Customization Overview - Credential Providers](https://docs.inji.io/inji-wallet/inji-mobile/technical-overview/customization-overview/credential_providers#use-mock-data-from-collab-sandbox-env) documentation.
+
 ## Inji Mobile Wallet Configuration
 To bind an Android or iOS wallet using the e-signet service via Mimoto, ensure the following property is updated in application-local.properties (if running Mimoto using IDE) or mimoto-default.properties (if running Mimoto using docker compose) to point to the appropriate e-signet instance running in your target environment
 ```properties
