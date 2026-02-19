@@ -113,8 +113,8 @@ This is not for production use.
 12. Access Apis as
    * http://localhost:8099/v1/mimoto/allProperties
    * http://localhost:8099/v1/mimoto/issuers
-   * http://localhost:8099/v1/mimoto/issuers/StayProtected
-   * http://localhost:8099/v1/mimoto/issuers/StayProtected/well-known-proxy
+   * http://localhost:8099/v1/mimoto/issuers/Mock
+   * http://localhost:8099/v1/mimoto/issuers/Mock/well-known-proxy
 
 ## How to create Google Client Credentials
 
