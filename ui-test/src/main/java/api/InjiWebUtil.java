@@ -45,6 +45,8 @@ public class InjiWebUtil extends AdminTestUtil {
 
 	public static TestCaseDTO isTestCaseValidForTheExecution(TestCaseDTO testCaseDTO) {
 		String testCaseName = testCaseDTO.getTestCaseName();
+		
+		currentTestCaseName = testCaseName; 
 
 		int indexof = testCaseName.indexOf("_");
 		String modifiedTestCaseName = testCaseName.substring(indexof + 1);
