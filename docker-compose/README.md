@@ -113,8 +113,8 @@ This is not for production use.
 12. Access Apis as
    * http://localhost:8099/v1/mimoto/allProperties
    * http://localhost:8099/v1/mimoto/issuers
-   * http://localhost:8099/v1/mimoto/issuers/StayProtected
-   * http://localhost:8099/v1/mimoto/issuers/StayProtected/well-known-proxy
+   * http://localhost:8099/v1/mimoto/issuers/Mock
+   * http://localhost:8099/v1/mimoto/issuers/Mock/well-known-proxy
 
 ## How to create Google Client Credentials
 
@@ -168,33 +168,33 @@ The mimoto-issuers-config.json file defines the list of Credential Issuers that 
 ```json
 {
   "issuers": [
-     {
-        "issuer_id": "StayProtected",
-        "credential_issuer": "StayProtected",
-        "display": [
-           {
-              "name": "StayProtected Insurance",
-              "logo": {
-                 "url": "https://raw.githubusercontent.com/tw-mosip/file-server/master/StayProtectedInsurance.png",
-                 "alt_text": "a square logo of a Sunbird"
-              },
-              "language": "en",
-              "title": "Download StayProtected Insurance Credentials",
-              "description": "Download insurance credential"
-           }
-        ],
-        "protocol": "OpenId4VCI",
-        "client_id": "esignet-sunbird-partner",
-        "client_alias": "esignet-sunbird-partner",
-        "wellknown_endpoint": "https://injicertify-insurance.collab.mosip.net/v1/certify/issuance/.well-known/openid-credential-issuer",
-        "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
-        "authorization_audience": "https://esignet-insurance.collab.mosip.net/v1/esignet/oauth/v2/token",
-        "token_endpoint": "https://localhost:8099/v1/mimoto/get-token/StayProtected",
-        "proxy_token_endpoint": "https://esignet-insurance.collab.mosip.net/v1/esignet/oauth/v2/token",
-        "qr_code_type": "OnlineSharing",
-        "credential_issuer_host": "https://injicertify-insurance.collab.mosip.net",
-        "enabled": "true"
-     }
+    {
+      "issuer_id": "Mock",
+      "protocol": "OpenId4VCI",
+      "display": [
+        {
+          "name": "Mock Identity",
+          "logo": {
+            "url": "https://inji.github.io/inji-config/logos/mosipid-logo.png",
+            "alt_text": "mosip-logo"
+          },
+          "title": "Mock Identity",
+          "description": "Download Mock Identity Credential",
+          "language": "en"
+        }
+      ],
+      "client_id": "wallet-demo",
+      "wellknown_endpoint": "https://injicertify-mock.collab.mosip.net/v1/certify/issuance/.well-known/openid-credential-issuer",
+      "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
+      "authorization_audience": "https://esignet-mock.collab.mosip.net/v1/esignet/oauth/v2/token",
+      "token_endpoint": "https://api.collab.mosip.net/v1/mimoto/get-token/Mock",
+      "proxy_token_endpoint": "https://esignet-mock.collab.mosip.net/v1/esignet/oauth/v2/token",
+      "client_alias": "wallet-demo-client",
+      "qr_code_type": "OnlineSharing",
+      "enabled": "true",
+      "credential_issuer": "Mock",
+      "credential_issuer_host": "https://injicertify-mock.collab.mosip.net"
+    }
   ]
 }
 ```
@@ -227,6 +227,8 @@ The mimoto-issuers-config.json file defines the list of Credential Issuers that 
    - `client_id` matches the one provided during Issuer onboarding with the Issuer's Authorization server.
    - `client_alias` for each Issuer is correctly configured and available in the oidckeystore.p12 file.
 3. For step-by-step guidance on how to add a new Issuer and generate the oidckeystore.p12 file, refer to the [Customization Overview](https://docs.inji.io/inji-wallet/inji-mobile/technical-overview/customization-overview/credential_providers) documentation.
+
+4. For sample UINs, refer to the [Customization Overview - Credential Providers](https://docs.inji.io/inji-wallet/inji-mobile/technical-overview/customization-overview/credential_providers#use-mock-data-from-collab-sandbox-env) documentation.
 
 ## Inji Mobile Wallet Configuration
 To bind an Android or iOS wallet using the e-signet service via Mimoto, ensure the following property is updated in application-local.properties (if running Mimoto using IDE) or mimoto-default.properties (if running Mimoto using docker compose) to point to the appropriate e-signet instance running in your target environment
