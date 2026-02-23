@@ -47,7 +47,7 @@ describe('Testing API Class', () => {
 
   test('Check fetchIssuers request', () => {
     const fetchIssuers: ApiRequest = apiModule.api.fetchIssuers;
-    expect(fetchIssuers.url()).toBe('https://api.collab.mossip.net/v1/mimoto/issuers');
+    expect(fetchIssuers.url()).toBe('https://api.collab.mossip.net/v1/mimoto/v2/issuers');
     expect(fetchIssuers.methodType).toBe(apiModule.MethodType.GET);
     expect(fetchIssuers.headers()).toEqual({
       'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ describe('Testing API Class', () => {
   test('Check fetchSpecificIssuer request', () => {
     const issuerId = '123';
     const fetchSpecificIssuer: ApiRequest = apiModule.api.fetchSpecificIssuer;
-    expect(fetchSpecificIssuer.url(issuerId)).toBe('https://api.collab.mossip.net/v1/mimoto/issuers/123');
+    expect(fetchSpecificIssuer.url(issuerId)).toBe('https://api.collab.mossip.net/v1/mimoto/v2/issuers/123');
     expect(fetchSpecificIssuer.methodType).toBe(apiModule.MethodType.GET);
     expect(fetchSpecificIssuer.headers()).toEqual({
       'Content-Type': 'application/json'
