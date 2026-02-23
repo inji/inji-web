@@ -9,6 +9,7 @@ export const Login: React.FC = () => {
   const { t } = useTranslation("HomePage");
   const navigate = useNavigate();
   const [guestClicked, setGuestClicked] = useState(false);
+  const [guestError, setGuestError] = useState<string | null>(null);
   const location = useLocation();
 
   const handleGoogleLogin = () => {
@@ -19,8 +20,13 @@ export const Login: React.FC = () => {
 
   const handleGuestLogin = () => {
     if (guestClicked) return; // guard against double click
+    const fromPath = location.state?.from?.pathname;
+    if (fromPath === "/user/authorize") {
+      setGuestError("To continue this verification request, please sign in to your wallet instead of continuing as guest.");
+      return;
+    }
     setGuestClicked(true);
-    const redirectPath = location.state?.from?.pathname || "/issuers";
+    const redirectPath = fromPath || "/issuers";
     navigate(redirectPath, { replace: true });
   };
 
@@ -48,9 +54,18 @@ export const Login: React.FC = () => {
           {t("Login.loginDescription")}
         </div>
 
-        <div data-testid="login-note" className="sm:my-3 text-[14px] leading-[20px] font-medium text-ellipsis text-center pb-4">
+        <div data-testid="login-note" className="sm:my-3 text-[14px] leading-[20px] font-medium text-ellipsis text-center pb-1">
           {t("Login.loginNote")}
         </div >
+
+        {guestError && (
+          <div
+            data-testid="login-guest-error"
+            className="mb-3 text-[12px] leading-[18px] text-red-600 text-center"
+          >
+            {guestError}
+          </div>
+        )}
 
         <GoogleSignInButton handleGoogleLogin={handleGoogleLogin} loadingText={t("Login.loggingIn")} text={t("Login.loginGoogle")}/>
 
