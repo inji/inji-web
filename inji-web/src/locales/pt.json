@@ -99,6 +99,7 @@
       "passcodeMismatchError": "As senhas não correspondem. Certifique-se de que ambos os campos de senha correspondam exatamente. Digite novamente e tente novamente.",
       "createWalletError": "Falha na criação da carteira.",
       "incorrectPasscodeError": "A senha não parece correta. Tente novamente ou toque em \"Esqueci a senha\" se precisar de ajuda para redefini-la.",
+      "incorrectPasscodeWithAttempts": "Código incorreto. Restam {{count}} tentativa(s).",
       "fetchWalletsError": "Erro ao buscar carteiras.",
       "walletStatus": {
         "temporarily_locked": "Você atingiu o número máximo de tentativas. Sua carteira está temporariamente bloqueada. Tente novamente mais tarde.",
