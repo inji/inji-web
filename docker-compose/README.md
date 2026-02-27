@@ -187,7 +187,7 @@ The mimoto-issuers-config.json file defines the list of Credential Issuers that 
       "wellknown_endpoint": "https://injicertify-mock.collab.mosip.net/v1/certify/issuance/.well-known/openid-credential-issuer",
       "redirect_uri": "io.mosip.residentapp.inji://oauthredirect",
       "authorization_audience": "https://esignet-mock.collab.mosip.net/v1/esignet/oauth/v2/token",
-      "token_endpoint": "https://api.collab.mosip.net/v1/mimoto/get-token/Mock",
+      "token_endpoint": "https://localhost:8099/v1/mimoto/get-token/Mock",
       "proxy_token_endpoint": "https://esignet-mock.collab.mosip.net/v1/esignet/oauth/v2/token",
       "client_alias": "wallet-demo-client",
       "qr_code_type": "OnlineSharing",
