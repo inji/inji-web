@@ -3,6 +3,8 @@ import {BackgroundDecorator} from '../../Common/BackgroundDecorator';
 import {CrossIconButton} from '../../Common/Buttons/CrossIconButton';
 import {BackArrowButton} from "../../Common/Buttons/BackArrowButton";
 import {PasscodePageTemplateStyles} from "./PasscodePageTemplateStyles";
+import {User} from "../../../types/data";
+import {convertStringIntoPascalCase} from "../../../utils/misc";
 
 interface PasscodePageTemplateProps {
     title: string;
@@ -13,6 +15,7 @@ interface PasscodePageTemplateProps {
     testId: string;
     contentTestId: string;
     onBack?: () => void;
+    user?: User | null;
 }
 
 export const PasscodePageTemplate: React.FC<PasscodePageTemplateProps> = ({
@@ -23,7 +26,8 @@ export const PasscodePageTemplate: React.FC<PasscodePageTemplateProps> = ({
                                                                               content,
                                                                               testId,
                                                                               contentTestId,
-                                                                              onBack
+                                                                              onBack,
+                                                                              user
                                                                           }) => {
     return (
         <div
@@ -35,6 +39,34 @@ export const PasscodePageTemplate: React.FC<PasscodePageTemplateProps> = ({
 
                 <div className={PasscodePageTemplateStyles.contentWrapper}>
                     <div className={PasscodePageTemplateStyles.titleContainer}>
+                        {user && (
+                            <div 
+                                className={PasscodePageTemplateStyles.userProfileContainer}
+                                data-testid={`user-profile-${testId}`}
+                            >
+                                <div className={PasscodePageTemplateStyles.userProfilePictureContainer}>
+                                    {user.profilePictureUrl ? (
+                                        <img
+                                            src={user.profilePictureUrl}
+                                            alt={user.displayName ? `Profile picture for ${convertStringIntoPascalCase(user.displayName)}` : 'Profile'}
+                                            className={PasscodePageTemplateStyles.userProfilePicture}
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    ) : (
+                                        <div
+                                            className={PasscodePageTemplateStyles.userProfileInitials}
+                                            role="img"
+                                            aria-label={user.displayName ? `Profile initials for ${convertStringIntoPascalCase(user.displayName)}` : 'Profile initials'}
+                                        >
+                                            {user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
+                                        </div>
+                                    )}
+                                </div>
+                                <span className={PasscodePageTemplateStyles.userProfileName}>
+                                    {convertStringIntoPascalCase(user.displayName)}
+                                </span>
+                            </div>
+                        )}
                         <h1
                             className={PasscodePageTemplateStyles.title}
                             data-testid={`title-${testId}`}
