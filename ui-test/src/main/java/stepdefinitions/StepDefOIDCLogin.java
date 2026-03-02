@@ -95,9 +95,7 @@ public class StepDefOIDCLogin {
 
 		Cookie myCookie = new Cookie.Builder(sessionCookieName, sessionCookieValue).path("/v1/mimoto").isHttpOnly(true)
 				.isSecure(true).build();
-		BasePage.waitForSeconds(driver, 10);
 		driver.manage().addCookie(myCookie);
-		BasePage.waitForSeconds(driver, 10);
 		driver.navigate().refresh();
 	}
 
