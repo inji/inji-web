@@ -98,7 +98,8 @@
       "passcodeLengthError": "Le code PIN doit comporter 6 chiffres.",
       "passcodeMismatchError": "Les codes d'accès ne correspondent pas. Veuillez vous assurer que les deux champs du code correspondent parfaitement. Saisissez-le à nouveau et réessayez.",
       "createWalletError": "Échec de la création du portefeuille.",
-      "incorrectPasscodeError": "Le code d'accès semble incorrect. Veuillez réessayer ou appuyer sur « Mot de passe oublié » si vous avez besoin d'aide pour le réinitialiser.",
+      "incorrectPasscodeError": "Le code d'accès semble incorrect. Veuillez réessayer ou appuyer sur « Mot de passe oublié » si vous avez besoin d'aide pour le réinitialiser.",
+      "incorrectPasscodeWithAttempts": "Le code d'accès semble incorrect. Tentative {{attempt}} sur {{maxAttempts}}. {{remainingAttempts}} tentative(s) restante(s) avant le verrouillage temporaire. Veuillez réessayer ou appuyer sur « Mot de passe oublié » si vous avez besoin d'aide pour le réinitialiser.",
       "fetchWalletsError": "Échec du chargement des portefeuilles.",
       "walletStatus": {
         "temporarily_locked": "Vous avez atteint le nombre maximal de tentatives. Votre portefeuille est temporairement verrouillé. Veuillez réessayer ultérieurement.",
