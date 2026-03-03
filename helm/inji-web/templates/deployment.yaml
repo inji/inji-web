@@ -90,9 +90,9 @@ spec:
           {{- end }}
           env:
             - name: container_user
-              value: {{ .Values.container_user }}
+              value: {{ .Values.container_user | quote }}
             - name: JDK_JAVA_OPTIONS
-              value: {{ .Values.additionalResources.javaOpts }}
+              value: {{ .Values.additionalResources.javaOpts | quote }}
             {{- if .Values.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
