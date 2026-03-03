@@ -3,7 +3,7 @@
 exports[`PDFViewer Component renders correctly and matches snapshot 1`] = `
 <div>
   <div
-    class="w-full max-h-screen relative flex flex-col items-center overflow-auto"
+    class="w-full max-h-screen relative flex flex-col items-center overflow-auto "
   >
     <div
       data-file="\\"blob:http://localhost:3000/mock-pdf-url\\""

@@ -6,7 +6,6 @@ import {ResponsiveIconButtonWithText} from "../Common/Buttons/ResponsiveIconButt
 import {DownloadIcon} from "../Common/Icons/DownloadIcon";
 import {useTranslation} from "react-i18next";
 
-
 export function VCDetailView(props: Readonly<{
     previewContent: Blob,
     onClose: () => void,
@@ -15,23 +14,26 @@ export function VCDetailView(props: Readonly<{
 }>) {
     const {t} = useTranslation('StoredCards', {
         keyPrefix: "cardView"
-    })
+    });
 
-    return <Modal isOpen={!!props.previewContent}
+    return (
+        <Modal isOpen={!!props.previewContent}
                   onClose={props.onClose}
                   action={<ResponsiveIconButtonWithText text={t('download')}
-                                                        icon={<DownloadIcon
-                                                            testId={"icon-download"}
+                    icon={<DownloadIcon testId={"icon-download"} 
                                                         />}
                                                         testId={"download"}
                                                         onClick={props.onDownload}
-                  />}
+                />
+            }
                   title={props.credential.credentialTypeDisplayName}
                   testId={"vc-card-detail-view"}
                   titleTestId={"credential-type-display-name"}
     >
         <PDFViewer
             previewContent={props.previewContent}
+                className="overflow-y-auto overflow-x-hidden h-full"
         />
-    </Modal>;
+        </Modal>
+         );
 }
