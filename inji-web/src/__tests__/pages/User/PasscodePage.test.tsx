@@ -62,6 +62,7 @@ jest.mock("../../../hooks/User/useUser.tsx", () => ({
 
 describe('Passcode', () => {
     const mockNavigate = jest.fn();
+    let storageSetItemSpy: jest.SpyInstance | null = null;
 
     const renderWithProviders = (ui: React.ReactElement) => {
         return render(
@@ -76,6 +77,7 @@ describe('Passcode', () => {
     };
 
     beforeEach(() => {
+        mockNavigate.mockClear();
         (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
 
         setMockUseSelectorState({
@@ -90,7 +92,14 @@ describe('Passcode', () => {
             saveWalletId: jest.fn(),
             fetchUserProfile: jest.fn()
         });
-    })
+    });
+
+    afterEach(() => {
+        if (storageSetItemSpy) {
+            storageSetItemSpy.mockRestore();
+            storageSetItemSpy = null;
+        }
+    });
 
     test("check if layout is matching with snapshot when Wallet exists", async () => {
         mockApiResponse({data: successWalletResponse});
@@ -179,14 +188,18 @@ describe('Passcode', () => {
     })
 
     test("should redirect to home when successfully unlocked wallet", async () => {
+        storageSetItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
         mockApiResponseSequence([{data: successWalletResponse}, {data: successWalletResponse}])
         renderWithProviders(<PasscodePage/>);
 
         await enterPasscode()
         userEvent.click(screen.getByTestId("btn-submit-passcode"));
 
-        await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1))
-        expect(mockNavigate).toHaveBeenCalledWith("/user/home");
+        await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1));
+
+        expect(storageSetItemSpy).toHaveBeenCalledWith('showLoginSuccessToast', 'true');
+        expect(mockNavigate).toHaveBeenCalledWith("/user/home", { state: { loginSuccess: true } });
     })
 
     const walletLockErrorMessages = [
@@ -276,6 +289,8 @@ describe('Passcode', () => {
 
 // Testing for re-login scenario in case of session expiry
     test("should redirect to previous url post unlock if available", async () => {
+        storageSetItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
         (AppStorage.getItem as jest.Mock).mockReturnValue("/previous-url");
         mockApiResponseSequence([{data: successWalletResponse}, {data: successWalletResponse}])
 
@@ -286,9 +301,11 @@ describe('Passcode', () => {
 
         await waitFor(() =>
             expect(AppStorage.removeItem).toHaveBeenCalledWith("redirectTo", true)
-        )
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-        expect(mockNavigate).toHaveBeenCalledWith("/previous-url");
+        );
+
+        expect(storageSetItemSpy).toHaveBeenCalledWith('showLoginSuccessToast', 'true');
+        expect(mockNavigate).toHaveBeenCalledTimes(1);
+        expect(mockNavigate).toHaveBeenCalledWith("/previous-url", { state: { loginSuccess: true } });
     })
 
     test("should clear passcode input fields when wrong passcode is entered during unlock wallet", async () => {

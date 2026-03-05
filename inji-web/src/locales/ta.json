@@ -407,7 +407,8 @@
   "User": {
     "Home": {
       "title": "முகப்பு",
-      "welcome": "வரவேற்கிறோம்"
+      "welcome": "வரவேற்கிறோம்",
+      "loginSuccess": "உள்நுழைவு வெற்றிகரமாக!"
     },
     "ProfileDropdown": {
       "profile": "சுயவிவரம்",

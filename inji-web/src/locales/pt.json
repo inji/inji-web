@@ -407,7 +407,8 @@
   "User": {
     "Home": {
       "title": "Lar",
-      "welcome": "Bem-vindo"
+      "welcome": "Bem-vindo",
+      "loginSuccess": "Login bem-sucedido!"
     },
     "ProfileDropdown": {
       "profile": "Perfil",
