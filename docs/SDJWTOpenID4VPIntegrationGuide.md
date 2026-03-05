@@ -120,7 +120,7 @@ sequenceDiagram
   }
   ```
 
-  **Note:** `sdClaims` will hold disclosures available in the sd-jwt.
+  **Note:** `sdClaims` will hold field's JSON path for which disclosures available in the sd-jwt VC and `claims` will hold the public claims.
 
 #### Step 25 : Selection of credentials and submission
 
