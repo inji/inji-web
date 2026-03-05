@@ -110,7 +110,8 @@ sequenceDiagram
         "credentialTypeDisplayName": "SD-JWT VC",
         "credentialTypeLogo": "https://mosip.github.io/inji-config/logos/mosipid-logo.png",
         "format": "vc+sd-jwt",
-        "sdClaims": ["name", "age", "gender"]
+        "claims": [ "$.name", "$.id", "$.address.country.name" ],
+        "sdClaims": [ "$.age", "$.gender", "$.address.line1", "$.address.line2", "$.address.country.code" ]
       }
     ],
     "missingClaims": [
@@ -136,7 +137,7 @@ sequenceDiagram
   {
     "selectedCredentials": ["cred-123", "cred-456"],
     "selectedSdClaims": {
-      "cred-123": ["name", "age"]
+      "cred-123": ["$.age", "$.gender", "$.address.line1"]
     }
   }
   ```
