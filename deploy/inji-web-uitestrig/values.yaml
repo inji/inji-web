@@ -1,3 +1,11 @@
+commonLabels:
+  app.kubernetes.io/component: inji
+
+containerSecurityContext:
+  enabled: false
+  runAsUser: inji
+  runAsNonRoot: true
+
 ## ConfigMap with extra environment variables
 ##
 extraEnvVarsCM:
@@ -20,8 +28,8 @@ modules:
     enabled: true
     image:
       registry: docker.io
-      repository: mosipqa/uitest-web
-      tag: 0.16.x
+      repository: injistackdev/uitest-web
+      tag: develop
       pullPolicy: Always
 
 crontime: "0 3 * * *"    ## run cronjob every day at 3 AM (time hr: 0-23 )
