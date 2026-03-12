@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "Enter Passcode",
     "confirmPasscodeLabel":"Confirm Passcode",
     "forgotPasscode":"Forgot Passcode",
+    "loginWithDifferentAccount":"Log in with different account",
     "passcodeWarning":"Make sure you remember the password for future login",
     "error":{
       "walletNotFoundError":"Wallet not found",

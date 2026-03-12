@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "ಪಾಸ್‌ಕೋಡ್ ನಮೂದಿಸಿ",
     "confirmPasscodeLabel": "ಪಾಸ್‌ಕೋಡ್ ದೃಢೀಕರಿಸಿ",
     "forgotPasscode": "ಪಾಸ್‌ಕೋಡ್ ಮರೆತಿದ್ದಾರೆ",
+    "loginWithDifferentAccount": "ವಿಭಿನ್ನ ಖಾತೆಯೊಂದಿಗೆ ಲಾಗಿನ್ ಆಗಿ",
     "passcodeWarning": "ಭವಿಷ್ಯದಲ್ಲಿ ಲಾಗಿನ್ ಮಾಡಲು ಪಾಸ್‌ಕೋಡ್ ನೆನಪಿಡಿ",
     "error": {
       "walletNotFoundError": "ಪರ್ಸು ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಹೊಸದನ್ನು ರಚಿಸಿ.",

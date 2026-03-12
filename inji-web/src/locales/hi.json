@@ -92,6 +92,7 @@
     "enterPasscodeLabel": "पासकोड दर्ज करें",
     "confirmPasscodeLabel": "पासकोड की पुष्टि करें",
     "forgotPasscode": "पासकोड भूल गए",
+    "loginWithDifferentAccount": "अलग खाते से लॉग इन करें",
     "passcodeWarning": "भविष्य में लॉगिन के लिए पासकोड याद रखें",
     "error": {
       "walletNotFoundError": "कोई वॉलेट नहीं मिला। कृपया नया बनाएँ।",
