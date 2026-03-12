@@ -42,7 +42,7 @@ export const PasscodePage: React.FC = () => {
     const unlockWalletApi = useApi<Wallet>();
     const [canUnlockWallet, setCanUnlockWallet] = useState<boolean>(true);
     const [testIdSuffix, setTestIdSuffix] = useState("");
-
+    const [remainingTime,setRemainingTime]=useState<number>(0);
     const handleWalletStatusError = (errorCode: string, fallBackError: string | undefined = undefined, httpStatusCode: number | null = null) => {
         if (
             errorCode === WalletLockStatus.TEMPORARILY_LOCKED ||
@@ -51,7 +51,12 @@ export const PasscodePage: React.FC = () => {
         ) {
             setTestIdSuffix(`-${walletStatusToTestIdSuffix[errorCode]}`);
             setError(t(`error.walletStatus.${errorCode}`));
-            if (errorCode !== WalletLockStatus.LAST_ATTEMPT_BEFORE_LOCKOUT) {
+                  if(errorCode===WalletLockStatus.TEMPORARILY_LOCKED){
+                    setCanUnlockWallet(false);
+                    setPasscode(initialPasscodeArray);
+                    setConfirmPasscode(initialPasscodeArray);
+                    setRemainingTime(60*60); // 60 minutes in seconds
+                  }else if (errorCode !== WalletLockStatus.LAST_ATTEMPT_BEFORE_LOCKOUT) {
                 setCanUnlockWallet(false);
                 setPasscode(initialPasscodeArray);
                 setConfirmPasscode(initialPasscodeArray);
@@ -63,6 +68,21 @@ export const PasscodePage: React.FC = () => {
         }
     }
 
+                useEffect(()=>{
+                  let timer:NodeJS.Timeout;
+                  if(remainingTime>0){
+                  timer=setInterval(()=>{setRemainingTime(prev=>{const next = prev > 0 ? prev - 1 : 0;
+        if (next === 0) {
+          setCanUnlockWallet(true); 
+        }
+        return next;
+      });
+    }, 1000);
+  } else {
+    setCanUnlockWallet(true); 
+                  }
+                  return()=>{if(timer)clearInterval(timer);}
+                },[remainingTime]);
     const handleCommonErrors = (response: ApiResult<any>, fallBackError: string | undefined = undefined) => {
         if (response.error?.message === (NETWORK_ERROR_MESSAGE)) {
             if (!navigator.onLine) {
@@ -264,23 +284,30 @@ export const PasscodePage: React.FC = () => {
         return <PasscodeInput label={label} value={value} onChange={onChange} testId={testId}
                               disabled={!canUnlockWallet}/>;
     }
-
+            const formatTime=(seconds:number)=>{
+              const m=Math.floor(seconds/60);
+              const s=seconds%60;
+              return`${m}:${s.toString().padStart(2,'0')}`;
+    }
     const renderContent = () => {
         return (
             <div className={PasscodePageStyles.contentContainer}>
-                {wallets &&
+                {wallets && (
                     <Fragment>
-                        {<div className={PasscodePageStyles.inputWrapper}>
+                        <div className={PasscodePageStyles.inputWrapper}>
                             {renderPasscodeInput(t('enterPasscodeLabel'), passcode, setPasscode, "passcode")}
-
                             {isUserCreatingWallet() &&
                                 renderPasscodeInput(t('confirmPasscodeLabel'), confirmPasscode, setConfirmPasscode, "confirm-passcode")
                             }
                         </div>
-                        }
                         {
                             !isUserCreatingWallet() && renderForgotPasscodeButton()
                         }
+          {remainingTime > 0 && (
+            <div className={PasscodePageStyles.lockedMessage}>
+              {t('error.lockedTryAgainIn')} {formatTime(remainingTime)}
+            </div>
+          )}
                         <div className={PasscodePageStyles.buttonContainer}>
                             <SolidButton
                                 fullWidth={true}
@@ -292,7 +319,7 @@ export const PasscodePage: React.FC = () => {
                             />
                         </div>
                     </Fragment>
-                }
+                 )}
 
             </div>
         );
