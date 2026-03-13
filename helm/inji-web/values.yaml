@@ -51,8 +51,8 @@ service:
 
 image:
   registry: docker.io
-  repository: injistackdev/inji-web
-  tag: develop
+  repository: injistack/inji-web
+  tag: 0.16.0
 
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
