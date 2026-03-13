@@ -62,19 +62,19 @@ function installing_uitestrig() {
        exit 1;
     fi
 
-  read -p "Please enter the MOSIP_INJIWEB_GOOGLE_REFRESH_TOKEN : " token
+  read -p "Please enter the INJIWEB_GOOGLE_REFRESH_TOKEN : " token
     if [ -z "$token" ]; then
        echo "ERROR: Google Refresh Token cannot be empty; EXITING;";
        exit 1;
     fi
 
-  read -p "Please enter the MOSIP_INJIWEB_GOOGLE_CLIENT_ID : " client_id
+  read -p "Please enter the INJIWEB_GOOGLE_CLIENT_ID : " client_id
     if [ -z "$client_id" ]; then
        echo "ERROR: Google Client ID cannot be empty; EXITING;";
        exit 1;
     fi
 
-  read -p "Please enter the MOSIP_INJIWEB_GOOGLE_CLIENT_SECRET : " secret
+  read -p "Please enter the INJIWEB_GOOGLE_CLIENT_SECRET : " secret
     if [ -z "$secret" ]; then
        echo "ERROR: Google client secret cannot be empty; EXITING;";
        exit 1;
@@ -150,9 +150,9 @@ function installing_uitestrig() {
   --set uitestrig.configmaps.uitestrig.injiverify="https://$INJI_VERIFY_HOST/" \
   --set uitestrig.configmaps.uitestrig.ENV_ENDPOINT="https://$API_INTERNAL_HOST" \
   --set uitestrig.configmaps.uitestrig.ENV_USER="$Env_user" \
-  --set uitestrig.configmaps.uitestrig.MOSIP_INJIWEB_GOOGLE_REFRESH_TOKEN="$token" \
-  --set uitestrig.configmaps.uitestrig.MOSIP_INJIWEB_GOOGLE_CLIENT_ID="$client_id" \
-  --set uitestrig.configmaps.uitestrig.MOSIP_INJIWEB_GOOGLE_CLIENT_SECRET="$secret" \
+  --set uitestrig.configmaps.uitestrig.INJIWEB_GOOGLE_REFRESH_TOKEN="$token" \
+  --set uitestrig.configmaps.uitestrig.INJIWEB_GOOGLE_CLIENT_ID="$client_id" \
+  --set uitestrig.configmaps.uitestrig.INJIWEB_GOOGLE_CLIENT_SECRET="$secret" \
   --set uitestrig.configmaps.uitestrig.BROWSERSTACK_ACCESS_KEY="$Access_key" \
   --set uitestrig.configmaps.uitestrig.BROWSERSTACK_USERNAME="$User_name" \
   $ENABLE_INSECURE
