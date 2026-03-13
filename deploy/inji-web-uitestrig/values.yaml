@@ -50,9 +50,10 @@ uitestrig:
       TEST_URL: <test_url>  # provide test url
       ENV_USER: api-internal.released
       InsuranceUrl: https://registry.sandbox.xyz.net/api/v1/Insurance
-      MOSIP_INJIWEB_GOOGLE_REFRESH_TOKEN: <token> # pass the token
-      MOSIP_INJIWEB_GOOGLE_CLIENT_ID: <client_id> # pass the google client id
-      MOSIP_INJIWEB_GOOGLE_CLIENT_SECRET: <secret> # pass the google client secret
+      INJIWEB_GOOGLE_REFRESH_TOKEN: <token> # pass the token
+      INJIWEB_GOOGLE_CLIENT_ID: <client_id> # pass the google client id
+      INJIWEB_GOOGLE_CLIENT_SECRET: <secret> # pass the google client secret
+      authCertsPath: /home/inji/mosip
       NS: <namespace>  # provide the namespace
       injiWebUi: https://injiweb.sandbox.xyz.net/
       actuatorMimotoEndpoint: /v1/mimoto/actuator/env
