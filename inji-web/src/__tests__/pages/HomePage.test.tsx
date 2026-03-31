@@ -40,17 +40,14 @@ jest.mock('../../components/Home/HomeBanner.tsx', () => ({
     <div data-testid="HomeBanner" onClick={onClick}>HomeBanner</div>
   ),
 }));
- 
 jest.mock('../../components/Home/HomeFeatures', () => ({
   HomeFeatures: () => <div data-testid="HomeFeatures">HomeFeatures</div>,
 }));
- 
 jest.mock('../../components/Home/HomeQuickTip', () => ({
   HomeQuickTip: ({ onClick }: { onClick: () => void }) => (
     <div data-testid="HomeQuickTip" onClick={onClick}>HomeQuickTip</div>
   ),
 }));
- 
 // Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -76,31 +73,31 @@ describe('HomePage', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks(); 
+    jest.clearAllMocks();
   });
 
   test('sets landingVisited flag in sessionStorage on mount', () => {
-      const setItemSpy = jest.spyOn(window.sessionStorage.__proto__, 'setItem');
-      renderComponent();
-      expect(setItemSpy).toHaveBeenCalledWith(LANDING_VISITED, 'true');
+    const setItemSpy = jest.spyOn(window.sessionStorage.__proto__, 'setItem');
+    renderComponent();
+    expect(setItemSpy).toHaveBeenCalledWith(LANDING_VISITED, 'true');
   });
 
   test('logs a warning if sessionStorage.setItem fails', () => {
-      const setItemSpy = jest
-          .spyOn(window.sessionStorage.__proto__, 'setItem')
-          .mockImplementation(() => {
-              throw new Error('storage failed');
-          });
+    const setItemSpy = jest
+      .spyOn(window.sessionStorage.__proto__, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('storage failed');
+      });
 
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => { });
 
-      renderComponent();
+    renderComponent();
 
-      expect(setItemSpy).toHaveBeenCalledWith(LANDING_VISITED, 'true');
-      expect(warnSpy).toHaveBeenCalledWith(
-          'Unable to access sessionStorage',
-          expect.any(Error)
-      );
+    expect(setItemSpy).toHaveBeenCalledWith(LANDING_VISITED, 'true');
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Unable to access sessionStorage',
+      expect.any(Error)
+    );
   });
 
   test('renders HomeBanner, HomeFeatures, and HomeQuickTip components', () => {
@@ -110,7 +107,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('HomeQuickTip')).toBeInTheDocument();
   });
 
-  test('shows toast only once when HomeQuickTip is clicked multiple times', async() => {
+  test('shows toast only once when HomeQuickTip is clicked multiple times', async () => {
     renderComponent();
     const homeQuickTip = screen.getByTestId('HomeQuickTip');
 
@@ -125,7 +122,8 @@ describe('HomePage', () => {
       'QuickTip.toastText', // String as the message
       expect.objectContaining({
         onClose: expect.any(Function),
-        toastId: 'toast-wrapper'
+        toastId: 'toast-wrapper',
+        autoClose: false
       })
     );
 
@@ -135,51 +133,48 @@ describe('HomePage', () => {
       expect(toastElement).toBeInTheDocument();
     });
   });
-  
+
   // Snapshot test cases
   test('matches snapshot for HomePage', () => {
     const { asFragment } = renderComponent();
     expect(asFragment()).toMatchSnapshot();
   });
-  
+
   test('matches snapshot for HomePage with toast visible', () => {
     const { asFragment } = renderComponent();
     fireEvent.click(screen.getByTestId('HomeQuickTip'));
     expect(asFragment()).toMatchSnapshot();
   });
 
-  test('toast disappears after timeout', async () => {
-
-    // Create a more dynamic mock for toast
-    jest.spyOn(toast, 'warning').mockImplementation((message, options) => {
-      // Simulate toast lifecycle
-      if (options && options.onClose) {
-        setTimeout(options.onClose, 5000);
-      }
-      return 'mock-toast-id';
-    });
-  
+  test('toast does not disappear automatically and requires manual close', async () => {
     renderComponent();
     const homeQuickTip = screen.getByTestId('HomeQuickTip');
-  
+
     // Click to show toast
     fireEvent.click(homeQuickTip);
-  
+
     // Verify toast is initially present
     const initialToastWrapper = screen.getByTestId('toast-wrapper');
     expect(initialToastWrapper).toBeInTheDocument();
-  
-    // Wait for toast to potentially disappear
-    await waitFor(() => {
-      // Verify onClose was called
-      expect(toast.warning).toHaveBeenCalledWith(
-        'QuickTip.toastText',
-        expect.objectContaining({
-          onClose: expect.any(Function),
-          toastId: 'toast-wrapper'
-        })
-      );
-    }, { timeout: 6000 });
+
+    // Verify toast was called with autoClose: false
+    expect(toast.warning).toHaveBeenCalledWith(
+      'QuickTip.toastText',
+      expect.objectContaining({
+        onClose: expect.any(Function),
+        toastId: 'toast-wrapper',
+        autoClose: false
+      })
+    );
+
+    // Wait a bit to ensure toast doesn't auto-close
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 4000));
+    });
+
+    // Verify toast is still present (should not have auto-closed)
+    const toastWrapperAfterWait = screen.getByTestId('toast-wrapper');
+    expect(toastWrapperAfterWait).toBeInTheDocument();
   });
 
   test('shows toast message again after it disappears and user clicks again', async () => {
@@ -204,7 +199,7 @@ describe('HomePage', () => {
 
     // First click - show toast
     fireEvent.click(homeQuickTip);
-    
+
     expect(toast.warning).toHaveBeenCalledTimes(1);
 
     // Wait for the toast to disappear 
@@ -219,16 +214,17 @@ describe('HomePage', () => {
     fireEvent.click(homeQuickTip);
 
     // Verify toast is shown again
-    await waitFor(()=>{
+    await waitFor(() => {
       expect(toast.warning).toHaveBeenCalledTimes(1);
     })
 
-    await waitFor(()=>{
+    await waitFor(() => {
       expect(toast.warning).toHaveBeenCalledWith(
         'QuickTip.toastText',
         expect.objectContaining({
           onClose: expect.any(Function),
-          toastId: 'toast-wrapper'
+          toastId: 'toast-wrapper',
+          autoClose: false
         })
       );
     })
