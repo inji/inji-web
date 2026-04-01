@@ -1,10 +1,15 @@
-# Forgot Password Flow: Wallet Unlock & Lockout Mechanism
+# Wallet Unlock Flow & Lockout Policy
 
 ## 1\. Overview
 
-The **Forgot Password** flow in Inji Web is a **wallet unlock** process. Since Inji Web does not store the user's password in plain text, the process uses a PIN-based decryption strategy to access the wallet. To protect against unauthorized access and brute-force attacks, the system employs a "Lockout Policy" that transitions the wallet through specific security states defined in `WalletLockStatus`: `TEMPORARILY_LOCKED`, `PERMANENTLY_LOCKED`, `LAST_ATTEMPT_BEFORE_LOCKOUT`, and `LOCK_EXPIRED`.
+The Wallet Unlock flow in Inji Web is a PIN-based authentication mechanism that enables secure access to the user's wallet by decrypting the wallet key. Since Inji Web does not store the user's password in plain text, the provided PIN is used to derive the decryption key. To protect against unauthorized access and brute-force attacks, the system enforces a lockout policy that transitions the wallet through specific security states defined in `WalletLockStatus`: `TEMPORARILY_LOCKED`, `PERMANENTLY_LOCKED`, `LAST_ATTEMPT_BEFORE_LOCKOUT`, and `LOCK_EXPIRED`.
 
------
+The lockout policy enforces the following wallet states:
+
+* **TEMPORARILY_LOCKED:** The wallet is locked for a configured duration after exceeding allowed attempts in a cycle.
+* **LOCK_EXPIRED:** A previously applied temporary lock has expired, allowing the user to retry PIN entry.
+* **LAST_ATTEMPT_BEFORE_LOCKOUT:** Indicates the final remaining retry attempt before the wallet transitions to a permanent lock.
+* **PERMANENTLY_LOCKED:** The wallet is permanently disabled after exceeding the maximum number of lock cycles.
 
 ## 2\. Execution Flow
 
@@ -13,29 +18,27 @@ The flow is triggered whenever a user is prompted for their passcode (e.g., afte
 1.  **Input:** User enters a 6-digit PIN on the Inji Web Passcode page.
 2.  **Authentication & Decryption:** Inji Web calls the Mimoto `/unlock` API. Mimoto attempts to decrypt the `wallet_key` using the provided PIN.
 3.  **State Management:**
-    * **Success:** Wallet is unlocked. `WalletLockService` resets all failure counters and lock metadata.
-    * **Failure:** Mimoto increments the `failedAttemptCount`. If the count reaches specific thresholds, the `walletLockStatus` is updated to a restricted state.
-4.  **Locking Tiers:**
-    * **Warning (`last_attempt_before_lockout`):** Triggered when the user is on their final attempt of the final allowed cycle.
+    * **Success:** Wallet is successfully unlocked. `WalletLockService` resets all failure counters and lock metadata (clearing failed attempts, cycle counts, and active lock statuses). The user is then redirected to the home page.
+    * **Failure:** Mimoto increments the `failedAttemptCount`. If the count reaches defined thresholds, the `walletLockStatus` is updated to a restricted state. The user is prompted to re-enter the PIN, subject to the current lock status.
+4.  **Locking Tiers:**    
     * **Temporary Lock (`temporarily_locked`):** The wallet is unusable for a configured duration (e.g., 60 mins).
+    * **Warning (`last_attempt_before_lockout`):** Triggered when the user is on their final attempt of the final allowed cycle.
     * **Permanent Lock (`permanently_locked`):** After exceeding the maximum allowed lock cycles, the wallet is permanently disabled.
 
------
 
 ## 3\. Architecture
 
 The architecture splits responsibilities to ensure that sensitive cryptographic operations and state management are isolated from the UI.
 
-* **Inji Web :**
+* **Inji Web:**
     * **UI:** Captures user PIN.
     * **Session Management:** Once unlocked, it stores the received `decryptedWalletKey` into the Http session.
-* **Mimoto :**
+* **Mimoto:**
     * **WalletUnlockService:** Orchestrates the high-level unlock logic, including checking for expired locks via `resetTemporaryLockIfExpired`.
     * **WalletLockService:** Enforces the "Lock Cycle Policy" (failed attempt increments and cycle management).
-    * **WalletUtil:** Performs the AES decryption of the wallet key using the provided PIN.
+    * **WalletUtil:** Performs AES-based decryption of the wallet key using a key derived from the provided PIN.
     * **Database (WalletRepository):** Persists the wallet object with its encryption and lock metadata.
 
------
 
 ## 4\. Sequence Diagram
 
@@ -113,7 +116,6 @@ else Error
 end
 ```
 
------
 
 ## 5\. Integration
 
@@ -123,14 +125,6 @@ end
 | :--- | :--- |:---------------------------------------------------------------------------------------------------|
 | **Unlock Wallet** | `POST /wallets/{walletId}/unlock` | [Mimoto Stoplight](https://mosip.stoplight.io/docs/mimoto/772c63a91221a-unlock-an-existing-wallet) |
 
-### Mimoto Implementation Links
-
-For detailed design summaries, refer to the following Mimoto internal documentation:
-
-* **Core Unlock Logic:** [WalletUnlockProcess.md](https://github.com/inji/mimoto/blob/master/docs/WalletUnlockProcess.md) - Explains the `WalletUnlockService` implementation.
-* **Encryption Logic:** [UserDataEncryptionWithPinBasedKey.md](https://github.com/inji/mimoto/blob/master/docs/UserDataEncryptionWithPinBasedKey.md) - Details how the PIN is used to derive the decryption key.
-
------
 
 ## 6\. Security & Configuration
 
@@ -143,26 +137,28 @@ Configurable properties governing the passcode flow are defined in the `applicat
 | `wallet.passcode.maxLockCyclesAllowed` | `3` | Total cycles allowed before the wallet is **Permanently Locked**. |
 
 
------
-## 7. Errors
+## 7\. Errors
 
 Mimoto uses the following error codes to signal wallet state and failures to the UI:
 
-| Error Code                    | HTTP Status | Description                                                                 |
-|-------------------------------|-------------|-----------------------------------------------------------------------------|
-| `invalid_request`             | 400         | Invalid input such as wallet not found, missing user ID, or malformed PIN. |
-| `invalid_pin`                 | 400         | Incorrect PIN, but attempts still remain.                                  |
-| `last_attempt_before_lockout` | 400         | Final attempt remaining before permanent lock.                             |
-| `unauthorized`                | 401         | User is not authenticated or user ID is missing from the session.          |
-| `temporarily_locked`          | 423         | Maximum attempts reached; wallet locked temporarily until cooldown expires.|
-| `permanently_locked`          | 423         | All retry cycles exhausted; wallet permanently locked.                     |
-| `internal_server_error`       | 500         | Failure during decryption or wallet retrieval.                             |
-| `database_unavailable`        | 503         | Database connectivity issues.                                              |
+| Error Code                    | HTTP Status | Description                                                                                          |
+|-------------------------------|-------------|------------------------------------------------------------------------------------------------------|
+| `invalid_request`             | 400         | Invalid input such as missing user ID, invalid wallet ID, wallet not found, or invalid PIN format    |
+| `invalid_pin`                 | 400         | Incorrect PIN, retry attempts are still available.                                                   |
+| `last_attempt_before_lockout` | 400         | Indicates the final remaining retry attempt before the wallet transitions to a permanent lock state. |
+| `unauthorized`                | 401         | User is not authenticated or user ID is missing from the session.                                    |
+| `temporarily_locked`          | 423         | Maximum attempts reached; wallet locked temporarily until cooldown period expires.                   |
+| `permanently_locked`          | 423         | Maximum lock cycles exceeded; wallet is permanently locked and cannot be unlocked using PIN.         |
+| `internal_server_error`       | 500         | Unexpected server-side failure during wallet decryption or retrieval.                                |
+| `database_unavailable`        | 503         | Failure to connect to or interact with the database.                                                 |
 
------
+## 8\. References
 
-## 8. References
+For low-level implementation details of the Mimoto wallet unlock and cryptographic flow, refer to:
 
-- [Wallet Unlock Process](https://github.com/inji/mimoto/blob/master/docs/WalletUnlockProcess.md)
-- [User Data Encryption with PIN-Based Key]( https://github.com/inji/mimoto/blob/master/docs/UserDataEncryptionWithPinBasedKey.md)
-- [Mimoto API Documentation](https://mosip.stoplight.io/docs/mimoto ) 
+* [Mimoto: Wallet Unlock Process](https://github.com/inji/mimoto/blob/master/docs/WalletUnlockProcess.md)
+* [Mimoto: User Data Encryption with PIN-Based Key](https://github.com/inji/mimoto/blob/master/docs/UserDataEncryptionWithPinBasedKey.md)
+
+For API documentation, refer to the Mimoto Stoplight:
+
+* [Mimoto API Documentation](https://mosip.stoplight.io/docs/mimoto)

@@ -2,7 +2,7 @@
 
 ## 1\. Overview
 
-The user's sensitive data is protected using a multi-layered encryption strategy. This mechanism ensures that Verifiable Credentials (VCs) and Personally Identifiable Information (PII) are never stored in plaintext. The core of this security is the **Wallet Key** - a master AES-256 key that is itself encrypted using a **Derived Key** generated from the user's **6-digit PIN**.
+The user's sensitive data is protected using a layered encryption model designed to ensure that sensitive information is never stored in plaintext. This mechanism ensures that Verifiable Credentials (VCs) and Personally Identifiable Information (PII) are never stored in plaintext. The core of this security is the **Wallet Key** - a master AES-256 key that is itself encrypted using a **Derived Key** generated from the user's **6-digit PIN**.
 
 The primary goals are:
 
@@ -15,7 +15,8 @@ The primary goals are:
 
 ### Phase 1: PIN Creation & Wallet Key Generation
 
-When a user sets up their PIN for the first time:
+When a user sets a PIN, the system generates a secret **Wallet Key** and securely locks it using that PIN. The PIN itself is never stored — only a derived cryptographic key is used.
+When the PIN is set for the first time:
 
 1.  **Wallet Key Generation:** Mimoto generates a random 256-bit AES symmetric key (the **Wallet Key**).
 2.  **Key Derivation (PBKDF2):** Mimoto takes the user's PIN and a random 32-byte salt to derive a **Derived Key** using the `PBKDF2WithHmacSHA512` algorithm.
@@ -24,7 +25,7 @@ When a user sets up their PIN for the first time:
 
 ### Phase 2: Unlocking the Wallet
 
-During login or session resumption:
+When the user enters their PIN during login or session resumption, the system regenerates the same Derived Key and uses it to unlock (decrypt) the stored Wallet Key:
 
 1.  **Re-Derivation:** Mimoto retrieves the salt from the database and derives the key again using the entered PIN.
 2.  **Decryption:** The Derived Key is used to decrypt the stored payload to retrieve the Wallet Key (Base64-encoded AES Key).
@@ -44,11 +45,12 @@ Responsibilities are clearly separated between Inji Web and Mimoto.
 
 * **Inji Web (UI & Orchestration):** 
     * Provides the interface for PIN setup and entry.
+    * Initiates wallet creation and unlock requests
     * Maintains the authenticated session with Mimoto.
     * Does not perform cryptographic operations; it acts as the gateway to the user.
 * **Mimoto (Crypto & Storage):**
-    * **`DerivedKeyCryptoUtil`**: Handles the core PBKDF2 key derivation and AES-GCM decryption for the master Wallet Key.
-    * **`DataProtectionService`**: Manages the local encryption/decryption of credentials using the session-based Wallet Key and orchestrates PII encryption via the Kernel.
+    * **`DerivedKeyCryptoUtil`**: Handles the core PBKDF2 key derivation and AES-GCM decryption for the Wallet Key.
+    * **`DataProtectionService`**: Manages the local encryption/decryption of credentials using the session-based Wallet Key and orchestrates PII encryption via the Cryptomanager.
     * **`UserMetadataService`**: Handles the lifecycle of PII attributes (name, email and profile picture) and ensures they are encrypted before persistence.
     * **`WalletRepository` & `WalletCredentialsRepository`**: Persistence layers for encrypted key metadata and user's verifiable credentials.
 
@@ -113,7 +115,7 @@ Mimoto adheres to the following cryptographic standards to ensure security for t
 
 * **Algorithm:** AES-256 in GCM mode (`AES/GCM/NoPadding`).
 * **Integrity:** GCM provides a 128-bit authentication tag to detect any tampering with the encrypted data.
-* **Key Stretching:** PBKDF2 with **10,000 iterations** (configured via `mosip.kernel.crypto.hash-iteration` in `application-default.properties`) to prevent brute-forcing of the 6-digit PIN.
+* **Key Stretching:** PBKDF2 with **10,000 iterations** (configured via `mosip.kernel.crypto.hash-iteration`) to prevent brute-forcing of the 6-digit PIN. This property is defined in the `application-default.properties` file for the local setup, and in the `mimoto-default.properties` file for the environment setup.
 * **Randomness:** Unique **32-byte salts** and **12-byte IVs** (Nonces) are generated for every encryption operation using `SecureRandom`.
 
 
@@ -121,13 +123,13 @@ Mimoto adheres to the following cryptographic standards to ensure security for t
 
 Mimoto returns specific error codes if the encryption/decryption process fails:
 
-| Error Code | HTTP Status | Description |
-| :--- | :--- | :--- |
-| invalid_request | 400 | Validation failure: Missing Wallet ID/User ID or invalid 6-digit PIN format. |
-| invalid_pin | 400 | Incorrect PIN: Decryption of wallet_key failed; retries still available. |
-| unauthorized | 401 | Session expired: USER_ID or WALLET_KEY not found in session. |
-| internal_server_error | 500 | Processing error during decryption or cryptomanager operation. |
-| database_unavailable | 503 | Database unavailable: Unable to fetch or update required data. |
+| Error Code | HTTP Status | Description                                                                                 |
+| :--- | :--- |:--------------------------------------------------------------------------------------------|
+| invalid_request | 400 | Validation failure: Missing Wallet ID or User ID or wallet key. invalid 6-digit PIN format. |
+| invalid_pin | 400 | Incorrect PIN: Decryption of wallet_key failed; retries still available.                    |
+| unauthorized | 401 | Session expired: User ID not found in session.                                              |
+| internal_server_error | 500 | Processing error during decryption or cryptomanager operation.                              |
+| database_unavailable | 503 | Database unavailable: Unable to fetch or update required data.                              |
 
 
 ## 8\. References

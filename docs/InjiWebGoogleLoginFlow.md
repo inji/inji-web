@@ -1,7 +1,17 @@
 # Google OAuth2 Login & User Onboarding
 
 ## 1. Overview
-The login flow in Inji Web utilizes **Spring Security OAuth2** to provide a secure and seamless authentication experience via Google. This process not only authenticates the user but also handles the automatic onboarding of new users by creating persistent metadata and initializing a secure session in Redis.
+The login flow allows users to log in using their Google account and seamlessly access the application without creating a separate username or password.
+
+When a user logs in:
+- Their identity is verified by Google
+- The system creates or retrieves an internal user profile
+- A secure session is established
+- The user is redirected to continue with wallet access (via passcode entry)
+
+The system never stores Google credentials and ensures that all sensitive user data is securely encrypted before being persisted.
+
+This flow in Inji Web utilizes **Spring Security OAuth2** to provide a secure and seamless authentication experience via Google. This process not only authenticates the user but also handles the automatic onboarding of new users by creating persistent metadata and initializing a secure session in Redis.
 
 The flow ensures that Personally Identifiable Information (PII) is protected at rest using encryption, while the user's identity is tied to a unique internal `userId` used for all subsequent wallet operations.
 
@@ -26,8 +36,12 @@ To understand the underlying integration and environment setup required for this
 2.  **Token Retrieval**: Spring Security internally exchanges this code for an `access_token` and fetches the user profile (Name, Email, Picture).
 
 ### Phase 3: User Onboarding (`CustomOAuth2UserService`)
+After successful login, the system checks if the user already exists. If not, it creates a new internal identity and securely stores the user’s profile information.
+
+An internal `userId` is generated to uniquely identify the user within the system, independent of Google. This ensures the system is not tightly coupled to a specific identity provider and can support multiple providers in the future.
+
 1.  **Metadata Check**: The service extracts the Google `sub` ID and checks the `user_metadata` table.
-2.  **Creation/Update**: If new, it generates a unique internal **UUID** (`userId`) and encrypts the PII (Name, Email, Picture).
+2.  **Creation/Update**: If new, it generates a unique internal **UUID** (`userId`) and encrypts the PII (Name, Email, Picture). Else the existing record is used.
 3.  **Enrichment**: The internal `userId` is added to the security principal for downstream use.
 
 ### Phase 4: Success/Failure Handling
@@ -37,15 +51,16 @@ To understand the underlying integration and environment setup required for this
 
 ## 4. Architecture
 The architecture ensures a clean separation between the user interface, security logic, and data persistence.
+Mimoto owns the complete authentication lifecycle, while Inji Web only initiates the login and handles the final response.
 
-* **Inji Web (Front-end UI)**: Initiates the login via a simple location replace and handles the final landing page logic. It does not handle passwords or tokens; it only triggers the initial redirect and listens for the final success/failure result.
+* **Inji Web (UI)**: Initiates the login via a simple location replace and handles the final landing page logic. It does not handle passwords or tokens; it only triggers the initial redirect and listens for the final success/failure result.
 * **Mimoto (Security & Orchestration)**:
     * **Security Config**: Manages the OAuth2 filter chain and CSRF protection.
     * **User Service**: Handles profile extraction and identity mapping.
     * **Login Handlers**: Manage the final transition back to the UI, whether the attempt succeeded or failed.
 * **MOSIP Kernel (Crypto Engine)**: `CryptoManagerService` performs the actual encryption of PII data (email, display name).
-* **Redis (Shared Session Memory)**: Stores the `JSESSIONID` and its associated data, ensuring high availability and session persistence across server restarts.
-* **PostgreSQL (Encrypted Storage)**: The persistent database for the `user_metadata` table.
+* **Session Store (Redis)**: Stores the `JSESSIONID` and its associated data, ensuring high availability and session persistence across server restarts.
+* **Persistence Layer (PostgreSQL)**: The persistent database for the `user_metadata` table.
 
 
 ## 5. Sequence Diagram
