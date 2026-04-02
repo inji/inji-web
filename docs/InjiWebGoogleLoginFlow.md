@@ -111,12 +111,12 @@ The integration is split into **Authentication** (Spring Security) and **Orchest
 ## 8. Errors
 When login fails, Mimoto uses **302 Redirects** to pass error context back to Inji Web.
 
-| Scenario | HTTP Status | Description                                                                                      |
-| :--- | :--- |:-------------------------------------------------------------------------------------------------|
-| **Login Success** | 302 | Redirects to `${mosip.inji.web.url}/user/passcode`.                                              |
-| **Consent Denied** | 302 | Redirects to `${injiWebUrl}/?status=error&error_message=Consent denied...`.                      |
-| **IDP Timeout** | 302 | Redirects to `${injiWebUrl}/?status=error&error_message=Timeout...`. Google servers unreachable. |
-| **Unauthorized** | 401 | Returned if a user attempts to access protected APIs without an active session.                  |
+| Scenario | HTTP Status | Description                                                                               |
+| :--- | :--- |:------------------------------------------------------------------------------------------|
+| **Login Success** | 302 | Redirects to `${mosip.inji.web.url}/user/passcode`.                                       |
+| **Consent Denied** | 302 | Redirects to `${injiWebUrl}/?status=error&error_message=...`.                             |
+| **IDP Timeout** | 302 | Redirects to `${injiWebUrl}/?status=error&error_message=...`. Google servers unreachable. |
+| **Unauthorized** | 401 | Returned if a user attempts to access protected APIs without an active session.           |
 
 
 ## 9. References

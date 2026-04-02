@@ -68,9 +68,9 @@ sequenceDiagram
     participant KC as MOSIP Kernel<br/>(Cryptomanager)
 
     Note over User, DB: Wallet Setup
-    User->>UI: Enter Name & PIN
+    User->>UI: Enter PIN
     UI->>WC: POST /wallets
-    WC->>WS: createWallet(name, pin)
+    WC->>WS: createWallet
     WS->>WS: Generate Wallet Key
     WS->>WS: Protect Wallet Key using PIN (derive + encrypt)
     WS->>DB: Store encrypted wallet data
@@ -80,7 +80,7 @@ sequenceDiagram
     Note over User, DB: Wallet Unlock
     User->>UI: Enter PIN
     UI->>WC: POST /wallets/{id}/unlock
-    WC->>WS: unlockWallet(pin)
+    WC->>WS: unlockWallet
     WS->>DB: Fetch encrypted wallet key
     WS->>WS: Decrypt Wallet Key using PIN
     WS-->>WC: Wallet Key
@@ -89,13 +89,13 @@ sequenceDiagram
 
     Note over User, DB: Credential Download
     UI->>WC: Store Credential
-    WC->>DPS: encryptCredential(data, walletKey)
+    WC->>DPS: encryptCredential
     DPS->>DPS: AES-GCM encryption
     DPS->>DB: Save encrypted credential
 
     Note over User, DB: PII Protection
     UI->>WC: Save/Update Profile
-    WC->>DPS: encrypt(data, refId="user_pii")
+    WC->>DPS: encrypt
     DPS->>KC: Request encryption
     KC-->>DPS: Encrypted data
     DPS->>DB: Save encrypted metadata
