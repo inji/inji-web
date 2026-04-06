@@ -60,8 +60,7 @@ export const getTokenRequestBody = (code: string, codeVerifier: string, issuerId
         return {
             'grantType': 'authorization_code',
             'code': code,
-            // 'redirectUri': api.authorizationRedirectionUrl,
-            'redirectUri': "https://injiweb.dev-int-inji.mosip.net/redirect",
+            'redirectUri': api.authorizationRedirectionUrl,
             'codeVerifier': codeVerifier,
             'issuer': issuerId,
             'credentialConfigurationId': credentialConfigurationId,
@@ -70,8 +69,7 @@ export const getTokenRequestBody = (code: string, codeVerifier: string, issuerId
     return {
         'grant_type': 'authorization_code',
         'code': code,
-        // 'redirect_uri': api.authorizationRedirectionUrl,
-        'redirect_uri': "https://injiweb.dev-int-inji.mosip.net/redirect",
+        'redirect_uri': api.authorizationRedirectionUrl,
         'code_verifier': codeVerifier,
         'issuer': issuerId,
         'credential': credentialConfigurationId,
