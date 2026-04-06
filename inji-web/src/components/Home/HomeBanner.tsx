@@ -2,7 +2,11 @@ import React from "react";
 import Login from "../Login/Login"; // Import your existing login component
 import { useTranslation } from "react-i18next";
 
-export const HomeBanner: React.FC = () => {
+interface HomeBannerProps {
+  isOpenIdVpLogin?: boolean;
+}
+
+export const HomeBanner: React.FC<HomeBannerProps> = ({ isOpenIdVpLogin = false }) => {
   const { t } = useTranslation("HomePage");
 
   return (
@@ -32,7 +36,7 @@ export const HomeBanner: React.FC = () => {
   
         {/* Right side: Login Component */}
         <div className="px-6 flex flex-col sm:flex-row w-full sm:w-[35%] bg-white mb-14 mx-14 py-6 sm:py-8 rounded-xl shadow-md items-center">
-          <Login/>
+          <Login isOpenIdVpLogin={isOpenIdVpLogin}/>
         </div>
       </div>
     </div>

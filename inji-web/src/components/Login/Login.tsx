@@ -5,7 +5,11 @@ import {useTranslation} from "react-i18next";
 import {BorderedButton} from "../Common/Buttons/BorderedButton";
 import {GoogleSignInButton} from "../Common/Buttons/GoogleSignInButton";
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  isOpenIdVpLogin?: boolean;
+}
+
+export const Login: React.FC<LoginProps> = ({ isOpenIdVpLogin = false }) => {
   const { t } = useTranslation("HomePage");
   const navigate = useNavigate();
   const [guestClicked, setGuestClicked] = useState(false);
@@ -45,27 +49,30 @@ export const Login: React.FC = () => {
         </div>
 
         <div data-testid="login-description" className="sm:mt-3 text-[18px] leading-[28px] text-muted text-ellipsis text-center pb-0">
-          {t("Login.loginDescription")}
+          {t(isOpenIdVpLogin ? "Login.loginDescriptionOVP" : "Login.loginDescription")}
         </div>
 
         <div data-testid="login-note" className="sm:my-3 text-[14px] leading-[20px] font-medium text-ellipsis text-center pb-4">
-          {t("Login.loginNote")}
+          {t(isOpenIdVpLogin ? "Login.loginNoteOVP" : "Login.loginNote")}
         </div >
 
         <GoogleSignInButton handleGoogleLogin={handleGoogleLogin} loadingText={t("Login.loggingIn")} text={t("Login.loginGoogle")}/>
 
-        <Separator/>
-
-        <div className="w-full">
-          <BorderedButton
-              testId="home-banner-guest-login"
-              onClick={handleGuestLogin}
-              title={
-                t("Login.loginGuest")
-              }
-              disabled={guestClicked}
-          />
-        </div>
+        {!isOpenIdVpLogin && (
+          <>
+            <Separator/>
+            <div className="w-full">
+              <BorderedButton
+                  testId="home-banner-guest-login"
+                  onClick={handleGuestLogin}
+                  title={
+                    t("Login.loginGuest")
+                  }
+                  disabled={guestClicked}
+              />
+            </div>
+          </>
+        )}
     </div>
   );
 };

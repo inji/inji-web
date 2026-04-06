@@ -66,6 +66,8 @@
       "loginTitle": "Entrar",
       "loginDescription": "Faça login com sua conta ou continue como convidado para acessar suas credenciais.",
       "loginNote": "Alguns recursos podem ser limitados no modo convidado.",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "Fazendo login",
       "loginGoogle": "Continuar com o Google",
       "loginGuest": "Continuar como convidado"

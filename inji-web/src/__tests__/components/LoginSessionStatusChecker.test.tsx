@@ -3,7 +3,7 @@ import {render, waitFor} from '@testing-library/react';
 import {useUser} from '../../hooks/User/useUser';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {AppStorage} from '../../utils/AppStorage';
-import {KEYS, ROUTES} from '../../utils/constants';
+import {KEYS, OPENID_VP_LOGIN, ROUTES} from '../../utils/constants';
 import LoginSessionStatusChecker from "../../components/Common/LoginSessionStatusChecker";
 import {nonPasscodeRelatedProtectedRoutes, protectedRoutes, unProtectedRoutes} from "../../test-utils/mockObjects";
 
@@ -82,6 +82,24 @@ describe('LoginSessionStatusChecker', () => {
 
         await waitFor(() => expect(mockRemoveUser).toHaveBeenCalled())
         expect(mockNavigate).toHaveBeenCalledWith(ROUTES.ROOT);
+    });
+
+    test('should set VP login intent and redirect to clean root when unauthenticated on /user/authorize with vp_token', async () => {
+        const vpSearch =
+            '?client_id=test&response_type=vp_token&presentation_definition_uri=https%3A%2F%2Fexample.com%2Fpd';
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+        (useLocation as jest.Mock).mockReturnValue({
+            pathname: ROUTES.USER_AUTHORIZE,
+            search: vpSearch,
+        });
+        (AppStorage.getItem as jest.Mock).mockReturnValue(null);
+
+        render(<LoginSessionStatusChecker/>);
+
+        await waitFor(() => expect(mockRemoveUser).toHaveBeenCalled());
+        expect(setItemSpy).toHaveBeenCalledWith(OPENID_VP_LOGIN, 'true');
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.ROOT);
+        setItemSpy.mockRestore();
     });
 
     test("should not redirect to login when fetching user profile fails and path is already root page", async () => {

@@ -66,6 +66,8 @@
       "loginTitle":"Log In",
       "loginDescription":"Log in with your account or continue as a guest to access your credentials.",
       "loginNote":"Some features may be limited in guest mode.",
+      "loginDescriptionOVP":"Continue to share credentials.",
+      "loginNoteOVP":"Log in to share your credentials with the service you’re trying to access.",
       "loggingIn":"Logging In",
       "loginGoogle":"Continue With Google",
       "loginGuest":"Continue as Guest"

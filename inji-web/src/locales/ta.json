@@ -66,6 +66,8 @@
       "loginTitle": "உள்நுழையவும்",
       "loginDescription": "உங்கள் கணக்கில் உள்நுழையவோ அல்லது உங்கள் சான்றுகளுக்கு அணுக விருந்தினராக தொடரவோ செய்யுங்கள்.",
       "loginNote": "விருந்தினர் பயன்முறையில் சில அம்சங்கள் கட்டுப்படுத்தப்பட்டிருக்கலாம்.",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "உள்நுழைகிறது",
       "loginGoogle": "Google உடன் தொடரவும்",
       "loginGuest": "விருந்தினராக தொடரவும்"

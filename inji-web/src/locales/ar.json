@@ -66,6 +66,8 @@
       "loginTitle": "تسجيل الدخول",
       "loginDescription": "قم بتسجيل الدخول باستخدام حسابك أو تابع كضيف للوصول إلى بيانات الاعتماد الخاصة بك.",
       "loginNote": "قد تكون بعض الميزات محدودة في وضع الضيف.",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "تسجيل الدخول",
       "loginGoogle": "تابع باستخدام Google",
       "loginGuest": "الاستمرار كضيف"

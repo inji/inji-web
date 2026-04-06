@@ -66,6 +66,8 @@
       "loginTitle": "Se connecter",
       "loginDescription": "Connectez-vous avec votre compte ou continuez en tant qu'invité pour accéder à vos identifiants.",
       "loginNote": "Certaines fonctionnalités peuvent être limitées en mode invité.",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "Connexion en cours",
       "loginGoogle": "Continuer avec Google",
       "loginGuest": "Continuer en tant qu'invité"

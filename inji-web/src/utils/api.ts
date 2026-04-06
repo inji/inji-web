@@ -75,7 +75,8 @@ export class api {
             `?response_type=code&` +
             `client_id=${currentIssuer.client_id}&` +
             `scope=${filterCredentialWellknown.scope}&` +
-            `redirect_uri=${api.authorizationRedirectionUrl}&` +
+            // `redirect_uri=${api.authorizationRedirectionUrl}&` +
+            `redirect_uri=https://injiweb.dev-int-inji.mosip.net/redirect&` +
             `state=${state}&` +
             `code_challenge=${code_challenge.codeChallenge}&` +
             `code_challenge_method=S256&` +

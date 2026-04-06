@@ -52,6 +52,10 @@ jest.mock("../pages/AuthorizationPage.tsx", () => ({
     AuthorizationPage: () => <div>AuthorizationPage</div>
 }));
 
+jest.mock("../pages/VPAuthorizationPage.tsx", () => ({
+    VPAuthorizationPage: () => <div>User/authorizePage</div>
+}));
+
 jest.mock("../pages/CredentialsPage.tsx", () => ({
     CredentialsPage: () => <div>Issuers/issuer1Page</div>
 }))

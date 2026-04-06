@@ -66,6 +66,8 @@
       "loginTitle": "लॉग इन करें",
       "loginDescription": "अपने खाते से लॉग इन करें या अपनी साख तक पहुंचने के लिए अतिथि के रूप में जारी रखें।",
       "loginNote": "अतिथि मोड में कुछ सुविधाएँ सीमित हो सकती हैं।",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "लॉगिन हो रहा है",
       "loginGoogle": "Google के साथ जारी रखें",
       "loginGuest": "अतिथि के रूप में जारी रखें"

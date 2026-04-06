@@ -36,6 +36,7 @@ export const ROUTES = {
     FAQ: `/${Pages.FAQ}`,
     USER_FAQ: `/${Pages.USER}/${Pages.FAQ}`,
     USER_RESET_PASSCODE: `/${Pages.USER}/${Pages.RESET_PASSCODE}`,
+    USER_AUTHORIZE: `/${Pages.USER}/${Pages.AUTHORIZE}`,
 } as const;
 
 export const HTTP_STATUS_CODES = {
@@ -63,5 +64,7 @@ export const pdfWorkerSource = (pdfVersion : string) => `//unpkg.com/pdfjs-dist@
 export const passcodeLength = 6;
 
 export const LANDING_VISITED = "landingVisited";
+
+export const OPENID_VP_LOGIN = "openIdVpLogin";
 
 export const OPENID4VP_AUTHORIZE_PREFIX = "openid4vp://authorize";

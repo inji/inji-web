@@ -6,7 +6,7 @@ import {toast} from "react-toastify";
 import {useTranslation} from "react-i18next";
 import {useLocation} from 'react-router-dom';
 import {LoginFailedModal} from '../components/Login/LoginFailedModal';
-import {LANDING_VISITED} from "../utils/constants";
+import {LANDING_VISITED, OPENID_VP_LOGIN} from "../utils/constants";
 
 const Status = {
     SUCCESS: "success",
@@ -18,6 +18,17 @@ export const HomePage: React.FC = () => {
     const [toastVisible, setToastVisible] = useState(false);
     const location = useLocation();
     const [isLoginFailed, setIsLoginFailed] = useState(false);
+    const [isOpenIdVpLogin] = useState(() => {
+        try {
+            if (sessionStorage.getItem(OPENID_VP_LOGIN) === 'true') {
+                sessionStorage.removeItem(OPENID_VP_LOGIN);
+                return true;
+            }
+        } catch (e) {
+            console.warn('Unable to persist OpenID VP login intent', e);
+        }
+        return false;
+    });
 
     // to mark landing as visited
     useEffect(() => {
@@ -61,7 +72,7 @@ export const HomePage: React.FC = () => {
     return (
         <div>
             <div className={"pb-20 flex flex-col gap-y-4 "}>
-                <HomeBanner/>
+                <HomeBanner isOpenIdVpLogin={isOpenIdVpLogin}/>
                 <HomeFeatures/>
                 <HomeQuickTip onClick={() => showToast(t("QuickTip.toastText"))}/>
             </div>

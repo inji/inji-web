@@ -66,6 +66,8 @@
       "loginTitle": "ಲಾಗಿನ್ ಮಾಡಿ",
       "loginDescription": "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಬಳಸಿಕೊಂಡು ಲಾಗಿನ್ ಮಾಡಿ ಅಥವಾ ನಿಮ್ಮ ಗುರುತುಗಳಿಗೆ ಪ್ರವೇಶಿಸಲು ಅತಿಥಿಯಾಗಿ ಮುಂದುವರೆಯಿರಿ.",
       "loginNote": "ಅತಿಥಿ ಮೋಡ್‌ನಲ್ಲಿ ಕೆಲವು ವೈಶಿಷ್ಟ್ಯಗಳು ಸೀಮಿತವಾಗಿರಬಹುದು.",
+      "loginDescriptionOVP": "Continue to share credentials.",
+      "loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "loggingIn": "ಲಾಗಿನ್ ಆಗುತ್ತಿದೆ",
       "loginGoogle": "Google ನೊಂದಿಗೆ ಮುಂದುವರಿಯಿರಿ",
       "loginGuest": "ಅತಿಥಿಯಾಗಿ ಮುಂದುವರಿಯಿರಿ"

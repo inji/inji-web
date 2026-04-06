@@ -10,6 +10,8 @@ jest.mock("react-i18next", () => ({
       "Login.loginTitle": "Log In",
       "Login.loginDescription": "Log in with your account or continue as a guest to access your credentials.",
       "Login.loginNote": "Some features may be limited in guest mode.",
+      "Login.loginDescriptionOVP": "Continue to share credentials.",
+      "Login.loginNoteOVP": "Log in to share your credentials with the service you're trying to access.",
       "Login.loggingIn": "Logging in",
       "Login.loginGoogle": "Continue with Google",
       "Login.loginGuest": "Continue as Guest"
@@ -60,6 +62,21 @@ describe("Login Page Tests", () => {
       fireEvent.click(guestButton);
 
       expect(mockNavigate).toHaveBeenCalledWith("/issuers", { replace: true });
+  });
+
+  test("hides guest login and OR separator when isOpenIdVpLogin is true", () => {
+    render(
+      <MemoryRouter>
+        <Login isOpenIdVpLogin />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByTestId("home-banner-guest-login")).not.toBeInTheDocument();
+    expect(screen.queryByText("OR")).not.toBeInTheDocument();
+    expect(screen.getByTestId("login-description")).toHaveTextContent("Continue to share credentials.");
+    expect(screen.getByTestId("login-note")).toHaveTextContent(
+      "Log in to share your credentials with the service you're trying to access."
+    );
   });
 
   test("Google login button redirects to Google OAuth URL", () => {

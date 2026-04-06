@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useUser} from '../../hooks/User/useUser';
-import {KEYS, ROUTES} from '../../utils/constants';
+import {KEYS, OPENID_VP_LOGIN, ROUTES} from '../../utils/constants';
 import {AppStorage} from "../../utils/AppStorage";
 
 const loginProtectedPrefixes = [ROUTES.USER];
@@ -27,10 +27,20 @@ const LoginSessionStatusChecker = () => {
     const redirectToLogin = useCallback(() => {
         removeUser()
         if (!isRootPage()) {
+            const isVpAuthorizeEntry =
+                location.pathname === ROUTES.USER_AUTHORIZE &&
+                isVpTokenAuthorizeSearch(location.search);
+            if (isVpAuthorizeEntry) {
+                try {
+                    sessionStorage.setItem(OPENID_VP_LOGIN, 'true');
+                } catch (e) {
+                    console.warn('Unable to persist OpenID VP login intent', e);
+                }
+            }
             console.warn("Redirecting to / page as accessing protected route without login from ", location.pathname);
-            navigate(ROUTES.ROOT)
+            navigate(ROUTES.ROOT);
         }
-    }, [isRootPage, location.pathname, navigate, removeUser]);
+    }, [isRootPage, location.pathname, location.search, navigate, removeUser]);
 
 
     const validateStatus = useCallback(() => {
@@ -104,5 +114,11 @@ const LoginSessionStatusChecker = () => {
 
     return null;
 };
+
+function isVpTokenAuthorizeSearch(search: string | undefined): boolean {
+    const safeSearch = search ?? '';
+    const query = safeSearch.startsWith('?') ? safeSearch.slice(1) : safeSearch;
+    return new URLSearchParams(query).get('response_type') === 'vp_token';
+}
 
 export default LoginSessionStatusChecker;
