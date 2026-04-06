@@ -16,7 +16,7 @@
         }
       ],
       "client_id": "wallet-demo",
-      "token_endpoint": "https://api.collab.mosip.net/v1/mimoto/get-token/Mock",
+      "token_endpoint": "https://localhost:8099/v1/mimoto/get-token/Mock",
       "client_alias": "wallet-demo-client",
       "qr_code_type": "OnlineSharing",
       "enabled": "true",
