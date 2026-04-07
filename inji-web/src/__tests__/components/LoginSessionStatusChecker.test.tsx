@@ -102,6 +102,24 @@ describe('LoginSessionStatusChecker', () => {
         setItemSpy.mockRestore();
     });
 
+    test('should set VP login intent for DID-based authorize URL without response_type', async () => {
+        const didSearch =
+            '?client_id=did%3Aweb%3Aexample.com&client_id_scheme=did';
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+        (useLocation as jest.Mock).mockReturnValue({
+            pathname: ROUTES.USER_AUTHORIZE,
+            search: didSearch,
+        });
+        (AppStorage.getItem as jest.Mock).mockReturnValue(null);
+
+        render(<LoginSessionStatusChecker/>);
+
+        await waitFor(() => expect(mockRemoveUser).toHaveBeenCalled());
+        expect(setItemSpy).toHaveBeenCalledWith(OPENID_VP_LOGIN, 'true');
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.ROOT);
+        setItemSpy.mockRestore();
+    });
+
     test("should not redirect to login when fetching user profile fails and path is already root page", async () => {
         (useLocation as jest.Mock).mockReturnValue({pathname: ROUTES.ROOT});
         (AppStorage.getItem as jest.Mock).mockReturnValue(null);

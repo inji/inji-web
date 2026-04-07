@@ -27,10 +27,10 @@ const LoginSessionStatusChecker = () => {
     const redirectToLogin = useCallback(() => {
         removeUser()
         if (!isRootPage()) {
-            const isVpAuthorizeEntry =
+            const isOpenIdVpAuthorizeEntry =
                 location.pathname === ROUTES.USER_AUTHORIZE &&
-                isVpTokenAuthorizeSearch(location.search);
-            if (isVpAuthorizeEntry) {
+                isOpenIdVpAuthorizeQuery(location.search);
+            if (isOpenIdVpAuthorizeEntry) {
                 try {
                     sessionStorage.setItem(OPENID_VP_LOGIN, 'true');
                 } catch (e) {
@@ -115,10 +115,18 @@ const LoginSessionStatusChecker = () => {
     return null;
 };
 
-function isVpTokenAuthorizeSearch(search: string | undefined): boolean {
+function isOpenIdVpAuthorizeQuery(search: string | undefined): boolean {
     const safeSearch = search ?? '';
     const query = safeSearch.startsWith('?') ? safeSearch.slice(1) : safeSearch;
-    return new URLSearchParams(query).get('response_type') === 'vp_token';
+    const params = new URLSearchParams(query);
+    if (params.get('response_type') === 'vp_token') {
+        return true;
+    }
+    const clientId = params.get('client_id');
+    if (!clientId) {
+        return false;
+    }
+    return clientId.toLowerCase().includes('did');
 }
 
 export default LoginSessionStatusChecker;
