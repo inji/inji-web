@@ -27,9 +27,9 @@ const LoginSessionStatusChecker = () => {
     const redirectToLogin = useCallback(() => {
         removeUser()
         if (!isRootPage()) {
-            const isOpenIdVpAuthorizeEntry =
+            const isOpenIdVPAuthorizeRoute =
                 location.pathname === ROUTES.USER_AUTHORIZE
-            if (isOpenIdVpAuthorizeEntry) {
+            if (isOpenIdVPAuthorizeRoute) {
                 try {
                     sessionStorage.setItem(OPENID_VP_LOGIN, 'true');
                 } catch (e) {
