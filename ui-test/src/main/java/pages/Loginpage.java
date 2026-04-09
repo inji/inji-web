@@ -56,11 +56,6 @@ public class Loginpage extends BasePage {
 			field.click();
 			field.clear();
 			field.sendKeys(String.valueOf(string.charAt(i)));
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -81,11 +76,6 @@ public class Loginpage extends BasePage {
 			field.click();
 			field.clear();
 			field.sendKeys(String.valueOf(string.charAt(i)));
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -464,7 +454,11 @@ public class Loginpage extends BasePage {
 	}
 
 	public void waitUntilPasscodeEnabled() {
-		waitUntilElementEnabled(driver, By.cssSelector("input[data-testid='input-passcode']"), 10);
+		waitUntilPasscodeEnabled(10);
+	}
+
+	public void waitUntilPasscodeEnabled(int timeoutSeconds) {
+		waitUntilElementEnabled(driver, By.cssSelector("input[data-testid='input-passcode']"), timeoutSeconds);
 	}
 
 }

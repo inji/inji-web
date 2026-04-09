@@ -60,7 +60,7 @@ public class SunbirdCredentials extends BasePage {
 	}
 
 	public Boolean isLoginButtonDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//button[@id='verify_form']"));
+		return isElementIsVisible(driver, By.xpath("//button[@id='verify_form']"), 5);
 	}
 
 	public Boolean isLifeInceranceDisplayed() {
@@ -68,7 +68,7 @@ public class SunbirdCredentials extends BasePage {
 	}
 
 	public Boolean isLoginFailedDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[contains(text(), 'Login failed')]"));
+		return isElementIsVisible(driver, By.xpath("//*[contains(text(), 'Login failed')]"), 5);
 	}
 
 	public void clickOnLifeInsurance() {

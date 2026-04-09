@@ -95,10 +95,9 @@ public class StepDefOIDCLogin {
 
 		Cookie myCookie = new Cookie.Builder(sessionCookieName, sessionCookieValue).path("/v1/mimoto").isHttpOnly(true)
 				.isSecure(true).build();
-		BasePage.waitForSeconds(driver, 10);
 		driver.manage().addCookie(myCookie);
-		BasePage.waitForSeconds(driver, 10);
 		driver.navigate().refresh();
+		loginpage.waituntilpagecompletelyloaded();
 	}
 
 	@Then("user enters the passcode {string}")
@@ -916,14 +915,14 @@ public class StepDefOIDCLogin {
 
 	@Then("user wait for temporary lock to expire")
 	public void user_wait_for_tempory_lock_to_expire() throws InterruptedException, Exception {
-		logger.info("Temp Lock time:" + BaseTest.getWalletPasscodeSettings().get("retryBlockedUntil") * 60);
+		int lockSeconds = BaseTest.getWalletPasscodeSettings().get("retryBlockedUntil") * 60;
+		logger.info("Temp Lock time:" + lockSeconds);
 
-		BasePage.waitForSeconds(driver, (BaseTest.getWalletPasscodeSettings().get("retryBlockedUntil") * 60) - 10);
+		BasePage.waitForSeconds(driver, Math.max(lockSeconds - 10, 1));
 		driver.navigate().refresh();
 		assertTrue(!loginpage.isSubmitButtonEnabled(), "Before temporaty lock Expire Submit button is enabled");
-		BasePage.waitForSeconds(driver, BaseTest.getWalletPasscodeSettings().get("retryBlockedUntil") * 60);
 		driver.navigate().refresh();
-		loginpage.waitUntilPasscodeEnabled();
+		loginpage.waitUntilPasscodeEnabled(20);
 		assertTrue(!loginpage.isPasscodeInputDisabled(), "Passocde button is not enabled after temporaty lock Expire");
 	}
 

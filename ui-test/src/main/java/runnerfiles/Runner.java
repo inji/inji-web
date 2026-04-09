@@ -19,6 +19,7 @@ import org.testng.TestNG;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.xml.XmlSuite;
 import io.mosip.testrig.apirig.testrunner.OTPListener;
 
 import java.io.File;
@@ -128,6 +129,10 @@ public class Runner extends AbstractTestNGCucumberTests{
 					BaseTestCase.setReportName("injiweb");
 					suitefiles.add(file.getAbsolutePath());
 					runner.setTestSuites(suitefiles);
+					int threadCount = getConfiguredThreadCount();
+					runner.setParallel(XmlSuite.ParallelMode.METHODS);
+					runner.setThreadCount(threadCount);
+					runner.setDataProviderThreadCount(threadCount);
 					System.getProperties().setProperty("testng.outpur.dir", "testng-report");
 					runner.setOutputDirectory("testng-report");
 					runner.run();
@@ -146,20 +151,9 @@ public class Runner extends AbstractTestNGCucumberTests{
 	}
 	
 	@Override
-	@DataProvider(parallel = false)
+	@DataProvider(parallel = true)
 	public Object[][] scenarios() {
-		Object[][] scenarios = super.scenarios();
-		System.out.println("Number of scenarios provided: " + scenarios.length);
-
-		for (Object[] scenario : scenarios) {
-			if (scenario.length > 0 && scenario[0] instanceof PickleWrapper) {
-				System.out.println("Scenario Name: " + ((PickleWrapper) scenario[0]).getPickle().getName());
-			} else {
-				System.out.println("Scenario data is not as expected!");
-			}
-		}
-
-		return scenarios;
+		return super.scenarios();
 	}
 
 	@BeforeMethod
@@ -223,5 +217,32 @@ public class Runner extends AbstractTestNGCucumberTests{
 	        System.setProperty("cucumber.features", "/home/inji/featurefiles/");
 	    }
 	} 
+
+	private static int getConfiguredThreadCount() {
+		final int defaultThreadCount = 5;
+		final int maxBrowserStackThreads = 5;
+		try {
+			String configuredValue = InjiWebConfigManager.getproperty("browserStackThreadCount");
+			if (configuredValue == null || configuredValue.trim().isEmpty()) {
+				return defaultThreadCount;
+			}
+			int parsed = Integer.parseInt(configuredValue.trim());
+			if (parsed < 1) {
+				LOGGER.warn("Invalid browserStackThreadCount '" + configuredValue + "'. Falling back to "
+						+ defaultThreadCount);
+				return defaultThreadCount;
+			}
+			if (parsed > maxBrowserStackThreads) {
+				LOGGER.warn("Configured browserStackThreadCount " + parsed + " exceeds BrowserStack limit "
+						+ maxBrowserStackThreads + ". Capping to " + maxBrowserStackThreads);
+				return maxBrowserStackThreads;
+			}
+			return parsed;
+		} catch (Exception e) {
+			LOGGER.warn("Failed to read browserStackThreadCount from injiweb.properties. Falling back to "
+					+ defaultThreadCount, e);
+			return defaultThreadCount;
+		}
+	}
 
 }

@@ -59,12 +59,6 @@ public class StepDef {
 
 	@Given("User gets the title of the page")
 	public void getTheTitleOfThePage() {
-		try {
-
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
 		pageTitle = baseTest.getDriver().getTitle();
 	}
 
@@ -225,7 +219,6 @@ public class StepDef {
 	@Then("User search the issuers with {string}")
 	public void user_search_the_issuers_with(String string) throws Exception {
 		try {
-			Thread.sleep(6000);
 			homePage.enterIssuersInSearchBox(string);
 			test.log(Status.PASS, "Searched issuers with: " + string);
 		} catch (NoSuchElementException e) {
@@ -292,7 +285,6 @@ public class StepDef {
 	@Then("User verify go home button")
 	public void user_verify_go_home_button() throws Exception {
 		try {
-			Thread.sleep(2000);
 			Assert.assertTrue(homePage.isGoHomeButtonDisplayed());
 			test.log(Status.PASS, "Verified that Go Home button is displayed");
 		} catch (AssertionError e) {

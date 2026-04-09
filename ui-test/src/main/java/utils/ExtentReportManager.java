@@ -13,12 +13,12 @@ import com.aventstack.extentreports.reporter.configuration.Theme;
 
 public class ExtentReportManager {
 	private static ExtentReports extent;
-	private static ExtentTest test;
+	private static final ThreadLocal<ExtentTest> TEST = new ThreadLocal<>();
 
 	public static String currentReportFileName;
 	private static String timestamp;
 
-	public static void initReport() {
+	public static synchronized void initReport() {
 		if (extent == null) {
 			String envUrl = BaseTest.url;
 			if (envUrl.endsWith("/")) {
@@ -83,23 +83,24 @@ public class ExtentReportManager {
 		}
 	}
 
-	public static void createTest(String testName) {
-		test = extent.createTest(testName);
+	public static synchronized void createTest(String testName) {
+		TEST.set(extent.createTest(testName));
 	}
 
 	public static void logStep(String message) {
+		ExtentTest test = TEST.get();
 		if (test != null) {
 			test.info(message);
 		}
 	}
 
-	public static void flushReport() {
+	public static synchronized void flushReport() {
 		if (extent != null) {
 			extent.flush();
 		}
 	}
 
 	public static ExtentTest getTest() {
-		return test;
+		return TEST.get();
 	}
 }

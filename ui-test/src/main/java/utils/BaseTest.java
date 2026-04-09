@@ -4,21 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -26,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import com.browserstack.local.Local;
@@ -46,30 +40,35 @@ import io.mosip.testrig.apirig.utils.ConfigManager;
 import io.mosip.testrig.apirig.utils.S3Adapter;
 
 public class BaseTest {
-	public void setDriver(WebDriver driver) {
-		this.driver = driver;
-	}
+	private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
+	private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
+	private static final ThreadLocal<JavascriptExecutor> JSE = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> skipScenario = ThreadLocal.withInitial(() -> false);
+	private static final ThreadLocal<String> skipReason = new ThreadLocal<>();
+	private static final AtomicBoolean BROWSERSTACK_LOCAL_STARTED = new AtomicBoolean(false);
+	private static final Object BROWSERSTACK_LOCAL_LOCK = new Object();
 
+	private static Local browserStackLocal;
 	private static int passedCount = 0;
 	private static int failedCount = 0;
 	private static int totalCount = 0;
 	private static int skippedCount = 0;
-	public static WebDriver driver;
-	private long scenarioStartTime;
-	public static JavascriptExecutor jse;
-	private static ExtentReports extent;
-	private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
-	String username = System.getenv("BROWSERSTACK_USERNAME");
-	String accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
+	private static HashMap<String, Integer> walletPasscodeSettingsCache;
+
+	private final String username = System.getenv("BROWSERSTACK_USERNAME");
+	private final String accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
 	public final String URL = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
-	private Scenario scenario;
-	private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
-	private static ThreadLocal<Boolean> skipScenario = ThreadLocal.withInitial(() -> false);
-	private static ThreadLocal<String> skipReason = new ThreadLocal<>();
 
 	public static final String url = System.getenv("TEST_URL") != null && !System.getenv("TEST_URL").isEmpty()
 			? System.getenv("TEST_URL")
 			: InjiWebConfigManager.getproperty("injiWebUi");
+
+	public void setDriver(WebDriver driver) {
+		DRIVER.set(driver);
+		if (driver instanceof JavascriptExecutor) {
+			JSE.set((JavascriptExecutor) driver);
+		}
+	}
 
 	public static boolean isScenarioSkipped() {
 		return skipScenario.get();
@@ -92,29 +91,28 @@ public class BaseTest {
 	@Before
 	public void beforeAll(Scenario scenario) throws MalformedURLException {
 		clearSkip();
-		Local bsLocal = new Local();
-		HashMap<String, String> bsLocalArgs = new HashMap<>();
-		bsLocalArgs.put("key", accessKey);
-		try {
-			bsLocal.start(bsLocalArgs);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		startBrowserStackLocal();
 		totalCount++;
 		ExtentReportManager.initReport();
 		ExtentReportManager.createTest(scenario.getName());
 		ExtentReportManager.logStep("Scenario Started: " + scenario.getName());
+
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setCapability("browserName", "Chrome");
 		capabilities.setCapability("browserVersion", "latest");
-		HashMap<String, Object> browserstackOptions = new HashMap<String, Object>();
+		capabilities.setCapability("pageLoadStrategy", "eager");
+
+		HashMap<String, Object> browserstackOptions = new HashMap<>();
 		browserstackOptions.put("os", "Windows");
 		browserstackOptions.put("local", true);
-		browserstackOptions.put("interactiveDebugging", true);
+		browserstackOptions.put("interactiveDebugging",
+				Boolean.parseBoolean(System.getenv().getOrDefault("BROWSERSTACK_INTERACTIVE_DEBUGGING", "false")));
 		capabilities.setCapability("bstack:options", browserstackOptions);
 
-		driver = new RemoteWebDriver(new URL(URL), capabilities);
-		jse = (JavascriptExecutor) driver;
+		WebDriver driver = new RemoteWebDriver(new URL(URL), capabilities);
+		DRIVER.set(driver);
+		JSE.set((JavascriptExecutor) driver);
+		driver.manage().timeouts().implicitlyWait(Duration.ZERO);
 		driver.manage().window().maximize();
 		driver.get(url);
 	}
@@ -124,12 +122,11 @@ public class BaseTest {
 		try {
 			int retryBlockedUntil = getWalletPasscodeSettings().get("retryBlockedUntil");
 			String envThreshold = System.getenv("THRESH_TEMP_LOCK");
-			int THRESH_TEMP_LOCK = (envThreshold != null && !envThreshold.isEmpty()) ? Integer.parseInt(envThreshold)
-					: 1;
+			int tempLockThreshold = (envThreshold != null && !envThreshold.isEmpty()) ? Integer.parseInt(envThreshold) : 1;
 
-			if (retryBlockedUntil > THRESH_TEMP_LOCK) {
+			if (retryBlockedUntil > tempLockThreshold) {
 				String reason = "Threshold not met: retryBlockedUntil(" + retryBlockedUntil + ") < THRESH_TEMP_LOCK("
-						+ THRESH_TEMP_LOCK + ")";
+						+ tempLockThreshold + ")";
 				markScenarioSkipped(reason);
 				throw new SkipException("Scenario skipped due to threshold: " + reason);
 			}
@@ -140,13 +137,14 @@ public class BaseTest {
 
 	@BeforeStep
 	public void beforeStep(Scenario scenario) {
+		ScreenshotUtil.resetFailureScreenshotFlag();
 		String stepName = getStepName(scenario);
 		if (isScenarioSkipped()) {
 			ExtentCucumberAdapter.getCurrentStep().log(Status.SKIP,
-					"⏭ Step Skipped: " + stepName + " — " + getSkipReason());
+					"Step Skipped: " + stepName + " - " + getSkipReason());
 			throw new io.cucumber.java.PendingException("Scenario skipped: " + getSkipReason());
 		}
-		ExtentCucumberAdapter.getCurrentStep().log(Status.INFO, "➡️ Step Started: " + stepName);
+		ExtentCucumberAdapter.getCurrentStep().log(Status.INFO, "Step Started: " + stepName);
 	}
 
 	@AfterStep
@@ -154,15 +152,15 @@ public class BaseTest {
 		String stepName = getStepName(scenario);
 		if (isScenarioSkipped()) {
 			ExtentCucumberAdapter.getCurrentStep().log(Status.SKIP,
-					"⏭ Step Skipped: " + stepName + " — " + getSkipReason());
+					"Step Skipped: " + stepName + " - " + getSkipReason());
 			return;
 		}
 
 		if (scenario.isFailed()) {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.FAIL, "❌ Step Failed: " + stepName);
-			captureScreenshot();
+			ExtentCucumberAdapter.getCurrentStep().log(Status.FAIL, "Step Failed: " + stepName);
+			ScreenshotUtil.attachScreenshot(DRIVER.get(), "FailureScreenshot");
 		} else {
-			ExtentCucumberAdapter.getCurrentStep().log(Status.PASS, "✅ Step Passed: " + stepName);
+			ExtentCucumberAdapter.getCurrentStep().log(Status.PASS, "Step Passed: " + stepName);
 		}
 	}
 
@@ -171,24 +169,26 @@ public class BaseTest {
 		try {
 			if (isScenarioSkipped()) {
 				skippedCount++;
-				ExtentReportManager.getTest()
-						.skip("⏭ Scenario Skipped: " + scenario.getName() + " — " + getSkipReason());
+				ExtentReportManager.getTest().skip("Scenario Skipped: " + scenario.getName() + " - " + getSkipReason());
 			} else if (scenario.isFailed()) {
 				failedCount++;
-				ExtentReportManager.getTest().fail("❌ Scenario Failed: " + scenario.getName());
+				ExtentReportManager.getTest().fail("Scenario Failed: " + scenario.getName());
 			} else {
 				passedCount++;
-				ExtentReportManager.getTest().pass("✅ Scenario Passed: " + scenario.getName());
+				ExtentReportManager.getTest().pass("Scenario Passed: " + scenario.getName());
 			}
 		} finally {
+			WebDriver driver = DRIVER.get();
 			if (driver != null) {
 				try {
 					driver.quit();
-					logger.info("✅ WebDriver instance quit successfully after scenario: {}", scenario.getName());
+					logger.info("WebDriver quit after scenario: {}", scenario.getName());
 				} catch (Exception e) {
-					logger.error("❌ Error while quitting WebDriver after scenario: {}", scenario.getName(), e);
+					logger.error("Error while quitting WebDriver after scenario: {}", scenario.getName(), e);
 				} finally {
-					driver = null; // ensure cleanup
+					DRIVER.remove();
+					JSE.remove();
+					ScreenshotUtil.clearFailureScreenshotFlag();
 				}
 			}
 			ExtentReportManager.flushReport();
@@ -200,8 +200,7 @@ public class BaseTest {
 		try {
 			Field testCaseField = scenario.getClass().getDeclaredField("testCase");
 			testCaseField.setAccessible(true);
-			io.cucumber.plugin.event.TestCase testCase = (io.cucumber.plugin.event.TestCase) testCaseField
-					.get(scenario);
+			io.cucumber.plugin.event.TestCase testCase = (io.cucumber.plugin.event.TestCase) testCaseField.get(scenario);
 			List<TestStep> testSteps = testCase.getTestSteps();
 			for (TestStep step : testSteps) {
 				if (step instanceof PickleStepTestStep) {
@@ -214,37 +213,58 @@ public class BaseTest {
 		return "Unknown Step";
 	}
 
-	private void captureScreenshot() {
-		if (driver != null) {
-			byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-			ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromBase64String(
-					java.util.Base64.getEncoder().encodeToString(screenshot), "Failure Screenshot");
-		}
-	}
-
 	@AfterAll
 	public static void afterAll() {
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			utils.HttpUtils.cleanupWallets();
-			utils.HttpUtils.cleanupWallets();
-			if (extent != null) {
-				extent.flush();
-			}
-			try {
-				Thread.sleep(5000); // ensure report file is flushed before rename
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			pushReportsToS3();
-		}));
+		utils.HttpUtils.cleanupWallets();
+		ExtentReportManager.flushReport();
+		stopBrowserStackLocal();
+		pushReportsToS3();
 	}
 
 	public WebDriver getDriver() {
-		return driver;
+		return DRIVER.get();
 	}
 
 	public JavascriptExecutor getJse() {
-		return jse;
+		return JSE.get();
+	}
+
+	private void startBrowserStackLocal() {
+		if (BROWSERSTACK_LOCAL_STARTED.get()) {
+			return;
+		}
+
+		synchronized (BROWSERSTACK_LOCAL_LOCK) {
+			if (BROWSERSTACK_LOCAL_STARTED.get()) {
+				return;
+			}
+
+			HashMap<String, String> bsLocalArgs = new HashMap<>();
+			bsLocalArgs.put("key", accessKey);
+			try {
+				browserStackLocal = new Local();
+				browserStackLocal.start(bsLocalArgs);
+				BROWSERSTACK_LOCAL_STARTED.set(true);
+			} catch (Exception e) {
+				throw new IllegalStateException("Failed to start BrowserStack Local", e);
+			}
+		}
+	}
+
+	private static void stopBrowserStackLocal() {
+		synchronized (BROWSERSTACK_LOCAL_LOCK) {
+			if (!BROWSERSTACK_LOCAL_STARTED.get() || browserStackLocal == null) {
+				return;
+			}
+			try {
+				browserStackLocal.stop();
+			} catch (Exception e) {
+				logger.warn("Failed to stop BrowserStack Local cleanly", e);
+			} finally {
+				browserStackLocal = null;
+				BROWSERSTACK_LOCAL_STARTED.set(false);
+			}
+		}
 	}
 
 	public static void pushReportsToS3() {
@@ -265,9 +285,9 @@ public class BaseTest {
 		System.out.println("Target:   " + newReportFile.getAbsolutePath());
 
 		if (originalReportFile.renameTo(newReportFile)) {
-			System.out.println("✅ Report renamed to: " + newFileName);
+			System.out.println("Report renamed to: " + newFileName);
 		} else {
-			System.out.println("❌ Failed to rename the report file.");
+			System.out.println("Failed to rename the report file.");
 		}
 
 		executeLsCommand(newReportFile.getAbsolutePath());
@@ -347,8 +367,6 @@ public class BaseTest {
 
 		return new String[] { issuerSearchText, issuerSearchTextforSunbird };
 	}
-
-	private static HashMap<String, Integer> walletPasscodeSettingsCache;
 
 	public static HashMap<String, Integer> getWalletPasscodeSettings() throws Exception {
 		if (walletPasscodeSettingsCache == null) {

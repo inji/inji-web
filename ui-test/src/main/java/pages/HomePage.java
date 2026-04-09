@@ -2,14 +2,17 @@ package pages;
 
 import base.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.time.Duration;
 
 public class HomePage extends BasePage {
 
@@ -383,7 +386,8 @@ public class HomePage extends BasePage {
 	}
 
 	public void waitForseconds() {
-		waitForSeconds(driver, 15);
+		new WebDriverWait(driver, Duration.ofSeconds(5)).until(
+				webDriver -> "complete".equals(((JavascriptExecutor) webDriver).executeScript("return document.readyState")));
 	}
 
 }

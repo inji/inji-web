@@ -136,7 +136,6 @@ public class StepDefSunbirdCredentials {
 	@Then("User enter the policy number")
 	public void user_enter_the_policy_number() {
 		try {
-			Thread.sleep(3000); // Consider using WebDriverWait instead of Thread.sleep for better efficiency.
 			sunbirdCredentials.enterPolicyNumer(policynumber);
 			test.log(Status.PASS, "User successfully entered the policy number: " + policynumber);
 		} catch (NoSuchElementException e) {
@@ -144,11 +143,6 @@ public class StepDefSunbirdCredentials {
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
 			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
 			throw e;
-		} catch (InterruptedException e) {
-			test.log(Status.FAIL, "Thread was interrupted while waiting to enter the policy number: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			Thread.currentThread().interrupt(); // Restore interrupted state
-			throw new RuntimeException(e);
 		} catch (Exception e) {
 			test.log(Status.FAIL, "Unexpected error while entering the policy number: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
@@ -216,7 +210,7 @@ public class StepDefSunbirdCredentials {
 		int retryCount = 0;
 
 		while (retryCount < 3 && sunbirdCredentials.isLoginButtonDisplayed()) {
-			Thread.sleep(5000);
+			Thread.sleep(2000);
 			sunbirdCredentials.clickOnLogin();
 			if (!sunbirdCredentials.isLoginFailedDisplayed()) {
 				break;
