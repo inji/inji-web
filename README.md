@@ -39,7 +39,7 @@ Inji Web adheres to global interoperability standards, including:
 
 ### Current Limitations
 
-* **Signature Verification:** Some gaps currently exist in full signature verification flows.
+* **OVP Flow Support:** The Verifiable Presentation (OVP) flow is currently limited to **LDP-VC** (JSON-LD) format. Support for **SD-JWT VC** presentation is currently in the pipeline and not yet available.
 * **Passcode Management:** The option to change a passcode after the initial login is currently unavailable.
 
 
@@ -171,7 +171,7 @@ To update configurations on a Linux environment:
 
 1.  Open the file: `nano ./inji-web/public/env.config.js`
 2.  Update the `MIMOTO_URL` to point to your running Mimoto service.
-3.  Save and Exit: `ctrl + o` and then `y` to save the changes, followed by `ctrl + x` to exit.
+3.  Save and Exit: press `ctrl + o`, then `y` to save the changes, followed by `ctrl + x` to exit.
 
 
 ## Running Tests
