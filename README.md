@@ -1,7 +1,8 @@
-> ❗ **Important\!** Before you proceed, you should be aware of OpenID4VC & W3C VC. Please read the following standards before proceeding:
+> ❗ **Important\!** Before you proceed, you should be aware of OpenID4VCI, OpenID4VP & W3C VC. Please read the following standards before proceeding:
 >
->   * [W3C VC - Verifiable Credentials Overview](https://www.w3.org/TR/vc-overview/)
->   * [OpenID4VP - OpenID for Verifiable Presentations - 1.0](https://openid.net/specs/openid-4-verifiable-presentations-1_0-ID3.html)
+> * [W3C VC - Verifiable Credentials Overview](https://www.w3.org/TR/vc-overview/)
+> * [OpenID4VC - OpenID for Verifiable Credential Issuance - draft 13](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-ID1.html)
+> * [OpenID4VP - OpenID for Verifiable Presentations - draft 23](https://openid.net/specs/openid-4-verifiable-presentations-1_0-ID3.html)
 
 
 ### Table of Contents
@@ -53,7 +54,7 @@ Inji Web utilizes a **Backend-for-Frontend (BFF)** architecture pattern centered
 * **Credential Storage:** Utilizes **PostgreSQL** for persistent storage of credentials for logged-in users and **Datashare** for guest sessions or public credential sharing scenarios.
 * **Security Layer:** Integrated with **eSignet** for identity provider (IdP) services and supports **Google OAuth 2.0** for social login.
 
-For a detailed view of Inji web architecture and components, check [this link](https://docs.inji.io/inji-wallet/inji-web/technical-overview/architecture).
+For a detailed view of Inji web architecture and components, refer to the [Inji Web Architecture Documentation](https://docs.inji.io/inji-wallet/inji-web/technical-overview/architecture).
 
 
 ## Modularity & Extensibility
@@ -89,7 +90,7 @@ Inji Web supports two modes of deployment to cater to different users with diffe
 2. **Deployment with Kubernetes cluster**
     * Designed for production environments.
     * Enables organizations to host and utilize the product at scale.
-    * Click [here](https://docs.inji.io/readme/setup/deploy#deploying-inji-web-wallet) to learn more about this mode of deployment.
+    * Refer to the [Deployment Guide](https://docs.inji.io/readme/setup/deploy#deploying-inji-web-wallet) to learn more about this mode of deployment.
 
 
 ## Local Setup
@@ -148,15 +149,15 @@ This is the recommended method to run Inji Web together with Mimoto, Redis, and 
 * **Start Services:**
 
   ```bash
-  $ cd ./docker-compose
-  $ docker-compose up
+    cd ./docker-compose
+    docker-compose up
   ```
 
 * **Stop Services:**
 
   ```bash
-  $ cd ./docker-compose
-  $ docker-compose down
+    cd ./docker-compose
+    docker-compose down
   ```
 
 **Accessing the Application:**
@@ -218,5 +219,5 @@ In the upcoming releases the following [features](https://docs.inji.io/inji-wall
 
 We welcome contributions from everyone\!
 
-* [Check here](https://docs.inji.io/readme/contribution/code-contribution) to learn how you can contribute code to this application.
+* Refer to the [Code Contribution Guide](https://docs.inji.io/readme/contribution/code-contribution) to learn how you can contribute code to this application.
 * If you have any questions or run into issues while trying out the application, feel free to post them in the [MOSIP Community](https://community.mosip.io/) — we’ll be happy to help you out.
