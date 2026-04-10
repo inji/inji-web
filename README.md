@@ -1,4 +1,4 @@
-> ❗ **Important\!** Before you proceed, you should be aware of OpenID4VCI, OpenID4VP & W3C VC. Please read the following standards before proceeding:
+> ❗ **Important!** Before you proceed, you should be aware of OpenID4VCI, OpenID4VP & W3C VC. Please read the following standards before proceeding:
 >
 > * [W3C VC - Verifiable Credentials Overview](https://www.w3.org/TR/vc-overview/)
 > * [OpenID4VC - OpenID for Verifiable Credential Issuance - draft 13](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-ID1.html)
@@ -101,10 +101,10 @@ To run Inji Web, you must have **Node 18** installed.
 
 ```bash
 # Install nvm (if not already installed)
-$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
 # Install Node 18
-$ nvm install 18
+nvm install 18
 ```
 
 ### 2\. Running Locally (Non-Docker)
@@ -113,13 +113,13 @@ Recommended for frontend developers working on UI changes or deep codebase explo
 
 ```bash
 # Navigate to the frontend directory
-$ cd ./inji-web
+cd ./inji-web
 
 # Install dependencies
-$ npm install
+npm install
 
 # Start the application
-$ npm start
+npm start
 ```
 
 The application will be accessible at: **[http://localhost:3004](http://localhost:3004)**.
@@ -133,13 +133,13 @@ To build and run the Inji Web frontend as a standalone container, navigate to th
 
 ```bash
 # Navigate to the frontend directory
-$ cd ./inji-web
+cd ./inji-web
 
 # Build the docker image
-$ docker build -t <dockerImageName>:<tag> .
+docker build -t <dockerImageName>:<tag> .
 
 # Run the docker image (add environment variables as needed)
-$ docker run -e DEFAULT_LANG=en -it -p 3004:3004 <dockerImageName>:<tag>
+docker run -e DEFAULT_LANG=en -it -p 3004:3004 <dockerImageName>:<tag>
 ```
 
 #### Running with Docker Compose (Full Stack)
@@ -169,7 +169,7 @@ Inji Web connects to the Mimoto service. Configuration details, such as URLs to 
 
 To update configurations on a Linux environment:
 
-1.  Open the file: `$ nano ./inji-web/public/env.config.js`
+1.  Open the file: `nano ./inji-web/public/env.config.js`
 2.  Update the `MIMOTO_URL` to point to your running Mimoto service.
 3.  Save and Exit: `ctrl + o` and then `y` to save the changes, followed by `ctrl + x` to exit.
 
@@ -195,7 +195,7 @@ Refer to the [Postgres Configuration Guide](https://github.com/inji/mimoto/blob/
 
 ## Upcoming Features
 
-In the upcoming releases the following [features](https://docs.inji.io/inji-wallet/inji-web/overview/features#features-in-the-pipeline) are planned:
+In the upcoming releases, the following [features](https://docs.inji.io/inji-wallet/inji-web/overview/features#features-in-the-pipeline) are planned:
 
 * **Selective Disclosure (SD-JWT):** Ability to share specific attributes from a credential.
 * **Revocation Status:** Real-time checking of VC validity.
@@ -217,7 +217,7 @@ In the upcoming releases the following [features](https://docs.inji.io/inji-wall
 
 ## Contribution & Community
 
-We welcome contributions from everyone\!
+We welcome contributions from everyone!
 
 * Refer to the [Code Contribution Guide](https://docs.inji.io/readme/contribution/code-contribution) to learn how you can contribute code to this application.
 * If you have any questions or run into issues while trying out the application, feel free to post them in the [MOSIP Community](https://community.mosip.io/) — we’ll be happy to help you out.
