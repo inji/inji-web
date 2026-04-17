@@ -110,6 +110,7 @@ The integration is split into **Authentication** (Spring Security) and **Orchest
 
 ## 8. Errors
 When login fails, Mimoto uses **302 Redirects** to pass error context back to Inji Web.
+Direct requests to protected APIs made without a valid session will return a standard 401 Unauthorized response.
 
 | Scenario | HTTP Status | Description                                                                               |
 | :--- | :--- |:------------------------------------------------------------------------------------------|
@@ -120,5 +121,5 @@ When login fails, Mimoto uses **302 Redirects** to pass error context back to In
 
 
 ## 9. References
-* [How to create Google Client Credentials](https://github.com/inji/inji-web/blob/develop/docker-compose/README.md#how-to-create-google-client-credentials)
+* [How to create Google Client Credentials](https://github.com/inji/inji-web/blob/master/docker-compose/README.md#how-to-create-google-client-credentials)
 * [Google OAuth2 Login Integration](https://github.com/inji/mimoto/blob/master/docs/GoogleOauth2LoginIntegration.md)

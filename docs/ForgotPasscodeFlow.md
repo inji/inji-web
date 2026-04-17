@@ -1,10 +1,10 @@
 # Wallet Reset Flow (Forgot Passcode)
 
-## 1\. Overview
+## 1. Overview
 
 The **Forgot Passcode** flow in Inji Web is implemented as a **Wallet Reset** process. Since the user’s PIN is not stored, the existing Wallet Key cannot be recovered without it, making deletion and re-creation of the wallet the only recovery option.
 
-## 2\. Execution Flow
+## 2. Execution Flow
 
 The flow is triggered when the user clicks the **"Forgot Passcode?"** link from the `/user/passcode` screen.
 
@@ -34,7 +34,7 @@ The flow is triggered when the user clicks the **"Forgot Passcode?"** link from 
 2.  **Navigation:** The user is redirected back to `ROUTES.USER_PASSCODE`.
 3.  **Re-onboarding:** Because the backend no longer finds a wallet associated with the `USER_ID`, the user is greeted with the **"Set Passcode"** screen (Onboarding) instead of the "Enter Passcode" screen.
 
-## 3\. Architecture
+## 3. Architecture
 
 Responsibilities are clearly separated between Inji Web and Mimoto.
 
@@ -50,7 +50,7 @@ Responsibilities are clearly separated between Inji Web and Mimoto.
     * **Session Store (Redis)**: Maintains the `HttpSession` and clears `wallet_id` and `wallet_key` upon reset.
     * **Persistence Layer (PostgreSQL)**: Stores wallet and user data; wallet deletion triggers cascading removal of all associated credentials.
 
-## 4\. Sequence Diagram
+## 4. Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -81,7 +81,7 @@ sequenceDiagram
     Note over UI: App detects no Wallet and shows "Set Passcode"
 ```
 
-## 5\. Integration
+## 5. Integration
 
 ### API Reference
 
@@ -90,7 +90,7 @@ sequenceDiagram
 | **Unlock Wallet** | `POST` | [/wallets/{walletId}/unlock](<stoplight link to be updated>)                              |
 | **Delete Wallet** | `DELETE` | [/wallets/{walletId}](<stoplight link to be updated>)                                     |
 
-## 6\. Security Details
+## 6. Security Details
 
 ### PIN-Based Cryptography Implication
 
@@ -112,7 +112,7 @@ The `DELETE` request is **Session Bound**.
 
 Additionally, the request requires an `X-XSRF-TOKEN`, protecting against Cross-Site Request Forgery (CSRF).
 
-## 7\. Error Handling
+## 7. Error Handling
 
 ### Mimoto API Response Codes
 
@@ -131,7 +131,7 @@ Additionally, the request requires an `X-XSRF-TOKEN`, protecting against Cross-S
 | **Failure (4xx/5xx)** | Catch block triggers | Displays `resetFailure` message . |
 | **Back Button** | Calls `handleBackNavigation()` | Navigates back to `/user/passcode` (Unlock mode). |
 
-## 8\. References
+## 8. References
 
 For low-level implementation details of the Mimoto wallet unlock and cryptographic flow, refer to:
 

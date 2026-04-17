@@ -1,6 +1,6 @@
 # User Data Encryption & PIN-Based Key Protection
 
-## 1\. Overview
+## 1. Overview
 
 The user's sensitive data is protected using a layered encryption model designed to ensure that sensitive information is never stored in plaintext. This mechanism ensures that Verifiable Credentials (VCs) and Personally Identifiable Information (PII) are never stored in plaintext. The core of this security is the **Wallet Key** - a master AES-256 key that is itself encrypted using a **Derived Key** generated from the user's **6-digit PIN**.
 
@@ -11,7 +11,7 @@ The primary goals are:
 * Securing data even if the database is compromised
 
 
-## 2\. Execution Flow
+## 2. Execution Flow
 
 ### Phase 1: PIN Creation & Wallet Key Generation
 
@@ -39,7 +39,7 @@ Once the Wallet Key is available in the session:
 2.  **PII Protection:** User metadata (such as name, email and profile picture) is stored in the `user_metadata` table. These fields are encrypted using a System Key (Reference ID: `user_pii`) managed via the MOSIP Kernel Cryptomanager, rather than the user's Wallet Key.
 
 
-## 3\. Architecture
+## 3. Architecture
 
 Responsibilities are clearly separated between Inji Web and Mimoto.
 
@@ -55,7 +55,7 @@ Responsibilities are clearly separated between Inji Web and Mimoto.
     * **`WalletRepository` & `WalletCredentialsRepository`**: Persistence layers for encrypted key metadata and user's verifiable credentials.
 
 
-## 4\. Sequence Diagram: Secure Data Access
+## 4. Sequence Diagram: Secure Data Access
 
 ```mermaid
 sequenceDiagram
@@ -101,7 +101,7 @@ sequenceDiagram
     DPS->>DB: Save encrypted metadata
 ```
 
-## 5\. Integration
+## 5. Integration
 
 ### API Reference
 
@@ -119,7 +119,7 @@ Mimoto adheres to the following cryptographic standards to ensure security for t
 * **Randomness:** Unique **32-byte salts** and **12-byte IVs** (Nonces) are generated for every encryption operation using `SecureRandom`.
 
 
-## 7\. Errors
+## 7. Errors
 
 Mimoto returns specific error codes if the encryption/decryption process fails:
 
@@ -132,7 +132,7 @@ Mimoto returns specific error codes if the encryption/decryption process fails:
 | database_unavailable | 503 | Database unavailable: Unable to fetch or update required data.                              |
 
 
-## 8\. References
+## 8. References
 
 For low-level implementation details of the Mimoto cryptographic layer, refer to:
 

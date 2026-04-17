@@ -1,6 +1,6 @@
 # Wallet Unlock Flow & Lockout Policy
 
-## 1\. Overview
+## 1. Overview
 
 The Wallet Unlock flow in Inji Web is a PIN-based authentication mechanism that enables secure access to the user's wallet by decrypting the wallet key. Since Inji Web does not store the user's password in plain text, the provided PIN is used to derive the decryption key. To protect against unauthorized access and brute-force attacks, the system enforces a lockout policy that transitions the wallet through specific security states defined in `WalletLockStatus`: `TEMPORARILY_LOCKED`, `PERMANENTLY_LOCKED`, `LAST_ATTEMPT_BEFORE_LOCKOUT`, and `LOCK_EXPIRED`.
 
@@ -11,7 +11,7 @@ The lockout policy enforces the following wallet states:
 * **LAST_ATTEMPT_BEFORE_LOCKOUT:** Indicates the final remaining retry attempt before the wallet transitions to a permanent lock.
 * **PERMANENTLY_LOCKED:** The wallet is permanently disabled after exceeding the maximum number of lock cycles.
 
-## 2\. Execution Flow
+## 2. Execution Flow
 
 The flow is triggered whenever a user is prompted for their passcode (e.g., after session expiry or initial login).
 
@@ -26,7 +26,7 @@ The flow is triggered whenever a user is prompted for their passcode (e.g., afte
     * **Permanent Lock (`permanently_locked`):** After exceeding the maximum allowed lock cycles, the wallet is permanently disabled.
 
 
-## 3\. Architecture
+## 3. Architecture
 
 The architecture splits responsibilities to ensure that sensitive cryptographic operations and state management are isolated from the UI.
 
@@ -40,7 +40,7 @@ The architecture splits responsibilities to ensure that sensitive cryptographic 
     * **Database (WalletRepository):** Persists the wallet object with its encryption and lock metadata.
 
 
-## 4\. Sequence Diagram
+## 4. Sequence Diagram
 
 The sequence diagram below shows the wallet unlock flow, highlighting PIN validation and the progression of lock states across retries.
 
@@ -117,7 +117,7 @@ end
 ```
 
 
-## 5\. Integration
+## 5. Integration
 
 ### API Reference
 
@@ -126,7 +126,7 @@ end
 | **Unlock Wallet** | `POST /wallets/{walletId}/unlock` | [Mimoto Stoplight](https://mosip.stoplight.io/docs/mimoto/772c63a91221a-unlock-an-existing-wallet) |
 
 
-## 6\. Security & Configuration
+## 6. Security & Configuration
 
 Configurable properties governing the passcode flow are defined in the `application-default.properties` file for the local setup, and in the `mimoto-default.properties` file for the environment setup.
 
@@ -137,7 +137,7 @@ Configurable properties governing the passcode flow are defined in the `applicat
 | `wallet.passcode.maxLockCyclesAllowed` | `3` | Total cycles allowed before the wallet is **Permanently Locked**. |
 
 
-## 7\. Errors
+## 7. Errors
 
 Mimoto uses the following error codes to signal wallet state and failures to the UI:
 
@@ -152,7 +152,7 @@ Mimoto uses the following error codes to signal wallet state and failures to the
 | `internal_server_error`       | 500         | Unexpected server-side failure during wallet decryption or retrieval.                                |
 | `database_unavailable`        | 503         | Failure to connect to or interact with the database.                                                 |
 
-## 8\. References
+## 8. References
 
 For low-level implementation details of the Mimoto wallet unlock and cryptographic flow, refer to:
 
