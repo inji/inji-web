@@ -101,28 +101,28 @@ If you want to change your IDP from Google to another provider, you need to upda
 
 **Important:** When switching, you should replace the word `google` in the property keys with your new provider's **Registration ID** (e.g., `okta`, `facebook`, or `keycloak`). Refer `application-default.properties` for the property keys.
 
-### A. Client Registration (in `application-default.properties`)
+#### A. Client Registration (in `application-default.properties`)
 These properties identify the application to the IDP:
 * `spring.security.oauth2.client.registration.{registrationId}.client-id` – Client ID from your new provider.
 * `spring.security.oauth2.client.registration.{registrationId}.client-secret` – Client secret from your new provider.
 * `spring.security.oauth2.client.registration.{registrationId}.scope` – Scopes supported (e.g., `profile, email`).
 * `spring.security.oauth2.client.registration.{registrationId}.client-name` – Human-readable name for the login button.
 
-### B. Provider Endpoints (in `application-default.properties`)
+#### B. Provider Endpoints (in `application-default.properties`)
 These tell Mimoto where to send the user for authentication:
 * `spring.security.oauth2.client.provider.{registrationId}.authorization-uri` – The provider's login URL.
 * `spring.security.oauth2.client.provider.{registrationId}.token-uri` – The URL to exchange codes for tokens.
 * `spring.security.oauth2.client.provider.{registrationId}.user-info-uri` – The URL to fetch user profile details.
 * `spring.security.oauth2.client.provider.{registrationId}.jwk-set-uri` – The URI for the provider's public keys to validate tokens.
 
-### C. Attribute Mappings (in `application-default.properties`)
+#### C. Attribute Mappings (in `application-default.properties`)
 These map the IDP's response fields to Inji’s internal metadata:
 * `spring.security.oauth2.client.provider.{registrationId}.userNameAttribute` – The unique identifier (e.g., `sub`).
 * `spring.security.oauth2.client.provider.{registrationId}.nameAttribute` – Field for the user's full name.
 * `spring.security.oauth2.client.provider.{registrationId}.emailAttribute` – Field for the user's email.
 * `spring.security.oauth2.client.provider.{registrationId}.pictureAttribute` – Field for the profile picture URL.
 
-### D. Global Properties (in `application.properties`)
+#### D. Global Properties (in `application.properties`)
 * `googleIdToken` – Update this URL to point to the new provider's token endpoint
 
 
