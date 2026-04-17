@@ -85,10 +85,12 @@ sequenceDiagram
 
 ### API Reference
 
-| API | Method | Stoplight Link                                                                            |
-| :--- | :--- |:------------------------------------------------------------------------------------------|
-| **Unlock Wallet** | `POST` | [/wallets/{walletId}/unlock](<stoplight link to be updated>)                              |
-| **Delete Wallet** | `DELETE` | [/wallets/{walletId}](<stoplight link to be updated>)                                     |
+| API | Method | Stoplight Link                                                                        |
+| :--- | :--- |:--------------------------------------------------------------------------------------|
+| **Unlock Wallet** | `POST` | `/wallets/{walletId}/unlock`                                            |
+| **Delete Wallet** | `DELETE` | `/wallets/{walletId}`                                                 |
+
+For more details on the APIs listed above, visit the [Mimoto Stoplight documentation](https://mosip.stoplight.io/docs/mimoto)
 
 ## 6. Security Details
 

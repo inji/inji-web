@@ -123,7 +123,7 @@ end
 
 | Action | Endpoint | Documentation                                                                                      |
 | :--- | :--- |:---------------------------------------------------------------------------------------------------|
-| **Unlock Wallet** | `POST /wallets/{walletId}/unlock` | [Mimoto Stoplight](https://mosip.stoplight.io/docs/mimoto/772c63a91221a-unlock-an-existing-wallet) |
+| **Unlock Wallet** | `POST /wallets/{walletId}/unlock` | [Mimoto Stoplight](https://mosip.stoplight.io/docs/mimoto) |
 
 
 ## 6. Security & Configuration

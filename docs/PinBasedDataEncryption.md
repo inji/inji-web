@@ -105,10 +105,12 @@ sequenceDiagram
 
 ### API Reference
 
-| API | Method | Stoplight Link                        |
-| :--- | :--- |:--------------------------------------|
-| **Unlock Wallet** | `POST` | [/wallets/{id}/unlock](<to be added>) |
-| **User Metadata** | `GET` | [/users/metadata](<to be added>)      |
+| API | Method | Stoplight Link                      |
+| :--- | :--- |:------------------------------------|
+| **Unlock Wallet** | `POST` | `/wallets/{id}/unlock` |
+| **User Metadata** | `GET` | `/users/metadata`     |
+
+For more details on the APIs listed above, visit the [Mimoto Stoplight documentation](https://mosip.stoplight.io/docs/mimoto)
 
 ## 6. Security Specifications
 Mimoto adheres to the following cryptographic standards to ensure security for the user data:
@@ -139,5 +141,6 @@ For low-level implementation details of the Mimoto cryptographic layer, refer to
 * [Mimoto: User Data Encryption with PIN-Based Key](https://github.com/mosip/mimoto/blob/main/docs/UserDataEncryptionWithPinBasedKey.md)
 * [Mimoto: Wallet Unlock Process](https://github.com/mosip/mimoto/blob/main/docs/WalletUnlockProcess.md)
 
-For api documentation, refer to the Mimoto Stoplight:
+For API documentation, refer to the Mimoto Stoplight:
+
 * [Mimoto API Documentation](https://mosip.stoplight.io/docs/mimoto)
