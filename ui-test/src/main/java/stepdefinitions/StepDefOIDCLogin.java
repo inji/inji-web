@@ -29,10 +29,9 @@ import pages.MosipCredentials;
 import pages.SetNetwork;
 import utils.BaseTest;
 import utils.ExtentReportManager;
-import utils.GlobelConstants;
+import utils.InjiWebConstants;
 import utils.HttpUtils;
 import utils.ScreenshotUtil;
-import utils.BaseTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ public class StepDefOIDCLogin {
 	private MosipCredentials mosipCredentials;
 	private SetNetwork setNetwork;
 	ExtentTest test = ExtentReportManager.getTest();
-	private GlobelConstants globelConstants;
 	private Loginpage loginpage;
 
 	private String sessionCookieName = "SESSION";
@@ -53,7 +51,7 @@ public class StepDefOIDCLogin {
 	private static final Logger logger = LoggerFactory.getLogger(StepDefOIDCLogin.class);
 
 	public static void updateConfigProperty(String key, String value) throws IOException {
-		File file = new File("src/test/resources/config.properties");
+		File file = new File("src/main/resources/config/injiweb.properties");
 		Properties props = new Properties();
 		try (FileInputStream fis = new FileInputStream(file)) {
 			props.load(fis);
@@ -166,7 +164,7 @@ public class StepDefOIDCLogin {
 	@Then("user verifies the submit button is not enabled")
 	public void user_verifies_submit_button_disabled() {
 		try {
-			boolean isEnabled = loginpage.isSubmitButtonEnabled();
+			boolean isEnabled = loginpage.isSubmitButtonEnabledFast();
 			assertFalse(isEnabled, "Submit button should be disabled");
 			test.log(Status.PASS, "User successfully verified Submit button is disabled");
 		} catch (AssertionError | NoSuchElementException e) {
@@ -183,13 +181,8 @@ public class StepDefOIDCLogin {
 	}
 
 	@Then("user verify error message for mismatch")
-	public void user_verify_error_message_for_mismatch() throws Exception {
-		loginpage.isMismatchErroDisplayed();
-	}
-
-	@Then("user prints error message for mismatch")
-	public void user_prints_error_message_for_mismatch() throws Exception {
-		loginpage.getMismatchErrorText();
+	public void user_verify_error_message_for_mismatch() {
+		assertEquals(InjiWebConstants.MisMatchError, loginpage.getMismatchErrorText().trim());
 	}
 
 	@Then("user prints verify message for mismatch")
@@ -197,7 +190,7 @@ public class StepDefOIDCLogin {
 
 		try {
 
-			assertEquals(loginpage.getMismatchErrorText().trim(), globelConstants.MisMatchError);
+			assertEquals(loginpage.getMismatchErrorText().trim(), InjiWebConstants.MisMatchError);
 			test.log(Status.PASS,
 					"Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.");
 		} catch (AssertionError | NoSuchElementException e) {
@@ -305,9 +298,8 @@ public class StepDefOIDCLogin {
 	}
 
 	@Then("user click on dropdown box for profile")
-	public void user_click_on_profile_dropdown() throws InterruptedException {
+	public void user_click_on_profile_dropdown() {
 		loginpage.clickOnProfileDropDown();
-
 	}
 
 	@Then("user click on dropdown box for profile again")
@@ -350,7 +342,7 @@ public class StepDefOIDCLogin {
 		loginpage.clickonStoredCredentialsButton();
 	}
 
-	@Then("user verify current url usercredentials")
+	@Then("user verify current url user credentials")
 	public void user_verify_current_url_credentials() {
 		try {
 			loginpage.waituntilpagecompletelyloaded();
@@ -422,7 +414,7 @@ public class StepDefOIDCLogin {
 	public void user_verify_MyProfile_Text() {
 		try {
 			String ProfileText = loginpage.getTextMyProfile();
-			assertEquals(ProfileText, globelConstants.ProfileText);
+			assertEquals(ProfileText, InjiWebConstants.ProfileText);
 			test.log(Status.PASS,
 					"Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.");
 		} catch (AssertionError | NoSuchElementException e) {
@@ -550,7 +542,7 @@ public class StepDefOIDCLogin {
 	public void user_verify_the_title_of_the_window() {
 		try {
 			String windowTitle = loginpage.getTitleOfTheForgetPasswordWindow();
-			assertEquals(windowTitle, globelConstants.windowTitle);
+			assertEquals(windowTitle, InjiWebConstants.windowTitle);
 			test.log(Status.PASS, "Title of the forget Passcode window");
 		} catch (AssertionError | NoSuchElementException e) {
 			test.log(Status.FAIL, "Text verification failed: " + e.getMessage());
@@ -607,8 +599,8 @@ public class StepDefOIDCLogin {
 		}
 	}
 
-	@Then("user verify user info on resetpasscode available")
-	public void user_verify_user_info_on_resetpasscode_available() {
+	@Then("user verify user info on reset passcode available")
+	public void user_verify_user_info_on_reset_passcode_available() {
 
 		try {
 			boolean isDisplayed = loginpage.isResetUserInfoOnForgetPasswordDisplayed();
@@ -870,7 +862,7 @@ public class StepDefOIDCLogin {
 			loginpage.enterPasscode(wrongPasscode);
 			loginpage.clickonSubmitButton();
 			assertTrue(loginpage.isMismatchErroDisplayed(), "After attempt " + i + ": Error Message is not displayed");
-			assertTrue(!loginpage.isSubmitButtonEnabled(), "After attempt " + i + ": Submit button disabled");
+			assertTrue(!loginpage.isSubmitButtonEnabledFast(), "After attempt " + i + ": Submit button disabled");
 		}
 	}
 
@@ -883,7 +875,7 @@ public class StepDefOIDCLogin {
 		for (int i = 1; i <= noOfTimes; i++) {
 			loginpage.enterPasscode(wrongPasscode);
 			loginpage.clickonSubmitButton();
-			assertTrue(!loginpage.isSubmitButtonEnabled(), "After attempt " + i + ": Submit button disabled");
+			assertTrue(!loginpage.isSubmitButtonEnabledFast(), "After attempt " + i + ": Submit button disabled");
 		}
 	}
 
@@ -900,12 +892,12 @@ public class StepDefOIDCLogin {
 			if (i < maxNoOfTimes) {
 				assertTrue(loginpage.isMismatchErroDisplayed(),
 						"After attempt " + i + ": Mismatch error not displayed");
-				assertTrue(!loginpage.isSubmitButtonEnabled(),
+				assertTrue(!loginpage.isSubmitButtonEnabledFast(),
 						"After attempt " + i + ": Submit button should be enabled");
 			} else {
 				assertTrue(loginpage.isTempLockErroDisplayed(),
 						"After attempt " + i + ": Temp lock error not displayed");
-				assertFalse(loginpage.isSubmitButtonEnabled(),
+				assertFalse(loginpage.isSubmitButtonEnabledFast(),
 						"After attempt " + i + ": Submit button should be disabled");
 				assertTrue(loginpage.isPasscodeInputDisabled(),
 						"After attempt " + i + ": Pass code not disabled after max fail");
@@ -920,9 +912,9 @@ public class StepDefOIDCLogin {
 
 		BasePage.waitForSeconds(driver, Math.max(lockSeconds - 10, 1));
 		driver.navigate().refresh();
-		assertTrue(!loginpage.isSubmitButtonEnabled(), "Before temporaty lock Expire Submit button is enabled");
+		assertTrue(!loginpage.isSubmitButtonEnabledFast(), "Before temporaty lock Expire Submit button is enabled");
 		driver.navigate().refresh();
-		loginpage.waitUntilPasscodeEnabled(20);
+		loginpage.waitUntilPasscodeEnabled(BasePage.getConfiguredWaitTimeInSeconds());
 		assertTrue(!loginpage.isPasscodeInputDisabled(), "Passocde button is not enabled after temporaty lock Expire");
 	}
 

@@ -6,33 +6,15 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class HttpUtils {
 
-	private static final String PROPERTIES_PATH = "src/test/resources/config.properties";
-	private static final Properties properties = loadProperties();
-	public static String baseUrl = BaseTest.url;
-	public static String get(String key) {
-		String envValue = System.getenv(key);
-		if (envValue != null && !envValue.trim().isEmpty()) {
-			return envValue.trim();
-		}
-		String sysProp = System.getProperty(key);
-		if (sysProp != null && !sysProp.trim().isEmpty()) {
-			return sysProp.trim();
-		}
-		String fileProp = properties.getProperty(key);
-		if (fileProp != null && !fileProp.trim().isEmpty()) {
-			return fileProp.trim();
-		}
-		throw new RuntimeException("Missing required config value for key: " + key);
-	}
+	public static final String baseUrl = BaseTest.url;
 
 	public static String getIdToken() throws IOException {
-		String clientId = get("INJIWEB_GOOGLE_CLIENT_ID");
-		String clientSecret = get("INJIWEB_GOOGLE_CLIENT_SECRET");
-		String refreshToken = get("INJIWEB_GOOGLE_REFRESH_TOKEN");
+		String clientId = InjiWebConfigManager.getproperty("INJIWEB_GOOGLE_CLIENT_ID");
+		String clientSecret = InjiWebConfigManager.getproperty("INJIWEB_GOOGLE_CLIENT_SECRET");
+		String refreshToken = InjiWebConfigManager.getproperty("INJIWEB_GOOGLE_REFRESH_TOKEN");
 
 		URL url = new URL("https://oauth2.googleapis.com/token");
 		String urlParameters = "client_id=" + URLEncoder.encode(clientId, "UTF-8") +
@@ -133,16 +115,6 @@ public class HttpUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static Properties loadProperties() {
-		Properties props = new Properties();
-		try (FileInputStream fis = new FileInputStream(PROPERTIES_PATH)) {
-			props.load(fis);
-		} catch (IOException e) {
-			System.err.println("Failed to load config.properties: " + e.getMessage());
-		}
-		return props;
 	}
 
 	private static String readResponse(HttpURLConnection conn) throws IOException {

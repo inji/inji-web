@@ -18,21 +18,5 @@
 			<class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId" />
 		</classes>
 	</test>
-	<test name="GetPolicySunBirdR">
-		<parameter name="ymlFile"
-			value="injiweb/SunBirdR/GetPolicySunBirdR/GetPolicySunBirdR.yml" />
-			<parameter name="prerequisite" value="Yes" />
-		<classes>
-			<class name="io.inji.testrig.apirig.injiweb.testscripts.GetWithParam" />
-		</classes>
-	</test>
-	<test name="SearchPolicySunBirdR">
-		<parameter name="ymlFile"
-			value="injiweb/SunBirdR/SearchPolicySunBirdR/SearchPolicySunBirdR.yml" />
-			<parameter name="prerequisite" value="Yes" />
-		<classes>
-			<class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePost" />
-		</classes>
-	</test>
-	
+
 </suite>

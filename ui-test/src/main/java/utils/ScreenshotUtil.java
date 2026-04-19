@@ -28,7 +28,9 @@ public class ScreenshotUtil {
 	}
 
 	public static String captureScreenshot(WebDriver driver, String screenshotName) throws IOException {
-		byte[] screenshotBytes = captureFullPageScreenshot(driver);
+		byte[] screenshotBytes = shouldCaptureFullPage()
+				? captureFullPageScreenshot(driver)
+				: ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
 		String destinationPath = System.getProperty("user.dir") + "/screenshots/" + screenshotName + "_"
 				+ System.currentTimeMillis() + ".png";
 		File destination = new File(destinationPath);
@@ -103,5 +105,10 @@ public class ScreenshotUtil {
 	public static String encodeFileToBase64Binary(String filePath) throws IOException {
 		byte[] fileContent = FileUtils.readFileToByteArray(new File(filePath));
 		return Base64.getEncoder().encodeToString(fileContent);
+	}
+
+	private static boolean shouldCaptureFullPage() {
+		String screenshotMode = System.getenv("SCREENSHOT_MODE");
+		return screenshotMode != null && "FULLPAGE".equalsIgnoreCase(screenshotMode.trim());
 	}
 }

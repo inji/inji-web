@@ -1,41 +1,30 @@
 package io.inji.testrig.apirig.injiweb.testscripts;
 
-import java.lang.reflect.Field;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import io.mosip.testrig.apirig.dto.OutputValidationDto;
+import io.mosip.testrig.apirig.dto.TestCaseDTO;
+import io.mosip.testrig.apirig.testrunner.BaseTestCase;
+import io.mosip.testrig.apirig.testrunner.HealthChecker;
+import io.mosip.testrig.apirig.utils.*;
+import io.restassured.response.Response;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.testng.ITest;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.SkipException;
+import org.testng.*;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
+import utils.InjiWebConfigManager;
+import utils.InjiWebUtil;
 
-import api.InjiWebConfigManager;
-import api.InjiWebUtil;
-import io.mosip.testrig.apirig.dto.OutputValidationDto;
-import io.mosip.testrig.apirig.dto.TestCaseDTO;
-import io.mosip.testrig.apirig.testrunner.BaseTestCase;
-import io.mosip.testrig.apirig.testrunner.HealthChecker;
-import io.mosip.testrig.apirig.utils.AdminTestException;
-import io.mosip.testrig.apirig.utils.AdminTestUtil;
-import io.mosip.testrig.apirig.utils.AuthenticationTestException;
-import io.mosip.testrig.apirig.utils.GlobalConstants;
-import io.mosip.testrig.apirig.utils.OutputValidationUtil;
-import io.mosip.testrig.apirig.utils.ReportUtil;
-import io.mosip.testrig.apirig.utils.SecurityXSSException;
-import io.restassured.response.Response;
+import java.lang.reflect.Field;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 	private static final Logger logger = Logger.getLogger(SimplePostForAutoGenId.class);
@@ -44,9 +33,6 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 	public Response response = null;
 	public boolean sendEsignetToken = false;
 	public boolean auditLogCheck = false;
-  public static String fullName = null; 
-    public static String policyNumber = null;
-    public static String dob = null;
 
 	@BeforeClass
 	public static void setLogLevel() {
@@ -66,7 +52,7 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 
 	/**
 	 * Data provider class provides test case list
-	 * 
+	 *
 	 * @return object of data provider
 	 */
 	@DataProvider(name = "testcaselist")
@@ -80,13 +66,12 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 
 	/**
 	 * Test method for OTP Generation execution
-	 * 
-	 * @param objTestParameters
-	 * @param testScenario
-	 * @param testcaseName
+	 *
+	 * @param testCaseDTO
 	 * @throws AuthenticationTestException
 	 * @throws AdminTestException
 	 * @throws NoSuchAlgorithmException
+	 * @throws SecurityXSSException
 	 */
 	@Test(dataProvider = "testcaselist")
 	public void test(TestCaseDTO testCaseDTO)
@@ -104,7 +89,6 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 		}
 
 		testCaseDTO = InjiWebUtil.isTestCaseValidForTheExecution(testCaseDTO);
-		testCaseDTO = InjiWebUtil.changeContextURLByFlag(testCaseDTO);
 		String[] templateFields = testCaseDTO.getTemplateFields();
 		String inputJson = "";
 
@@ -135,26 +119,17 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 					throw new AdminTestException("Failed at output validation");
 			}
 		} else {
-			if (testCaseName.contains("ESignet_")) {
-				if (InjiWebConfigManager.isInServiceNotDeployedList(GlobalConstants.ESIGNET)) {
-					throw new SkipException("esignet is not deployed hence skipping the testcase");
-				}
-				String tempUrl = InjiWebConfigManager.getEsignetBaseUrl();
-				if (testCaseDTO.getEndPoint().startsWith("$SUNBIRDBASEURL$") && testCaseName.contains("SunBirdR")) {
+			if (testCaseDTO.getEndPoint().startsWith("$SUNBIRDBASEURL$") && testCaseName.contains("SunBirdR")) {
+				String tempUrl = ApplnURI;
+				if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
+					throw new SkipException(GlobalConstants.SERVICE_NOT_DEPLOYED_MESSAGE);
 
-					if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
-						throw new SkipException(GlobalConstants.SERVICE_NOT_DEPLOYED_MESSAGE);
+				if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
+					tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
+				testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
 
-					if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
-						tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
-					testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
-				}
-				
-				if (testCaseName.contains("_AuthorizationCode_")) {
-					response = postRequestWithCookieAuthHeaderAndXsrfTokenForAutoGenId(
-							tempUrl + testCaseDTO.getEndPoint(), inputJson, COOKIENAME, testCaseDTO.getTestCaseName(),
-							idKeyName);
-				} else if (testCaseName.contains("SunBirdR_CreatePolicy_")){
+
+				if (testCaseName.contains("SunBirdR_CreatePolicy_")) {
 					//Adding the while loop for try creating sunbird policy in registry for 3 times if gets failed
 					int currLoopCount = 0;
 					do {
@@ -188,11 +163,6 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 				ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(),
 						getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate()), testCaseDTO,
 						response.getStatusCode());
-			    JSONObject jsonObject = new JSONObject(inputJson);
-		         fullName = jsonObject.getString("fullName");
-		         policyNumber = jsonObject.getString("policyNumber");
-		         dob = jsonObject.getString("dob");
-
 			}
 			Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
 			if (!OutputValidationUtil.publishOutputResult(ouputValid))
@@ -203,7 +173,7 @@ public class SimplePostForAutoGenId extends InjiWebUtil implements ITest {
 
 	/**
 	 * The method ser current test name to result
-	 * 
+	 *
 	 * @param result
 	 */
 	@AfterMethod(alwaysRun = true)

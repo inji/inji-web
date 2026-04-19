@@ -18,6 +18,7 @@ import org.openqa.selenium.TimeoutException;
 public class Loginpage extends BasePage {
 
 	private WebDriver driver;
+	private static final By SUBMIT_BUTTON = By.xpath("//button[@data-testid='btn-submit-passcode']");
 
 	public Loginpage(WebDriver driver) {
 		this.driver = driver;
@@ -40,7 +41,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public void enterPasscode(String string) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.xpath("//div[@data-testid='passcode-container']//input[@type='password' and @maxlength='1']")));
 
@@ -60,11 +61,15 @@ public class Loginpage extends BasePage {
 	}
 
 	public void enterConfirmPasscode(String string) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(
-				"//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']")));
-		List<WebElement> confirmFields = driver.findElements(By
-				.xpath("//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']"));
+		By confirmLocator = By.xpath(
+				"//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']");
+		// Scroll the container into view first — the element exists in the DOM but is
+		// below the visible viewport, so visibilityOfElementLocated would time out
+		// without this step.
+		scrollIntoView(driver, confirmLocator);
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(confirmLocator));
+		List<WebElement> confirmFields = driver.findElements(confirmLocator);
 
 		if (confirmFields.size() < string.length()) {
 			throw new RuntimeException("Not enough confirm passcode input fields found: expected " + string.length()
@@ -84,9 +89,29 @@ public class Loginpage extends BasePage {
 	}
 
 	public void focusToggleButtonWithKeyboard() {
-		WebElement toggleButton = driver.findElement(By.xpath("(//button[@type='button'])[2]"));
-		toggleButton.sendKeys(Keys.TAB);
-		toggleButton.sendKeys(Keys.SPACE);
+		By toggleLocator = By.xpath("//button[@data-testid='btn-toggle-visibility-passcode']");
+		By eyeViewLocator = By.xpath(
+				"//button[@data-testid='btn-toggle-visibility-passcode']/*[@data-testid='eye-view']");
+
+		WebElement toggleButton = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+				.until(ExpectedConditions.elementToBeClickable(toggleLocator));
+
+		// Scroll into view and give keyboard focus in one atomic JS call so there is
+		// no gap where a React re-render can scroll the page again between the two ops.
+		((JavascriptExecutor) driver).executeScript(
+				"arguments[0].scrollIntoView({block:'center'}); arguments[0].focus();", toggleButton);
+
+		// React re-renders triggered during the confirmation-passcode entry steps can
+		// silently reset the passcode toggle back to HIDDEN. If that happened, use
+		// SPACE to restore it to VISIBLE before the calling assertion runs.
+		// If the toggle is already VISIBLE no action is taken, so this is idempotent.
+		// Use the short wait here — if the toggle hasn't recovered in 3 s it was reset
+		// and needs the SPACE key; waiting the full 30 s just delays the fix.
+		if (!isElementIsVisible(driver, eyeViewLocator, getConfiguredShortWaitTimeInSeconds())) {
+			toggleButton.sendKeys(Keys.SPACE);
+			new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.visibilityOfElementLocated(eyeViewLocator));
+		}
 	}
 
 	public void clickonToggleButtonConfimration() {
@@ -99,15 +124,24 @@ public class Loginpage extends BasePage {
 	}
 
 	public Boolean isSubmitButtonEnabled() {
-		return isElementEnabled(driver, By.xpath("//button[@data-testid='btn-submit-passcode']"));
+		return isElementEnabled(driver, SUBMIT_BUTTON);
+	}
+
+	public Boolean isSubmitButtonEnabledFast() {
+		return isElementEnabled(driver, SUBMIT_BUTTON, getConfiguredShortWaitTimeInSeconds());
 	}
 
 	public void clickonSubmitButton() {
-		clickOnElement(driver, By.xpath("//button[@data-testid='btn-submit-passcode']"));
+		By submitLocator = SUBMIT_BUTTON;
+		// Scroll into view first — the submit button can sit below the viewport after
+		// the passcode fields are filled, causing ElementNotInteractableException even
+		// though the element is present in the DOM and CSS-visible.
+		scrollIntoView(driver, submitLocator);
+		clickOnElement(driver, submitLocator);
 	}
 
 	public Boolean isMismatchErroDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div/*[@data-testid='error-msg-passcode']"));
+		return isElementIsVisible(driver, By.xpath("//span[@data-testid='error-msg-passcode']"));
 	}
 
 	public Boolean isTempLockErroDisplayed() {
@@ -115,11 +149,12 @@ public class Loginpage extends BasePage {
 	}
 
 	public String getMismatchErrorText() {
-		return getElementText(driver, By.xpath("//div[@data-testid='error-passcode']"));
+		return getElementText(driver, By.xpath("//span[@data-testid='error-msg-passcode']"));
 	}
 
 	public void clickonuserprofiledropdownbutton() {
-		clickOnElement(driver, By.xpath("(//div[@data-testid='profile-details']//div)[4]"), 60);
+		clickOnElement(driver, By.xpath("(//div[@data-testid='profile-details']//div)[4]"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 	public void clickonLogout() {
@@ -152,17 +187,26 @@ public class Loginpage extends BasePage {
 	}
 
 	public void clickOnProfileDropDown() {
-		clickOnElement(driver, By.xpath("(//div[@data-testid='profile-details']//div)[4]"), 60);
+		// Wait for the profile section to be visible — this is the positive signal that
+		// the home page has fully rendered after passcode submit. Relying on the submit
+		// button disappearing is not reliable because it may already be gone from the
+		// DOM before this method is called.
+		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.xpath("//div[@data-testid='profile-details']")));
+		clickOnElement(driver, By.xpath("//div[@class='relative inline-block cursor-pointer']"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 	public void waituntilpagecompletelyloaded() {
-		new WebDriverWait(driver, Duration.ofSeconds(15)).until(webDriver -> ((JavascriptExecutor) webDriver)
+		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds())).until(webDriver -> ((JavascriptExecutor) webDriver)
 				.executeScript("return document.readyState").equals("complete"));
 	}
 
 	public void clickOnProfileDropDownDisplayedAgain() {
 		waituntilpagecompletelyloaded();
-		clickOnElement(driver, By.xpath("(//div[@data-testid='profile-details']//div)[4]"), 60);
+		clickOnElement(driver, By.xpath("(//div[@data-testid='profile-details']//div)[4]"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 	public Boolean isHomeButtonDisplayed() {
@@ -182,9 +226,17 @@ public class Loginpage extends BasePage {
 	}
 
 	public Boolean isHomeStringDisplayedAfterCollpase() {
-		List<WebElement> collapsedText = driver
-				.findElements(By.xpath("//div[@data-testid='sidebar-container']//span[text()='Home']"));
-		return (collapsedText.isEmpty() || !collapsedText.get(0).isDisplayed());
+		// Returns true when the collapse is verified (text label disappeared), false
+		// if the text is still visible after the animation window.
+		// The caller does assertTrue(result), so true == "collapse confirmed".
+		By homeTextLocator = By.xpath("//div[@data-testid='sidebar-container']//span[text()='Home']");
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.invisibilityOfElementLocated(homeTextLocator));
+			return true; // element became invisible — collapse confirmed
+		} catch (TimeoutException e) {
+			return false; // element still visible after 5 s — collapse did not complete
+		}
 	}
 
 	public Boolean isIconVisibleAfterCollpase() {
@@ -221,11 +273,11 @@ public class Loginpage extends BasePage {
 	}
 
 	public String getCurrentUrlUserHome() {
-		return waitForUrlContains(driver, "user/home", 5);
+		return waitForUrlContains(driver, "user/home", getConfiguredWaitTimeInSeconds());
 	}
 
 	public String getCurrentUrlUserCredentials() {
-		return waitForUrlContains(driver, "user/credentials", 5);
+		return waitForUrlContains(driver, "user/credentials", getConfiguredWaitTimeInSeconds());
 	}
 
 	public void clickOnProfileOption() {
@@ -282,7 +334,9 @@ public class Loginpage extends BasePage {
 	}
 
 	public void clickOnForgetPasscodeOption() {
-		clickOnElement(driver, By.xpath("//button[@data-testid='btn-forgot-passcode']"));
+		By forgetPasswordButton = By.xpath("//button[@data-testid='btn-forgot-passcode']");
+		scrollIntoView(driver, forgetPasswordButton);
+		clickOnElement(driver, forgetPasswordButton);
 	}
 
 	public String getTitleOfTheForgetPasswordWindow() {
@@ -290,7 +344,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public String getCurrentUrluserresetpasscode() {
-		return waitForUrlContains(driver, "user/reset-passcode", 5);
+		return waitForUrlContains(driver, "user/reset-passcode", getConfiguredWaitTimeInSeconds());
 	}
 
 	public Boolean isbackButtonDisplayedOnForgetpasscode() {
@@ -318,7 +372,9 @@ public class Loginpage extends BasePage {
 	}
 
 	public Boolean isForgetPasscodeButtonDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//button[@data-testid='btn-set-new-passcode']"));
+		By forgetPasswordButton = By.xpath("//button[@data-testid='btn-set-new-passcode']");
+		scrollIntoView(driver, forgetPasswordButton);
+		return isElementIsVisible(driver, forgetPasswordButton);
 	}
 
 	public Boolean isForgetPasscodeButtonenabled() {
@@ -326,7 +382,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public String getCurrentUrluserpasscode() {
-		return waitForUrlContains(driver, "user/passcode", 5);
+		return waitForUrlContains(driver, "user/passcode", getConfiguredWaitTimeInSeconds());
 	}
 
 	public void clickOnForgetPasscodeButton() {
@@ -436,7 +492,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public String getCurrentUrlUserFAQ() {
-		return waitForUrlContains(driver, "user/faq", 5);
+		return waitForUrlContains(driver, "user/faq", getConfiguredWaitTimeInSeconds());
 	}
 
 	public boolean isPasscodeInputDisabled() {
@@ -454,7 +510,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public void waitUntilPasscodeEnabled() {
-		waitUntilPasscodeEnabled(10);
+		waitUntilPasscodeEnabled(getConfiguredWaitTimeInSeconds());
 	}
 
 	public void waitUntilPasscodeEnabled(int timeoutSeconds) {

@@ -4,23 +4,22 @@ package stepdefinitions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId;
-import io.mosip.testrig.apirig.utils.AdminTestUtil;
 
+import io.mosip.testrig.apirig.utils.NotificationListener;
 import org.junit.Assert;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
-import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 
 import pages.FaqPage;
 import pages.HomePage;
 import pages.SetNetwork;
 import utils.BaseTest;
 import utils.ExtentReportManager;
-import utils.GlobelConstants;
+import utils.InjiWebConfigManager;
+import utils.InjiWebConstants;
 import utils.ScreenshotUtil;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,8 +30,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import base.BasePage;
 
 public class StepDef {
 	private BaseTest baseTest;
@@ -42,7 +39,6 @@ public class StepDef {
 	private WebDriver driver;
 	String pageTitle;
 	ExtentTest test = ExtentReportManager.getTest();
-	private GlobelConstants globelConstants;
 	public static String screenshotPath = System.getProperty("user.dir") + "/test-output/screenshots";
 
 	public StepDef() {
@@ -161,12 +157,42 @@ public class StepDef {
 
 	@When("User click on verify button")
 	public void user_click_on_verify_button() {
+		int maxAttempts = 3;
+		int otpPageWaitTime = InjiWebConfigManager.getOtpVerificationPageWaitTimeInSeconds();
+		Exception lastException = null;
 		try {
-			homePage.waitForseconds();
-			homePage.clickOnVerify();
-			test.log(Status.PASS, "User clicked on verify button");
+			for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+				try {
+					homePage.clickOnVerify();
+					test.log(Status.INFO, "Clicked on verify OTP button. Attempt: " + attempt + "/" + maxAttempts);
+
+					// Success: navigated away from OTP page (download started)
+					if (!homePage.isOnOtpVerificationPage(otpPageWaitTime)) {
+						NotificationListener.markRequestRemove();
+						test.log(Status.PASS, "OTP verified successfully — navigated away from OTP verification page");
+						return;
+					}
+
+					// Still on OTP page: error shown, or button still visible — retry
+					test.log(Status.WARNING, "Still on OTP verification page after verify attempt "
+							+ attempt + "/" + maxAttempts + ". Retrying if attempts remain.");
+				} catch (Exception e) {
+					lastException = e;
+					test.log(Status.WARNING, "Verify OTP attempt " + attempt + "/" + maxAttempts
+							+ " failed: " + e.getMessage());
+				}
+			}
+
+			NotificationListener.markRequestRemove();
+			throw new RuntimeException("Still on OTP verification page after " + maxAttempts
+					+ " verify attempts", lastException);
 		} catch (NoSuchElementException e) {
 			test.log(Status.FAIL, "Element not found while clicking verify button: " + e.getMessage());
+			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
+			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
+			throw e;
+		} catch (Exception e) {
+			test.log(Status.FAIL, "Unexpected error while clicking verify button: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
 			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
 			throw e;
@@ -176,7 +202,6 @@ public class StepDef {
 	@Then("User verify Download Success text displayed")
 	public void user_verify_download_success_text_displayed() throws Exception {
 		try {
-			baseTest.getDriver().manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			Assert.assertTrue(homePage.isSuccessMessageDisplayed());
 			test.log(Status.PASS, "Verified that Download Success text is displayed");
 		} catch (AssertionError e) {
@@ -372,13 +397,13 @@ public class StepDef {
 	@Then("User verify home screens in arabic")
 	public void user_verify_home_screens_in_arabic() {
 		try {
-			Assert.assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInArabic);
+			Assert.assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInArabic);
 			Assert.assertEquals(homePage.getHomePageDescriptionText(),
-					globelConstants.isHomePageDescriptionTextnArabic);
+					InjiWebConstants.isHomePageDescriptionTextnArabic);
 			Assert.assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInArabic);
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInArabic);
 			Assert.assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInArabic);
+					InjiWebConstants.ListOfCredentialDescriptionTextInArabic);
 			test.log(Status.PASS, "Verified Arabic home screen text");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed while verifying Arabic home screen: " + e.getMessage());
@@ -419,12 +444,12 @@ public class StepDef {
 	@Then("User verify home screens in tamil")
 	public void user_verify_home_screens_in_tamil() {
 		try {
-			Assert.assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInTamil);
-			Assert.assertEquals(homePage.getHomePageDescriptionText(), globelConstants.isHomePageDescriptionTextnTamil);
+			Assert.assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInTamil);
+			Assert.assertEquals(homePage.getHomePageDescriptionText(), InjiWebConstants.isHomePageDescriptionTextnTamil);
 			Assert.assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInTamil);
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInTamil);
 			Assert.assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInTamil);
+					InjiWebConstants.ListOfCredentialDescriptionTextInTamil);
 			test.log(Status.PASS, "Verified Tamil home screen text");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed while verifying Tamil home screen: " + e.getMessage());
@@ -465,12 +490,12 @@ public class StepDef {
 	@Then("User verify home screens in kannada")
 	public void user_verify_home_screens_in_kannada() {
 		try {
-			Assert.assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInKannada);
+			Assert.assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInKannada);
 			Assert.assertTrue(homePage.isHomePageDescriptionTextDisplayed());
 			Assert.assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInKannada);
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInKannada);
 			Assert.assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInKannada);
+					InjiWebConstants.ListOfCredentialDescriptionTextInKannada);
 			test.log(Status.PASS, "Verified Kannada home screen text");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed while verifying Kannada home screen: " + e.getMessage());
@@ -511,12 +536,12 @@ public class StepDef {
 	@Then("User verify home screens in hindi")
 	public void user_verify_home_screens_in_hindi() {
 		try {
-			Assert.assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInHindi);
-			Assert.assertEquals(homePage.getHomePageDescriptionText(), globelConstants.HomePageDescriptionTextInHindi);
+			Assert.assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInHindi);
+			Assert.assertEquals(homePage.getHomePageDescriptionText(), InjiWebConstants.HomePageDescriptionTextInHindi);
 			Assert.assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInHindi);
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInHindi);
 			Assert.assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInHindi);
+					InjiWebConstants.ListOfCredentialDescriptionTextInHindi);
 			test.log(Status.PASS, "Verified Hindi home screen text");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed while verifying Hindi home screen: " + e.getMessage());
@@ -557,12 +582,12 @@ public class StepDef {
 	@Then("User verify home screens in french")
 	public void user_verify_home_screens_in_french() {
 		try {
-			Assert.assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInFrench);
-			Assert.assertEquals(homePage.getHomePageDescriptionText(), globelConstants.HomePageDescriptionTextInFrench);
+			Assert.assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInFrench);
+			Assert.assertEquals(homePage.getHomePageDescriptionText(), InjiWebConstants.HomePageDescriptionTextInFrench);
 			Assert.assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInFrench);
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInFrench);
 			Assert.assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInFrench);
+					InjiWebConstants.ListOfCredentialDescriptionTextInFrench);
 			test.log(Status.PASS, "Verified French home screen text");
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed while verifying French home screen: " + e.getMessage());
@@ -604,14 +629,14 @@ public class StepDef {
 	@Then("User verify home screens in portugues")
 	public void user_verify_home_screens_in_portuguese() {
 		try {
-			assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInPortugues,
+			assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInPortugues,
 					"Home page text does not match");
-			assertEquals(homePage.getHomePageDescriptionText(), globelConstants.HomePageDescriptionTextInPortugues,
+			assertEquals(homePage.getHomePageDescriptionText(), InjiWebConstants.HomePageDescriptionTextInPortugues,
 					"Home page description text does not match");
 			assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInPortugues, "List of issuers text does not match");
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInPortugues, "List of issuers text does not match");
 			assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInPortugues,
+					InjiWebConstants.ListOfCredentialDescriptionTextInPortugues,
 					"List of issuers description text does not match");
 
 			test.log(Status.PASS, "User successfully verified home screens in Portuguese");
@@ -636,7 +661,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page")
 	public void user_validate_the_list_of_credential_types_title_of_the_page() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialType,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialType,
 					"List of credential types title does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title on the page");
@@ -663,7 +688,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in Arabic language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_arabic_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInArabic,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInArabic,
 					"List of credential types title in Arabic does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title in Arabic");
@@ -690,7 +715,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in Tamil language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_tamil_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInTamil,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInTamil,
 					"List of credential types title in Tamil does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title in Tamil");
@@ -717,7 +742,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in Kannada language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_kannada_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInKannada,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInKannada,
 					"List of credential types title in Kannada does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title in Kannada");
@@ -744,7 +769,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in Hindi language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_hindi_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInHindi,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInHindi,
 					"List of credential types title in Hindi does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title in Hindi");
@@ -771,7 +796,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in French language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_french_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInFrench,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInFrench,
 					"List of credential types title in French does not match");
 
 			test.log(Status.PASS, "User successfully validated the list of credential types title in French");
@@ -798,7 +823,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in Portuguese language")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_portuguese_language() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInPortugues,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInPortugues,
 					"List of credential types title in Portuguese does not match");
 			test.log(Status.PASS, "User successfully validated the list of credential types title in Portuguese");
 		} catch (AssertionError e) {
@@ -825,7 +850,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page for Sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialType,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialType,
 					"List of credential types title for Sunbird does not match");
 			test.log(Status.PASS, "User successfully validated the list of credential types title for Sunbird");
 		} catch (AssertionError e) {
@@ -851,7 +876,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in arabic laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_arabic_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInArabic,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInArabic,
 					"List of credential types title in Arabic for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in Arabic for Sunbird");
@@ -880,7 +905,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in tamil laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_tamil_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInTamil,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInTamil,
 					"List of credential types title in Tamil for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in Tamil for Sunbird");
@@ -909,7 +934,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in kannada laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_kannada_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInKannada,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInKannada,
 					"List of credential types title in Kannada for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in Kannada for Sunbird");
@@ -938,7 +963,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in hindi laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_hindi_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInHindi,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInHindi,
 					"List of credential types title in Hindi for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in Hindi for Sunbird");
@@ -967,7 +992,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in french laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_french_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInFrench,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInFrench,
 					"List of credential types title in French for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in French for Sunbird");
@@ -996,7 +1021,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in portugues laguage for sunbird")
 	public void user_validate_the_list_of_credential_types_title_of_the_page_in_portuguese_language_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInPortugues,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInPortugues,
 					"List of credential types title in Portuguese for Sunbird does not match");
 			test.log(Status.PASS,
 					"User successfully validated the list of credential types title in Portuguese for Sunbird");
@@ -1222,10 +1247,10 @@ public class StepDef {
 			assertTrue(homePage.isFooterIsDisplayedOnHomePage(), "Footer is not displayed on the home page");
 			test.log(Status.PASS, "User verified that the footer is displayed on the home page");
 
-			assertEquals(homePage.getFooterText(), globelConstants.FooterText,
+			assertEquals(homePage.getFooterText(), InjiWebConstants.FooterText,
 					"Footer text does not match the expected value");
 			test.log(Status.PASS,
-					"User verified that the footer text matches the expected value: " + globelConstants.FooterText);
+					"User verified that the footer text matches the expected value: " + InjiWebConstants.FooterText);
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
@@ -1746,12 +1771,10 @@ public class StepDef {
 		}
 	}
 
-	@Then("Use click on procced button")
-	public void use_click_on_procced_button() {
+	@Then("Use click on proceed button")
+	public void use_click_on_proceed_button() {
 		try {
-			homePage.waitForseconds();
 			homePage.clickOnProccedCustomButton();
-			homePage.waitForseconds();
 			homePage.clickOnProccedConsentButton();
 			test.log(Status.PASS, "User successfully clicked on the Proceed button.");
 		} catch (NoSuchElementException e) {
@@ -1770,14 +1793,14 @@ public class StepDef {
 	@Then("User verifies home screen in Portuguese")
 	public void user_verify_home_screen_in_portuguese() {
 		try {
-			assertEquals(homePage.isHomePageTextDisplayed(), globelConstants.HomePageTextInPortugues,
+			assertEquals(homePage.isHomePageTextDisplayed(), InjiWebConstants.HomePageTextInPortugues,
 					"Home page title text mismatch");
-			assertEquals(homePage.getHomePageDescriptionText(), globelConstants.HomePageDescriptionTextInPortugues,
+			assertEquals(homePage.getHomePageDescriptionText(), InjiWebConstants.HomePageDescriptionTextInPortugues,
 					"Home page description mismatch");
 			assertEquals(homePage.isListOfIssuersTextDisplayed(),
-					globelConstants.ListOfCredentialTypeOnHomePageInPortugues, "List of issuers text mismatch");
+					InjiWebConstants.ListOfCredentialTypeOnHomePageInPortugues, "List of issuers text mismatch");
 			assertEquals(homePage.isListOfIssuersDescriptionTextDisplayed(),
-					globelConstants.ListOfCredentialDescriptionTextInPortugues,
+					InjiWebConstants.ListOfCredentialDescriptionTextInPortugues,
 					"List of issuers description text mismatch");
 
 			test.log(Status.PASS, "User successfully verified the home screen in Portuguese");
@@ -1820,7 +1843,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in arabic laguage")
 	public void user_validates_list_of_credential_types_title_in_arabic_for_sunbird() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInArabic,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInArabic,
 					"Credential types title does not match the expected Arabic text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in Arabic for Sunbird.");
 		} catch (NoSuchElementException e) {
@@ -1844,7 +1867,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in kannada laguage")
 	public void user_validates_list_of_credential_types_title_in_kannada() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInKannada,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInKannada,
 					"Credential types title does not match the expected Kannada text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in Kannada.");
 		} catch (NoSuchElementException e) {
@@ -1868,7 +1891,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in hindi laguage")
 	public void user_validates_list_of_credential_types_title_in_hindi() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInHindi,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInHindi,
 					"Credential types title does not match the expected Hindi text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in Hindi.");
 		} catch (NoSuchElementException e) {
@@ -1892,7 +1915,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in french laguage")
 	public void user_validates_list_of_credential_types_title_in_french() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInFrench,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInFrench,
 					"Credential types title does not match the expected French text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in French.");
 		} catch (NoSuchElementException e) {
@@ -1916,7 +1939,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in tamil laguage")
 	public void user_validates_list_of_credential_types_title_in_tamil() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInTamil,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInTamil,
 					"Credential types title does not match the expected Tamil text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in Tamil.");
 		} catch (NoSuchElementException e) {
@@ -1940,7 +1963,7 @@ public class StepDef {
 	@Then("User validate the list of credential types title of the page in portugues laguage")
 	public void user_validates_list_of_credential_types_title_in_portuguese() {
 		try {
-			assertEquals(homePage.isCredentialTypesDisplayed(), globelConstants.ListOfCredentialTypeInPortugues,
+			assertEquals(homePage.isCredentialTypesDisplayed(), InjiWebConstants.ListOfCredentialTypeInPortugues,
 					"Credential types title does not match the expected Portuguese text.");
 			test.log(Status.PASS, "Successfully validated the credential types title in Portuguese.");
 		} catch (NoSuchElementException e) {
@@ -1967,7 +1990,7 @@ public class StepDef {
 			String isInsuranceTextDisplayed = homePage.isVeridoniaInsuranceCompanyTextDisplayed();
 			String isCredentialTypesDisplayed = homePage.isCredentialTypesDisplayed();
 
-			assertEquals(isCredentialTypesDisplayed, globelConstants.ListOfCredentialType,
+			assertEquals(isCredentialTypesDisplayed, InjiWebConstants.ListOfCredentialType,
 					"Credential types title does not match the expected text.");
 
 			test.log(Status.PASS, "Successfully validated the credential types title for Sunbird.");

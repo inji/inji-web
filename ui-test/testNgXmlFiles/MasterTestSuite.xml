@@ -3,8 +3,8 @@
 
 <suite name="Mimoto API Test Rig Master Suite">
 	<suite-files>
-		<suite-file path="mimotoPrerequisiteSuite.xml" />
+		<suite-file path="injiWebPrerequisiteSuite.xml" />
 		<suite-file path="TestNg.xml" />
-		<suite-file path="mimotoPostrequisiteSuite.xml" />
+		<suite-file path="injiWebPostrequisiteSuite.xml" />
 	</suite-files>
 </suite>

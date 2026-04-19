@@ -39,3 +39,6 @@ testng-report/
 /reg
 ./reg
 reports
+screenshots/
+browserstack.err
+downloads/

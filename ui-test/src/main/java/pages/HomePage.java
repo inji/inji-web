@@ -94,6 +94,15 @@ public class HomePage extends BasePage {
 		clickOnElement(driver, By.xpath("//button[@id='verify_otp']"));
 	}
 
+	/**
+	 * Returns true if the OTP verification page is still displayed (verify button
+	 * visible), false if the page has navigated away (OTP accepted / download started).
+	 * Waits up to timeoutSeconds for the button to disappear before deciding.
+	 */
+	public boolean isOnOtpVerificationPage(int timeoutSeconds) {
+		return !isElementNotVisible(driver, By.xpath("//button[@id='verify_otp']"), timeoutSeconds);
+	}
+
 	public Boolean isSuccessMessageDisplayed() {
 		return isElementIsVisible(driver, By.xpath("//p[@data-testid='title-download-result']"));
 	}
@@ -386,7 +395,7 @@ public class HomePage extends BasePage {
 	}
 
 	public void waitForseconds() {
-		new WebDriverWait(driver, Duration.ofSeconds(5)).until(
+		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds())).until(
 				webDriver -> "complete".equals(((JavascriptExecutor) webDriver).executeScript("return document.readyState")));
 	}
 

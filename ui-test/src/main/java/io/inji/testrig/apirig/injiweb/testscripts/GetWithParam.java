@@ -21,8 +21,8 @@ import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
-import api.InjiWebConfigManager;
-import api.InjiWebUtil;
+import utils.InjiWebConfigManager;
+import utils.InjiWebUtil;
 import io.mosip.testrig.apirig.dto.OutputValidationDto;
 import io.mosip.testrig.apirig.dto.TestCaseDTO;
 import io.mosip.testrig.apirig.testrunner.BaseTestCase;

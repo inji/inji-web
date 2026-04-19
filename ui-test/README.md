@@ -24,6 +24,10 @@ export INJIWEB_GOOGLE_REFRESH_TOKEN=<<refresh_token>>
 export INJIWEB_GOOGLE_CLIENT_ID=<<google_client_id>>
 export INJIWEB_GOOGLE_CLIENT_SECRET=<<client_secret>>
 export TEST_URL=<<url>>
+export BROWSERSTACK_USERNAME=<<browserstack_username>>
+export BROWSERSTACK_ACCESS_KEY=<<browserstack_access_key>>
+# Optional: FULLPAGE for debug screenshots, defaults to fast viewport capture
+export SCREENSHOT_MODE=FULLPAGE
 ```
 
 ---
@@ -46,7 +50,11 @@ actuatorMimotoEndpoint=/v1/mimoto/actuator/dev
 eSignetbaseurl=https://esignet-mosipid.dev.mosip.net
 Note:- all are config properties has to be updated by replacing the 'dev' with actual env name/url
 
-update src\test\resources\config.properties
+update src\main\resources\config\injiweb.properties
+INJIWEB_GOOGLE_CLIENT_ID=
+INJIWEB_GOOGLE_CLIENT_SECRET=
+INJIWEB_GOOGLE_REFRESH_TOKEN=
+runOnBrowserStack=true
 issuerSearchText=National Identity Department
 issuerSearchTextforSunbird=StayProtected Insurance
 
@@ -88,32 +96,49 @@ curl --location 'https://oauth2.googleapis.com/token'   --header 'Content-Type: 
 ## BrowserStack Integration
 
 1. Sign up for BrowserStack and get your `username` and `accessKey` from the home page.
-2. Update the `browserstack.yml` file with your credentials or export the details as environment variables.
-
-```bash
-export BROWSERSTACK_ACCESS_KEY=<<accessKey>>
-export BROWSERSTACK_USERNAME=<<username>>
-```
-
-
-3. Choose a device and platform from the list:
+2. Prefer setting BrowserStack credentials using environment variables:
+   - `BROWSERSTACK_USERNAME`
+   - `BROWSERSTACK_ACCESS_KEY`
+   If not provided, the framework falls back to values in `src/main/resources/config/injiweb.properties`.
+3. Use `runOnBrowserStack` in `src/main/resources/config/injiweb.properties` to switch execution mode:
+   - `runOnBrowserStack=true` -> run on BrowserStack
+   - `runOnBrowserStack=false` -> run on local ChromeDriver
+   - `browserStackRunThreadCount` controls threads when `runOnBrowserStack=true`
+   - `localRunThreadCount` controls threads when `runOnBrowserStack=false`
+4. Choose a device and platform from the list:
    [https://www.browserstack.com/list-of-browsers-and-platforms/automate](https://www.browserstack.com/list-of-browsers-and-platforms/automate)
-4. Open a terminal and navigate to the project root:
+5. Open a terminal and navigate to the project root:
 
 ```bash
 cd ../inji-web-test
 ```
 
-5. Build the project:
+6. Build the project:
 
 ```bash
 mvn clean package
 ```
 
-6. Execute the test suite using the following command. Update the JAR version and environment details as required.
+7. Execute the test suite using the following command. Update the JAR version and environment details as required.
 
 ```bash
 java -Denv.user=api-internal.released -Denv.endpoint=https://api-internal.released.mosip.net -Denv.testLevel=smokeAndRegression -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+```
+
+### Run Single Testcase
+
+You can run a single scenario or a narrow set using Cucumber runtime properties:
+
+- By tag:
+
+```bash
+java -Dcucumber.filter.tags="@smoke and @sunbird" -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+```
+
+- By exact feature file and line number:
+
+```bash
+java -Dcucumber.features="src/test/resources/featurefiles/sunbird.feature:42" -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
 ```
 
 ---

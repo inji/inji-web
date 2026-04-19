@@ -1,6 +1,7 @@
 package utils;
 
-public class GlobelConstants {
+public class InjiWebConstants {
+	public static final String INJI_WEB = "injiweb";
 	public static final String HomePageTextInArabic = "الوصول إلى بيانات الاعتماد التي يمكن التحقق منها بكل سهولة!";
 	public static final String isHomePageDescriptionTextnArabic = "قم بتنزيل بيانات الاعتماد الخاصة بك ومشاركتها بشكل آمن على الفور.";
 	public static final String HomePageTextInTamil = "உங்கள் சரிபார்க்கக்கூடிய சான்றுகளை அணுகவும் எளிதாக!";

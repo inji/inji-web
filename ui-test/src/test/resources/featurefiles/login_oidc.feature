@@ -1,6 +1,6 @@
 Feature: OIDC Login for InjiWeb
 
-  @oidcLogin
+  @oidcLogin @walletCreation
   Scenario Outline: User first time login with OIDC using various passcode attempts
     When user performs token-based login using Gmail refresh token
     Then user verifies the submit button is not enabled
@@ -8,7 +8,6 @@ Feature: OIDC Login for InjiWeb
     Then user click on toggle button
     Then user verify the toggle button
     And user enters the passcode for confirmation "<wrongConfirmation1>"
-    #And user click on submit button
     Then user verify error message for mismatch
     And user enters the passcode for confirmation "<stringPasscode>"
     Then user click on toggle button for confirmation
@@ -23,7 +22,7 @@ Feature: OIDC Login for InjiWeb
       | initialPasscode | wrongConfirmation1 | stringPasscode |
       | 123456          | 123455             | abcdef         |
 
-  @oidcLogin
+  @oidcLogin @preResetPasscode
   Scenario Outline: User verifies Profile page options
     When user performs token-based login using Gmail refresh token
     And user enters the passcode "<initialPasscode>"
@@ -49,7 +48,7 @@ Feature: OIDC Login for InjiWeb
       | initialPasscode |
       | 123456          |
 
-  @oidcLogin
+  @oidcLogin @preResetPasscode
   Scenario Outline: User home page verification for all the options
     When user performs token-based login using Gmail refresh token
     And user enters the passcode "<initialPasscode>"
@@ -77,7 +76,7 @@ Feature: OIDC Login for InjiWeb
     And user verifies "Home" icon is highlighted
     And user verifies visual bar is present near "Home"
     Then user click on stored credentials button
-    And user verify current url usercredentials
+    And user verify current url user credentials
     When user fetches highlight status of "Stored Cards" menu
     Then user verifies "Stored Cards" text is highlighted
     And user verifies "Stored Cards" icon is highlighted
@@ -90,13 +89,13 @@ Feature: OIDC Login for InjiWeb
       | initialPasscode |
       | 123456          |
 
-  @oidcLogin
+  @oidcLogin @preResetPasscode @NeedsUIN @NeedsPolicy
   Scenario Outline: User download card verification and verifies it
     When user performs token-based login using Gmail refresh token
     And user enters the passcode "<initialPasscode>"
     And user click on submit button
     Then user click on stored credentials button
-    Then user verify current url usercredentials
+    Then user verify current url user credentials
     Then user verify no cards stored message
     Then user verify substring when no cards stored
     Then User click on cards button
@@ -111,11 +110,12 @@ Feature: OIDC Login for InjiWeb
     And User click on getOtp button
     And User enter the otp
     And User click on verify button
+    Then User verifies mosip vc is downloaded successfully
     Then user click on stored credentials button
     Then User click on cards button
     And User search the issuers sunbird
-    And User verify sunbird cridentials button
-    And User click on sunbird cridentials button
+    And User verify sunbird credentials button
+    And User click on sunbird credentials button
     Then User verify list of credential types displayed
     And User verify sunbird rc insurance verifiable credential displayed
     And User click on sunbird rc insurance verifiable credential button
@@ -126,8 +126,8 @@ Feature: OIDC Login for InjiWeb
     Then user click on stored credentials button
     Then User click on cards button
     And User search the issuers sunbird
-    And User verify sunbird cridentials button
-    And User click on sunbird cridentials button
+    And User verify sunbird credentials button
+    And User click on sunbird credentials button
     Then User verify list of credential types displayed
     And User verify life Insurance displayed
     And User click on life Insurance button
@@ -145,7 +145,7 @@ Feature: OIDC Login for InjiWeb
       | initialPasscode |
       | 123456          |
 
-  @oidcLogin
+  @oidcLogin @resetPasscodeScenario
   Scenario Outline: User Reset passcode and verify login with new passcode
     When user performs token-based login using Gmail refresh token
     Then user verify forget passcode option
@@ -154,13 +154,12 @@ Feature: OIDC Login for InjiWeb
     Then user verify the current url userresetpasscode
     Then user verify the back button
     Then user verify passcode reset info1 available
-    Then user verify user info on resetpasscode available
+    Then user verify user info on reset passcode available
     Then user verify forget passcode button
     Then user verify forget passcode button enabled
     Then user click on forget passcode button
     And user enters the passcode "<resetPasscode>"
     And user enters the passcode for confirmation "<wrongConfirmation1>"
-    #And user click on submit button
     Then user verify error message for mismatch
     And user enters the passcode for confirmation "<resetPasscode>"
     And user click on submit button
@@ -171,7 +170,7 @@ Feature: OIDC Login for InjiWeb
     And user click on submit button
     Then user verify current url userhome
     Then user click on stored credentials button
-    Then user verify current url usercredentials
+    Then user verify current url user credentials
     Then user verify no cards stored message
     Then user verify substring when no cards stored
     Then user click on dropdown box for profile
@@ -184,7 +183,7 @@ Feature: OIDC Login for InjiWeb
       | resetPasscode | wrongConfirmation1 |
       | 111111        | 123455            |
 
-  @oidcLogin
+  @oidcLogin @afterResetPasscode
   Scenario Outline: User verify reset passcode attempts
     When user performs token-based login using Gmail refresh token
     And user enters the passcode "<initialPasscode>"
@@ -203,7 +202,7 @@ Feature: OIDC Login for InjiWeb
       | 111111          | 123455             |
 
 
-  @oidcLogin @skipBasedOnThreshold
+  @oidcLogin @afterResetPasscode @skipBasedOnThreshold
   Scenario Outline: User verify passcode lock and reset flow
     When user performs token-based login using Gmail refresh token
     And user enters the wrong passcode "<wrongConfirmation1>" for max failed attempts
@@ -218,7 +217,7 @@ Feature: OIDC Login for InjiWeb
       | 111111          | 123455             |
 
 
-  @oidcLogin @skipBasedOnThreshold
+  @oidcLogin @afterResetPasscode @skipBasedOnThreshold
   Scenario Outline: User verify lock then less-than max attempts after reset
     When user performs token-based login using Gmail refresh token
     And user enters the wrong passcode "<wrongConfirmation1>" for max failed attempts
@@ -234,7 +233,7 @@ Feature: OIDC Login for InjiWeb
       | 111111          | 123455             |
 
 
-  @oidcLogin @skipBasedOnThreshold
+  @oidcLogin @afterResetPasscode @skipBasedOnThreshold
   Scenario Outline: User verify permanent lock and forget passcode flow
     When user performs token-based login using Gmail refresh token
     And user enters the wrong passcode "<wrongConfirmation1>" for max failed attempts

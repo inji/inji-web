@@ -1,5 +1,5 @@
 AddIdentity:
-   InjiWeb_AddIdentity_withValidParameters_smoke_Pos:
+   InjiWeb_AddIdentity_withValidParameters_smoke_UIN1_Pos:
       endPoint: /idrepository/v1/identity/
       description: Creating a new identity with all valid parameters
       uniqueIdentifier: TC_InjiWeb_AddIdentity_01
@@ -15,7 +15,65 @@ AddIdentity:
    "UIN": "$UIN$",
   "dateOfBirth": "1992/04/15",
   "postalCode": "14022",
-  "email": "InjiWeb_AddIdentity_withValidParameters_smoke_Pos@mosip.net",
+  "email": "InjiWeb_AddIdentity_withValidParameters_smoke_UIN1_Pos@mosip.net",
+  "phone": "9876543210",
+  "referenceIdentityNumber": "6789545678878",
+  "version": "v1",
+   "introducerRID": "212124324784879",
+   "introducerUIN": "212124324784879",
+   "category": "individualBiometrics",
+   "requesttime": "$TIMESTAMP$"
+}'
+      output: '{
+  "status":"ACTIVATED"
+}'
+
+   InjiWeb_AddIdentity_withValidParameters_smoke_UIN2_Pos:
+      endPoint: /idrepository/v1/identity/
+      description: Creating a new identity with all valid parameters
+      uniqueIdentifier: TC_InjiWeb_AddIdentity_01
+      role: idrepo
+      restMethod: post
+      inputTemplate: injiweb/AddIdentity/addIdentity_$LANGNUMBER$
+      outputTemplate: injiweb/AddIdentity/addIdentityResult
+      input: '{
+  "value": "$BIOVALUE$",
+  "id": "mosip.id.create",
+  "registrationId": "$RID$",
+  "biometricReferenceId": "23452353",
+   "UIN": "$UIN$",
+  "dateOfBirth": "1992/04/15",
+  "postalCode": "14022",
+  "email": "InjiWeb_AddIdentity_withValidParameters_smoke_UIN2_Pos@mosip.net",
+  "phone": "9876543210",
+  "referenceIdentityNumber": "6789545678878",
+  "version": "v1",
+   "introducerRID": "212124324784879",
+   "introducerUIN": "212124324784879",
+   "category": "individualBiometrics",
+   "requesttime": "$TIMESTAMP$"
+}'
+      output: '{
+  "status":"ACTIVATED"
+}'
+
+   InjiWeb_AddIdentity_withValidParameters_smoke_UIN3_Pos:
+      endPoint: /idrepository/v1/identity/
+      description: Creating a new identity with all valid parameters
+      uniqueIdentifier: TC_InjiWeb_AddIdentity_01
+      role: idrepo
+      restMethod: post
+      inputTemplate: injiweb/AddIdentity/addIdentity_$LANGNUMBER$
+      outputTemplate: injiweb/AddIdentity/addIdentityResult
+      input: '{
+  "value": "$BIOVALUE$",
+  "id": "mosip.id.create",
+  "registrationId": "$RID$",
+  "biometricReferenceId": "23452353",
+   "UIN": "$UIN$",
+  "dateOfBirth": "1992/04/15",
+  "postalCode": "14022",
+  "email": "InjiWeb_AddIdentity_withValidParameters_smoke_UIN3_Pos@mosip.net",
   "phone": "9876543210",
   "referenceIdentityNumber": "6789545678878",
   "version": "v1",

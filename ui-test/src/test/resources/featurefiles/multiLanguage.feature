@@ -83,8 +83,8 @@ Feature: Inji web multilanguage testing
     Then User click on continue as guest
     And User verify that inji web logo is displayed
     And User search the issuers with "Insurance"
-    And User verify sunbird cridentials button
-    And User click on sunbird cridentials button
+    And User verify sunbird credentials button
+    And User click on sunbird credentials button
     And User validate the list of credential types title of the page for sunbird
     And User click on langauge button
     And User click on arabic langauge

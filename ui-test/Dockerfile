@@ -54,7 +54,6 @@ COPY --chown=${container_user}:${container_user} ./application.properties $work_
 COPY --chown=${container_user}:${container_user} ./target $work_dir/target
 COPY --chown=${container_user}:${container_user} ./src/test/resources/featurefiles/ /home/inji/featurefiles/
 COPY --chown=${container_user}:${container_user} ./src/main/resources/ /home/inji/src/test/resources/
-COPY --chown=${container_user}:${container_user} ./src/test/resources/config.properties /home/inji/src/test/resources/config.properties
 COPY --chown=${container_user}:${container_user} ./src/main/java/utils/ /home/inji/src/main/java/utils/
 COPY --chown=${container_user}:${container_user} ./screenshots/ /home/inji/screenshots/
 COPY --chown=${container_user}:${container_user} ./resource/ /home/inji/resource/

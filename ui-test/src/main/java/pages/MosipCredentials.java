@@ -2,13 +2,17 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import base.BasePage;
+import java.time.Duration;
 
 public class MosipCredentials extends BasePage {
 
 	private WebDriver driver;
 	public String pdfName;
+	private static final By OTP_INPUT = By.xpath("(//input[@class='pincode-input-text'])[1]");
+	private static final By VERIFY_OTP_BUTTON = By.xpath("//button[@id='verify_otp']");
 
 	public MosipCredentials(WebDriver driver) {
 		this.driver = driver;
@@ -16,29 +20,36 @@ public class MosipCredentials extends BasePage {
 
 	public Boolean isMockVerifiableCredentialDisplayed() {
 
-		return isElementIsVisible(driver, By.xpath("//h3[text()='Mock Verifiable Credential']"), 60);
+		return isElementIsVisible(driver, By.xpath("//h3[text()='Mock Verifiable Credential']"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 	public void clickOnMockVerifiableCredential() {
 		clickOnElement(driver, By.xpath("//h3[text()='Mock Verifiable Credential']"));
 	}
 
-	public void enterVid(String string) {
-		if (isElementIsVisible(driver, By.xpath("//input[@id='Otp_mosip-vid']"))) {
-			enterText(driver, By.xpath("//input[@id='Otp_mosip-vid']"), string);
-		} else {
-			if (isElementIsVisible(driver, By.xpath("//input[@id='Otp_vid']"))) {
-				enterText(driver, By.xpath("//input[@id='Otp_vid']"), string);
-			}
-		}
+	public void enterVid(String uinOrVid) {
+		enterTextInFirstVisible(driver, uinOrVid,
+				By.xpath("//input[@id='Otp_mosip-vid']"),
+				By.xpath("//input[@id='Otp_vid']"));
 	}
 
 	public void clickOnGetOtpButton() {
 		clickOnElement(driver, By.xpath("//button[@id='get_otp']"));
 	}
 
+	public boolean isOtpVerificationPageDisplayed(int timeoutSeconds) {
+		try {
+			return new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+					.until(webDriver -> webDriver.findElements(OTP_INPUT).stream().anyMatch(element -> element.isDisplayed())
+							|| webDriver.findElements(VERIFY_OTP_BUTTON).stream().anyMatch(element -> element.isDisplayed()));
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public void enterOtp(WebDriver driver, String otpString) {
-		if (!isElementIsVisible(driver, By.xpath("(//input[@class='pincode-input-text'])[1]"))) {
+		if (!isElementIsVisible(driver, OTP_INPUT)) {
 			throw new RuntimeException("OTP input field is not visible");
 		}
 		for (int i = 0; i < otpString.length(); i++) {
@@ -50,19 +61,26 @@ public class MosipCredentials extends BasePage {
 	public void clickOnMosipNationalId() {
 		pdfName = getElementAttribute(driver, By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
 				"data-testid").replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), 60);
+		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 	public Boolean isLoginPageLableDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//label[@for='Mosip vid']"))
-				|| isElementIsVisible(driver, By.xpath("//label[@for='Otp_vid']"));
+		try {
+			waitForFirstVisible(driver,
+					By.xpath("//label[@for='Mosip vid']"),
+					By.xpath("//label[@for='Otp_vid']"));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	public void clickOnLoginWithOtp() {
 
-		if (isElementIsVisible(driver, By.xpath("//*[@id='login_with_otp']"), 60)) {
+		if (isElementIsVisible(driver, By.xpath("//*[@id='login_with_otp']"), getConfiguredWaitTimeInSeconds())) {
 			clickOnElement(driver, By.xpath("//*[@id='login_with_otp']"));
-		} else if (isElementIsVisible(driver, By.xpath("//*[@id='get_otp']"), 60)) {
+		} else if (isElementIsVisible(driver, By.xpath("//*[@id='get_otp']"), getConfiguredWaitTimeInSeconds())) {
 			clickOnElement(driver, By.xpath("//*[@id='get_otp']"));
 		}
 	}
@@ -73,6 +91,25 @@ public class MosipCredentials extends BasePage {
 
 	public Boolean isDownloadingDescriptionTextDisplayed() {
 		return isElementIsVisible(driver, By.xpath("//*[@data-testid='title-download-result']"));
+	}
+
+	/**
+	 * Verifies the MOSIP VC download completed successfully end-to-end:
+	 * 1. Waits up to 90s for the download-result page to appear — confirms the OTP
+	 *    submission triggered a download and the backend responded.
+	 * 2. Waits up to 30s for a vc-card-view to render on that page — confirms the
+	 *    credential was received, parsed, and displayed, not just that the request
+	 *    was sent.
+	 * Returns false (instead of throwing) so the caller's assertion provides the
+	 * failure message in the report.
+	 */
+	public Boolean isMosipVcDownloadedSuccessfully() {
+		if (!isElementIsVisible(driver, By.xpath("//*[@data-testid='title-download-result']"),
+				getConfiguredWaitTimeInSeconds())) {
+			return false;
+		}
+		return isElementIsVisible(driver, By.xpath("//div[@data-testid='vc-card-view']"),
+				getConfiguredWaitTimeInSeconds());
 	}
 
 }

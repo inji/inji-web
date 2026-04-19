@@ -1,38 +1,27 @@
 package io.inji.testrig.apirig.injiweb.testscripts;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import io.mosip.testrig.apirig.dto.OutputValidationDto;
+import io.mosip.testrig.apirig.dto.TestCaseDTO;
+import io.mosip.testrig.apirig.testrunner.HealthChecker;
+import io.mosip.testrig.apirig.utils.*;
+import io.restassured.response.Response;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import org.testng.ITest;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.Reporter;
-import org.testng.SkipException;
+import org.testng.*;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
+import utils.InjiWebConfigManager;
+import utils.InjiWebUtil;
 
-import api.InjiWebConfigManager;
-import api.InjiWebUtil;
-import io.mosip.testrig.apirig.dto.OutputValidationDto;
-import io.mosip.testrig.apirig.dto.TestCaseDTO;
-import io.mosip.testrig.apirig.testrunner.HealthChecker;
-import io.mosip.testrig.apirig.utils.AdminTestException;
-import io.mosip.testrig.apirig.utils.AdminTestUtil;
-import io.mosip.testrig.apirig.utils.AuthenticationTestException;
-import io.mosip.testrig.apirig.utils.GlobalConstants;
-import io.mosip.testrig.apirig.utils.OutputValidationUtil;
-import io.mosip.testrig.apirig.utils.ReportUtil;
-import io.mosip.testrig.apirig.utils.SecurityXSSException;
-import io.restassured.response.Response;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class DeleteWithParam extends InjiWebUtil implements ITest {
 	private static final Logger logger = Logger.getLogger(DeleteWithParam.class);
@@ -57,7 +46,7 @@ public class DeleteWithParam extends InjiWebUtil implements ITest {
 
 	/**
 	 * Data provider class provides test case list
-	 * 
+	 *
 	 * @return object of data provider
 	 */
 	@DataProvider(name = "testcaselist")
@@ -69,18 +58,16 @@ public class DeleteWithParam extends InjiWebUtil implements ITest {
 
 	/**
 	 * Test method for OTP Generation execution
-	 * 
-	 * @param objTestParameters
-	 * @param testScenario
-	 * @param testcaseName
+	 *
+	 * @param testCaseDTO
 	 * @throws AuthenticationTestException
 	 * @throws AdminTestException
+	 * @throws SecurityXSSException
 	 */
 	@Test(dataProvider = "testcaselist")
 	public void test(TestCaseDTO testCaseDTO) throws AuthenticationTestException, AdminTestException, SecurityXSSException {
 		testCaseName = testCaseDTO.getTestCaseName();
 		testCaseDTO = InjiWebUtil.isTestCaseValidForTheExecution(testCaseDTO);
-		testCaseDTO = InjiWebUtil.changeContextURLByFlag(testCaseDTO);
 		if (HealthChecker.signalTerminateExecution) {
 			throw new SkipException(
 					GlobalConstants.TARGET_ENV_HEALTH_CHECK_FAILED + HealthChecker.healthCheckFailureMapS);
@@ -105,30 +92,20 @@ public class DeleteWithParam extends InjiWebUtil implements ITest {
 				if (!OutputValidationUtil.publishOutputResult(ouputValid))
 					throw new AdminTestException("Failed at output validation");
 			}
-		}
+		} else {
 
-		else {
-			
 			String inputJson = getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate());
-			
 			inputJson = InjiWebUtil.inputstringKeyWordHandeler(inputJson, testCaseName);
 
-			if (testCaseName.contains("ESignet_")) {
-				if (InjiWebConfigManager.isInServiceNotDeployedList(GlobalConstants.ESIGNET)) {
-					throw new SkipException("esignet is not deployed hence skipping the testcase");
-				}
-
+			if (testCaseDTO.getEndPoint().startsWith("$SUNBIRDBASEURL$") && testCaseName.contains("SunBirdR")) {
 				String tempUrl = ApplnURI;
+				if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
+					throw new SkipException(GlobalConstants.SERVICE_NOT_DEPLOYED_MESSAGE);
 
-				if (testCaseDTO.getEndPoint().startsWith("$SUNBIRDBASEURL$") && testCaseName.contains("SunBirdR")) {
+				if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
+					tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
+				testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
 
-					if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
-						throw new SkipException(GlobalConstants.SERVICE_NOT_DEPLOYED_MESSAGE);
-
-					if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
-						tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
-					testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
-				}
 
 				response = deleteWithPathParamAndCookie(tempUrl + testCaseDTO.getEndPoint(), inputJson, COOKIENAME,
 						testCaseDTO.getRole(), testCaseDTO.getTestCaseName());
@@ -148,7 +125,7 @@ public class DeleteWithParam extends InjiWebUtil implements ITest {
 
 	/**
 	 * The method ser current test name to result
-	 * 
+	 *
 	 * @param result
 	 */
 	@AfterMethod(alwaysRun = true)
