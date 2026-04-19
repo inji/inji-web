@@ -24,8 +24,7 @@ public class SunbirdCredentials extends BasePage {
 	}
 
 	public Boolean isSunbirdInsuranceDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
-				getConfiguredWaitTimeInSeconds());
+		return isDownloadSunbirdCredentialsDisplayed();
 	}
 
 	public String pdfNameInsurance;
@@ -156,11 +155,11 @@ public class SunbirdCredentials extends BasePage {
 	}
 
 	public Boolean isVehicleInsuranceDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		return isDownloadSunbirdCredentialsDisplayed();
 	}
 
 	public void clickOnVehicleInsurance() {
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		clickOnSunbirdInsurance();
 	}
 
 }

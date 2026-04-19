@@ -286,9 +286,9 @@ public class BaseTest {
 	@Before(value = "@resetPasscodeScenario", order = 600)
 	public void waitForPreResetScenariosToComplete(Scenario scenario) {
 		try {
-			boolean completed = PRE_RESET_LATCH.await(30, TimeUnit.MINUTES);
+			boolean completed = PRE_RESET_LATCH.await(10, TimeUnit.MINUTES);
 			if (!completed) {
-				logger.warn("PRE_RESET_LATCH timed out after 30 min for '{}' — proceeding anyway",
+				logger.warn("PRE_RESET_LATCH timed out after 10 min for '{}' — proceeding anyway",
 						scenario.getName());
 			}
 		} catch (InterruptedException e) {
@@ -350,9 +350,9 @@ public class BaseTest {
 	@Before(value = "@afterResetPasscode", order = 600)
 	public void checkResetPasscodeScenarioPassed(Scenario scenario) {
 		try {
-			boolean completed = RESET_PASSCODE_LATCH.await(20, TimeUnit.MINUTES);
+			boolean completed = RESET_PASSCODE_LATCH.await(10, TimeUnit.MINUTES);
 			if (!completed) {
-				String reason = "Reset passcode scenario did not complete within the 20-minute timeout";
+				String reason = "Reset passcode scenario did not complete within the 10-minute timeout";
 				logger.warn("{} — skipping: {}", reason, scenario.getName());
 				markScenarioSkipped(reason);
 				throw new SkipException(reason);

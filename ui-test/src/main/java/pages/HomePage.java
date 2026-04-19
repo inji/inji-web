@@ -188,7 +188,7 @@ public class HomePage extends BasePage {
 	}
 
 	public String isVeridoniaInsuranceCompanyTextDisplayed() {
-		return getElementText(driver, By.xpath("//span[@data-testid='NavBar-Text']"));
+		return isNationalIdentityDepartmentTextDisplayed();
 	}
 
 	public static void scrollDownByPage(WebDriver driver) {
@@ -394,9 +394,15 @@ public class HomePage extends BasePage {
 		return isElementIsVisible(driver, By.xpath("//*[@data-testid='HomeFeatureItem5-Image']"));
 	}
 
-	public void waitForseconds() {
+	public void waitForPageLoad() {
 		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds())).until(
 				webDriver -> "complete".equals(((JavascriptExecutor) webDriver).executeScript("return document.readyState")));
+	}
+
+	/** @deprecated Use {@link #waitForPageLoad()} instead */
+	@Deprecated
+	public void waitForseconds() {
+		waitForPageLoad();
 	}
 
 }

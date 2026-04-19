@@ -61,8 +61,8 @@ public class StepDef {
 	@Then("User validate the title of the page")
 	public void validateTheTitleOfThePage() {
 		try {
-			Assert.assertEquals(pageTitle, pageTitle);
-			test.log(Status.PASS, "User validate the title of the page");
+			Assert.assertEquals(InjiWebConstants.PAGE_TITLE, pageTitle);
+			test.log(Status.PASS, "User validate the title of the page: " + pageTitle);
 		} catch (AssertionError e) {
 			test.log(Status.FAIL, "Assertion failed: " + e.getMessage());
 			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));

@@ -88,15 +88,14 @@ public class InjiWebUtil extends AdminTestUtil {
 		return dob.format(DateTimeFormatter.ISO_LOCAL_DATE);
 	}
 
-	public static JSONArray mimotoActuatorResponseArray = null;
+	private static JSONArray mimotoActuatorResponseArray = null;
+	private static final Object ACTUATOR_LOCK = new Object();
 
 	public static String getValueFromMimotoActuator(String section, String key) {
 		String url = ApplnURI + ConfigManager.getproperty("actuatorMimotoEndpoint");
-		if (!(System.getenv("useOldContextURL") == null) && !(System.getenv("useOldContextURL").isBlank())
-				&& System.getenv("useOldContextURL").equalsIgnoreCase("true")) {
-			if (url.contains("/v1/mimoto/")) {
-				url = url.replace("/v1/mimoto/", "/residentmobileapp/");
-			}
+		String useOldUrl = System.getenv("useOldContextURL");
+		if (useOldUrl != null && !useOldUrl.isBlank() && useOldUrl.equalsIgnoreCase("true")) {
+			url = url.replace("/v1/mimoto/", "/residentmobileapp/");
 		}
 		String actuatorCacheKey = url + section + key;
 		String value = actuatorValueCache.get(actuatorCacheKey);
@@ -104,32 +103,26 @@ public class InjiWebUtil extends AdminTestUtil {
 			return value;
 
 		try {
-			if (mimotoActuatorResponseArray == null) {
-				Response response = null;
-				JSONObject responseJson = null;
-				response = RestClient.getRequest(url, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
-
-				responseJson = new JSONObject(response.getBody().asString());
-				mimotoActuatorResponseArray = responseJson.getJSONArray("propertySources");
+			synchronized (ACTUATOR_LOCK) {
+				if (mimotoActuatorResponseArray == null) {
+					Response response = RestClient.getRequest(url, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
+					JSONObject responseJson = new JSONObject(response.getBody().asString());
+					mimotoActuatorResponseArray = responseJson.getJSONArray("propertySources");
+				}
 			}
 			for (int i = 0, size = mimotoActuatorResponseArray.length(); i < size; i++) {
 				JSONObject eachJson = mimotoActuatorResponseArray.getJSONObject(i);
 				if (eachJson.get("name").toString().contains(section)) {
 					value = eachJson.getJSONObject(GlobalConstants.PROPERTIES).getJSONObject(key)
 							.get(GlobalConstants.VALUE).toString();
-					if (ConfigManager.IsDebugEnabled())
-//						logger.info("Actuator: " + url + " key: " + key + " value: " + value);
-						break;
+					break;
 				}
 			}
 			actuatorValueCache.put(actuatorCacheKey, value);
-
 			return value;
 		} catch (Exception e) {
-
 			return "";
 		}
-
 	}
 
 	public static String getSunbirdBaseURL() {
@@ -152,7 +145,6 @@ public class InjiWebUtil extends AdminTestUtil {
 
 	public static String getCredentialConfigKey(String wellKnownUrl) {
 		try {
-			// Use RestClient from your existing utility
 			Response response = RestClient.getRequest(wellKnownUrl, MediaType.APPLICATION_JSON,
 					MediaType.APPLICATION_JSON);
 			JSONObject json = new JSONObject(response.getBody().asString());
@@ -167,7 +159,7 @@ public class InjiWebUtil extends AdminTestUtil {
 		HashMap<String, Integer> result = new HashMap<>();
 		String actuatorUrl = ConfigManager.getproperty("apiInternalEndPoint")
 				+ ConfigManager.getproperty("actuatorMimotoEndpoint");
-		logger.info("Printing actauator url" + actuatorUrl);
+		logger.info("Actuator URL: " + actuatorUrl);
 		Response response = RestClient.getRequest(actuatorUrl, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON);
 		if (response.getStatusCode() != 200) {
 			throw new RuntimeException("Failed to fetch actuator values. HTTP error: " + response.getStatusCode());
