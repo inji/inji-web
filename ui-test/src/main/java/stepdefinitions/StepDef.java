@@ -1066,20 +1066,39 @@ public class StepDef {
 		((JavascriptExecutor) baseTest.getDriver()).executeScript("window.open('" + baseTest.url + "')");
 
 		Set<String> allWindowHandles = baseTest.getDriver().getWindowHandles();
+		String currentWindowHandle = baseTest.getDriver().getWindowHandle();
+		String secondWindowHandle = null;
 
-		if (allWindowHandles.size() >= 2) {
-			String secondWindowHandle = allWindowHandles.toArray(new String[0])[1];
+		java.util.Iterator<String> iterator = allWindowHandles.iterator();
+		while (iterator.hasNext()) {
+			String handle = iterator.next();
+			if (!handle.equals(currentWindowHandle)) {
+				secondWindowHandle = handle;
+				break;
+			}
+		}
+
+		if (secondWindowHandle != null) {
 			baseTest.getDriver().switchTo().window(secondWindowHandle);
-		} else {
-
 		}
 	}
 
 	@Then("User verify About inji open")
 	public void UserSwitchToAboutInjiTab() throws InterruptedException {
 		Set<String> allWindowHandles = baseTest.getDriver().getWindowHandles();
-		if (allWindowHandles.size() >= 2) {
-			String secondWindowHandle = allWindowHandles.toArray(new String[0])[1];
+		String currentWindowHandle = baseTest.getDriver().getWindowHandle();
+		String secondWindowHandle = null;
+
+		java.util.Iterator<String> iterator = allWindowHandles.iterator();
+		while (iterator.hasNext()) {
+			String handle = iterator.next();
+			if (!handle.equals(currentWindowHandle)) {
+				secondWindowHandle = handle;
+				break;
+			}
+		}
+
+		if (secondWindowHandle != null) {
 			baseTest.getDriver().switchTo().window(secondWindowHandle);
 		}
 	}

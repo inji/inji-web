@@ -248,7 +248,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public Boolean isArrowButtonDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[@data-testid='back-arrow-icon']"));
+		return isElementIsVisible(driver, By.xpath("//button[@data-testid='back-arrow-icon']"));
 	}
 
 	public Boolean isHomeArrowButtonDisplayed() {
@@ -276,7 +276,7 @@ public class Loginpage extends BasePage {
 	}
 
 	public void clickonBackAwroeButton() {
-		clickOnElement(driver, By.xpath("//*[@data-testid='back-arrow-icon']"));
+		clickOnElement(driver, By.xpath("//button[@data-testid='back-arrow-icon']"));
 	}
 
 	public void clickonHomeAwroeButton() {

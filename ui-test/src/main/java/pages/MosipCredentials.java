@@ -48,7 +48,7 @@ public class MosipCredentials extends BasePage {
 	}
 
 	public void clickOnMosipNationalId() {
-		pdfName = getElementAttribute(driver, By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
+		pdfName = getElementAttribute(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
 				"data-testid").replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
 		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), 60);
 	}
@@ -60,10 +60,10 @@ public class MosipCredentials extends BasePage {
 
 	public void clickOnLoginWithOtp() {
 
-		if (isElementIsVisible(driver, By.xpath("//*[@id='login_with_otp']"), 60)) {
-			clickOnElement(driver, By.xpath("//*[@id='login_with_otp']"));
-		} else if (isElementIsVisible(driver, By.xpath("//*[@id='get_otp']"), 60)) {
-			clickOnElement(driver, By.xpath("//*[@id='get_otp']"));
+		if (isElementIsVisible(driver, By.xpath("//button[@id='login_with_otp']"), 60)) {
+			clickOnElement(driver, By.xpath("//button[@id='login_with_otp']"));
+		} else if (isElementIsVisible(driver, By.xpath("//button[@id='get_otp']"), 60)) {
+			clickOnElement(driver, By.xpath("//button[@id='get_otp']"));
 		}
 	}
 
@@ -72,7 +72,7 @@ public class MosipCredentials extends BasePage {
 	}
 
 	public Boolean isDownloadingDescriptionTextDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[@data-testid='title-download-result']"));
+		return isElementIsVisible(driver, By.xpath("//p[@data-testid='title-download-result']"));
 	}
 
 }
