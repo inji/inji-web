@@ -19,19 +19,16 @@ The flow is triggered when the user clicks the **"Forgot Passcode?"** link from 
     * Cards must be re-downloaded from issuers.
     * This ensures data safety if the device is lost or the session is compromised.
 
-### Phase 2: Destructive Deletion (The API Call)
+### Phase 2: Wallet Reset
 
 1.  **User Action:** The user clicks the **"Set New Passcode"** button.
-2.  **API Request:** Inji Web triggers `handleForgotPasscode()`, which calls the Mimoto API: `DELETE /wallets/{walletId}`.
-3.  **Mimoto Backend Processing:**
-    * **Session Validation:** Mimoto ensures the `userId` in the active `HttpSession` matches the owner of the requested `walletId`.
-    * **Database Purge:** The `WalletService` invokes `walletRepository.delete()`. Due to database cascading rules, this automatically removes all rows in the `credential` table linked to that `walletId`.
-    * **Session Cleanup:** Wallet-related session attributes are cleared (`wallet_id`, `wallet_key`).
+2.  **API Request:** Inji Web sends a request to Mimoto to reset the wallet (`DELETE /wallets/{walletId}`).
+3.  **Backend Handling:** Mimoto validates the request, deletes the wallet and associated data, and clears any related session attributes.
 
 ### Phase 3: Local State Reset & Re-routing
 
-1.  **UI Cleanup:** Upon receiving a `200 OK`, the React code executes `removeWallet()`. This clears the `walletId` from the local application context and state.
-2.  **Navigation:** The user is redirected back to `ROUTES.USER_PASSCODE`.
+1.  **UI Cleanup:** On successful response, Inji Web clears wallet-related data from the application state.
+2.  **Navigation:** The user is redirected back to the passcode setup screen.
 3.  **Re-onboarding:** Because the backend no longer finds a wallet associated with the `USER_ID`, the user is greeted with the **"Set Passcode"** screen (Onboarding) instead of the "Enter Passcode" screen.
 
 ## 3. Architecture
@@ -45,40 +42,33 @@ Responsibilities are clearly separated between Inji Web and Mimoto.
     * Handles navigation and re-routing for user re-onboarding.
 
 * **Mimoto (Backend & Persistence):**
-    * **`WalletsController`**: Exposes the wallet deletion endpoint (`DELETE /wallets/{walletId}`).
-    * **`WalletService`**: Validates ownership and orchestrates secure wallet deletion.
-    * **Session Store (Redis)**: Maintains the `HttpSession` and clears `wallet_id` and `wallet_key` upon reset.
-    * **Persistence Layer (PostgreSQL)**: Stores wallet and user data; wallet deletion triggers cascading removal of all associated credentials.
+    * Exposes APIs for wallet reset and related operations.
+    * Validates the request and ensures secure deletion of wallet data.
+    * Manages session state and clears any wallet-related context.
+    * Handles persistence, including removal of wallet data and associated credentials.
 
 ## 4. Sequence Diagram
 
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as Inji Web 
-    participant Mimoto as Mimoto 
-    participant DB as PostgreSQL
-    participant Redis as Redis 
+    participant UI as Inji Web
+    participant Mimoto as Mimoto
 
     User->>UI: Clicks "Forgot Passcode?"
-    UI->>UI: Navigates to /user/reset-passcode
+    UI->>UI: Navigate to /user/reset-passcode
+
     User->>UI: Clicks "Set New Passcode"
-    
     UI->>Mimoto: DELETE /wallets/{walletId}
-    
-    Note over Mimoto: WalletService.deleteByUserIdAndId()
-    
-    Mimoto->>DB: DELETE FROM wallets WHERE id = ? AND user_id = ?
-    Note right of DB: Cascading Delete: All Credentials Purged
-    DB-->>Mimoto: Success (Row Deleted)
-    
-    Mimoto->>Redis: Remove wallet_id and wallet_key from session
+
+    Note over Mimoto: Validates request and deletes wallet data
+
     Mimoto-->>UI: 200 OK
-    
-    UI->>UI: removeWallet() (Clears context/state)
-    UI->>UI: Navigate to user/passcode
-    
-    Note over UI: App detects no Wallet and shows "Set Passcode"
+
+    UI->>UI: Clear wallet state (removeWallet)
+    UI->>UI: Navigate to /user/passcode
+
+    Note over UI: No wallet found → Show "Set Passcode"
 ```
 
 ## 5. Integration
@@ -94,38 +84,23 @@ For more details on the APIs listed above, visit the [Mimoto Stoplight documenta
 
 ## 6. Security Details
 
-### PIN-Based Cryptography Implication
+### PIN-Based Encryption
 
-In this flow, **security at rest is preserved through PIN-based encryption**.
+* The user’s **PIN is never stored**.
+* A key derived from the PIN is used to encrypt and decrypt wallet data.
+* Without the correct PIN, the data cannot be accessed.
+* When the wallet is deleted, all associated encrypted data is permanently removed.
 
-* The user's **PIN is never stored** by the server.
-* The **wallet key is derived from the PIN**, and without the correct PIN, the data cannot be decrypted.
-* When the wallet is deleted, all encrypted data (including credentials) is permanently removed from the database.
+This ensures that even if database data is accessed, it cannot be used without the PIN.
 
-As a result, even if database backups were accessed, the deleted wallet data cannot be meaningfully recovered without the original PIN.
+### Session Security
 
-### Session Integrity
+* The wallet deletion request is tied to the user’s active session.
+* The system validates that the request belongs to the correct user and wallet.
+* Wallet-related session data is cleared after deletion.
+* CSRF protection is enforced using an `X-XSRF-TOKEN`.
 
-The `DELETE` request is **Session Bound**.
-
-* The backend validates the request using the `USER_ID` stored in the session.
-* The `walletId` in the request must match the one associated with the session.
-* Wallet-related session attributes (`wallet_id`, `wallet_key`) are cleared during deletion.
-
-Additionally, the request requires an `X-XSRF-TOKEN`, protecting against Cross-Site Request Forgery (CSRF).
-
-## 7. Error Handling
-
-### Mimoto API Response Codes
-
-| Status | Error Code | Description                                    |
-| :--- | :--- |:-----------------------------------------------|
-| **400** | `invalid_request` | Missing Wallet ID or ID mismatch with session. |
-| **400** | `wallet_locked` | Wallet is locked or not available in session. |
-| **401** | `unauthorized` | Session expired or USER\_ID missing.           |
-| **500** | `internal_server_error` | DB connection failure or processing error.     |
-
-### Inji Web UI Behavior
+## 7. Inji Web Behavior
 
 | Scenario | Logic | UI Feedback |
 | :--- | :--- | :--- |

@@ -13,30 +13,30 @@ The primary goals are:
 
 ## 2. Execution Flow
 
-### Phase 1: PIN Creation & Wallet Key Generation
+### Phase 1: PIN Setup & Wallet Key Creation
 
-When a user sets a PIN, the system generates a secret **Wallet Key** and securely locks it using that PIN. The PIN itself is never stored — only a derived cryptographic key is used.
-When the PIN is set for the first time:
+When a user sets a PIN, a secure **Wallet Key** is generated and encrypted using a key derived from that PIN.
+The PIN itself is never stored, only its derived form is used.
+* A random AES-256 Wallet Key is generated.
+* A key is derived from the user’s PIN using a salt.
+* The Wallet Key is encrypted using this derived key.
+* The encrypted wallet key (with salt and IV) is stored securely.
 
-1.  **Wallet Key Generation:** Mimoto generates a random 256-bit AES symmetric key (the **Wallet Key**).
-2.  **Key Derivation (PBKDF2):** Mimoto takes the user's PIN and a random 32-byte salt to derive a **Derived Key** using the `PBKDF2WithHmacSHA512` algorithm.
-3.  **Master Encryption:** The Wallet Key is encrypted with this Derived Key using `AES/GCM/NoPadding`.
-4.  **Storage:** The resulting encrypted `wallet_key`(containing the Salt, IV, and Ciphertext) is stored in the `wallet` table.
+### Phase 2: Wallet Unlock
 
-### Phase 2: Unlocking the Wallet
+When the user enters their PIN:
+* The system derives the key again using the entered PIN and stored salt.
+* This key is used to decrypt the Wallet Key.
+* The decrypted Wallet Key is stored in the session for further operations.
 
-When the user enters their PIN during login or session resumption, the system regenerates the same Derived Key and uses it to unlock (decrypt) the stored Wallet Key:
+### Phase 3: Secure Data Usage
 
-1.  **Re-Derivation:** Mimoto retrieves the salt from the database and derives the key again using the entered PIN.
-2.  **Decryption:** The Derived Key is used to decrypt the stored payload to retrieve the Wallet Key (Base64-encoded AES Key).
-3.  **Memory Storage:** The Wallet Key is stored in the **HTTPSession** to facilitate data access without re-prompting the user for the PIN.
+Once unlocked:
+* Credentials are encrypted using the Wallet Key before storage.
+* User metadata is encrypted using a separate system-managed key.
 
-### Phase 3: Credential and PII Encryption
-
-Once the Wallet Key is available in the session:
-
-1.  **Credential Protection:** Every Verifiable Credential downloaded is encrypted using the Wallet Key before being saved to the `wallet_credentials` table.
-2.  **PII Protection:** User metadata (such as name, email and profile picture) is stored in the `user_metadata` table. These fields are encrypted using a System Key (Reference ID: `user_pii`) managed via the MOSIP Kernel Cryptomanager, rather than the user's Wallet Key.
+For a detailed flow and deeper cryptographic understanding, refer to:
+[User-data encryption with pin-based key](https://github.com/inji/mimoto/blob/master/docs/UserDataEncryptionWithPinBasedKey.md)
 
 
 ## 3. Architecture
@@ -49,57 +49,52 @@ Responsibilities are clearly separated between Inji Web and Mimoto.
     * Maintains the authenticated session with Mimoto.
     * Does not perform cryptographic operations; it acts as the gateway to the user.
 * **Mimoto (Crypto & Storage):**
-    * **`DerivedKeyCryptoUtil`**: Handles the core PBKDF2 key derivation and AES-GCM decryption for the Wallet Key.
-    * **`DataProtectionService`**: Manages the local encryption/decryption of credentials using the session-based Wallet Key and orchestrates PII encryption via the Cryptomanager.
-    * **`UserMetadataService`**: Handles the lifecycle of PII attributes (name, email and profile picture) and ensures they are encrypted before persistence.
-    * **`WalletRepository` & `WalletCredentialsRepository`**: Persistence layers for encrypted key metadata and user's verifiable credentials.
+    * Handles key derivation, encryption, and decryption operations.
+    * Manages secure storage of wallet data, credentials, and user metadata.
+    * Ensures sensitive data is encrypted before persistence.
+    * Provides APIs for wallet lifecycle operations (create, unlock, reset).
 
 
 ## 4. Sequence Diagram: Secure Data Access
 
+High-level sequence diagram illustrating the secure data access flow from wallet creation to credential usage is as follows:
+
 ```mermaid
 sequenceDiagram
     actor User
-    participant UI as Inji Web UI
-    participant WC as WalletsController
-    participant WS as WalletService
-    participant DPS as DataProtectionService
-    participant DB as Database
-    participant KC as MOSIP Kernel<br/>(Cryptomanager)
+    participant UI as Inji Web
+    participant Mimoto as Mimoto
 
-    Note over User, DB: Wallet Setup
+    %% --- Wallet Creation ---
+    Note over User, Mimoto: Wallet Creation
+    User->>UI: Set PIN
+    UI->>Mimoto: POST /wallets
+    Note over Mimoto: Generate wallet key<br>Encrypt using PIN-derived key
+    Mimoto-->>UI: 200 OK (Wallet created)
+
+    %% --- Login / Unlock ---
+    Note over User, Mimoto: Login / Wallet Unlock
     User->>UI: Enter PIN
-    UI->>WC: POST /wallets
-    WC->>WS: createWallet
-    WS->>WS: Generate Wallet Key
-    WS->>WS: Protect Wallet Key using PIN (derive + encrypt)
-    WS->>DB: Store encrypted wallet data
-    WS-->>WC: Wallet Created
-    WC-->>UI: 200 OK
+    User->>UI: Click "Submit"
+    UI->>Mimoto: POST /wallets/{walletId}/unlock
+    Note over Mimoto: Validate PIN and decrypt wallet key
+    Mimoto-->>UI: 200 OK (decryptedWalletKey)
+    UI->>UI: Store decryptedWalletKey in session
 
-    Note over User, DB: Wallet Unlock
-    User->>UI: Enter PIN
-    UI->>WC: POST /wallets/{id}/unlock
-    WC->>WS: unlockWallet
-    WS->>DB: Fetch encrypted wallet key
-    WS->>WS: Decrypt Wallet Key using PIN
-    WS-->>WC: Wallet Key
-    WC->>WC: Store in session
-    WC-->>UI: 200 OK
+    %% --- Credential Download & Secure Usage ---
+    Note over User, Mimoto: Credential Download & Secure Operations
+    UI->>Mimoto: Request credential download
+    Mimoto->>Mimoto: Credential data
+    Mimoto->>Mimoto: Use decryptedWalletKey to<br>Encrypt/Decrypt credentials
 
-    Note over User, DB: Credential Download
-    UI->>WC: Store Credential
-    WC->>DPS: encryptCredential
-    DPS->>DPS: AES-GCM encryption
-    DPS->>DB: Save encrypted credential
-
-    Note over User, DB: PII Protection
-    UI->>WC: Save/Update Profile
-    WC->>DPS: encrypt
-    DPS->>KC: Request encryption
-    KC-->>DPS: Encrypted data
-    DPS->>DB: Save encrypted metadata
+    %% --- Logout / Session End ---
+    Note over User, Mimoto: Logout / Session End
+    User->>UI: Logout / Session timeout
+    UI->>UI: Remove decryptedWalletKey from session
+    UI->>UI: Redirect to the landing page
 ```
+
+To have a detailed understanding of the pin-derived key encryption flow, refer to the [following documentation](https://github.com/mosip/mimoto/blob/main/docs/UserDataEncryptionWithPinBasedKey.md)
 
 ## 5. Integration
 
@@ -119,20 +114,6 @@ Mimoto adheres to the following cryptographic standards to ensure security for t
 * **Integrity:** GCM provides a 128-bit authentication tag to detect any tampering with the encrypted data.
 * **Key Stretching:** PBKDF2 with **10,000 iterations** (configured via `mosip.kernel.crypto.hash-iteration`) to prevent brute-forcing of the 6-digit PIN. This property is defined in the `application-default.properties` file for the local setup, and in the `mimoto-default.properties` file for the environment setup.
 * **Randomness:** Unique **32-byte salts** and **12-byte IVs** (Nonces) are generated for every encryption operation using `SecureRandom`.
-
-
-## 7. Errors
-
-Mimoto returns specific error codes if the encryption/decryption process fails:
-
-| Error Code | HTTP Status | Description                                                                                 |
-| :--- | :--- |:--------------------------------------------------------------------------------------------|
-| invalid_request | 400 | Validation failure: Missing Wallet ID or User ID or wallet key. invalid 6-digit PIN format. |
-| invalid_pin | 400 | Incorrect PIN: Decryption of wallet_key failed; retries still available.                    |
-| unauthorized | 401 | Session expired: User ID not found in session.                                              |
-| internal_server_error | 500 | Processing error during decryption or cryptomanager operation.                              |
-| database_unavailable | 503 | Database unavailable: Unable to fetch or update required data.                              |
-
 
 ## 8. References
 
