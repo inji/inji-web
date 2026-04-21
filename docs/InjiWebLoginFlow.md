@@ -75,18 +75,18 @@ Mimoto owns the complete authentication lifecycle, while Inji Web only initiates
 sequenceDiagram
     actor User
     participant UI as Inji Web
-    participant Backend
+    participant Mimoto
     participant Google as Google OAuth
 
     User->>UI: Click "Continue with Google"
-    UI->>Backend: Initiate OAuth login
-    Backend->>Google: Redirect to login
+    UI->>Mimoto: Initiate OAuth login
+    Mimoto->>Google: Redirect to login
 
     Google->>User: Prompt login / consent
     User->>Google: Authenticate
 
-    Google-->>Backend: Authorization response
-    Backend-->>UI: Session established
+    Google-->>Mimoto: Authorization response
+    Mimoto-->>UI: Session established
 
     UI->>UI: Redirect to /user/passcode
 ```
