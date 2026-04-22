@@ -47,7 +47,7 @@ A high-level sequence diagram illustrating the wallet unlock flow is as follows:
 sequenceDiagram
     actor User
     participant UI as Inji Web
-    participant Mimoto as Backend
+    participant Mimoto as Mimoto
 
     User->>UI: clicks "Continue with Google" button
 
