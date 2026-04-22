@@ -9,16 +9,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
-
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 
 import base.BasePage;
 import io.cucumber.java.en.And;
@@ -28,10 +23,8 @@ import pages.Loginpage;
 import pages.MosipCredentials;
 import pages.SetNetwork;
 import utils.BaseTest;
-import utils.ExtentReportManager;
 import utils.InjiWebConstants;
 import utils.HttpUtils;
-import utils.ScreenshotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +34,6 @@ public class StepDefOIDCLogin {
 	BaseTest baseTest;
 	private MosipCredentials mosipCredentials;
 	private SetNetwork setNetwork;
-	ExtentTest test = ExtentReportManager.getTest();
 	private Loginpage loginpage;
 
 	private String sessionCookieName = "SESSION";
@@ -79,16 +71,7 @@ public class StepDefOIDCLogin {
 		String sessionCookieValue = sessionCookie.contains("=") ? sessionCookie.split("=", 2)[1].split(";")[0].trim()
 				: sessionCookie;
 		driver.get(baseUrl);
-		try {
-			boolean isDisplayed = loginpage.isgoogleButtonDisplayed();
-			assertTrue(isDisplayed, "google Login Button on Home page");
-			test.log(Status.PASS, "User successfully verified that google Login Button on Home page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isgoogleButtonDisplayed(), "google Login Button on Home page");
 		driver.manage().deleteAllCookies();
 
 		Cookie myCookie = new Cookie.Builder(sessionCookieName, sessionCookieValue).path("/v1/mimoto").isHttpOnly(true)
@@ -110,31 +93,13 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify the toggle button")
 	public void user_verify_toggleButton() {
-		try {
-			boolean isDisplayed = loginpage.isToggleAppearinPlainTextFormat();
-			assertTrue(isDisplayed, "Toggle button displayed text in plain test format");
-			test.log(Status.PASS, "User successfully verified that Toggle button displayed text in plain test format");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isToggleAppearinPlainTextFormat(), "Toggle button displayed text in plain test format");
 	}
 
 	@Then("user toggles the password visibility using keyboard and verifies it")
 	public void user_toggle_with_keyboard_and_verify() {
-		try {
-			loginpage.focusToggleButtonWithKeyboard();
-			boolean isDisplayed = loginpage.isToggleAppearinPlainTextFormat();
-			assertTrue(isDisplayed, "Password should be visible in plain text format");
-			test.log(Status.PASS, "Verified password is shown in plain text using keyboard interaction");
-		} catch (Exception e) {
-			test.log(Status.FAIL, "Keyboard toggle failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "KeyboardToggleFailure");
-			throw e;
-		}
+		loginpage.focusToggleButtonWithKeyboard();
+		assertTrue(loginpage.isToggleAppearinPlainTextFormat(), "Password should be visible in plain text format");
 	}
 
 	@Then("user enters the passcode for confirmation {string}")
@@ -149,30 +114,12 @@ public class StepDefOIDCLogin {
 
 	@Then("user verifies the submit button enabled")
 	public void user_verifies_submit_button_enabled() {
-		try {
-			boolean isEnabled = loginpage.isSubmitButtonEnabled();
-			assertTrue(isEnabled, "Submit button enabled");
-			test.log(Status.PASS, "User successfully verified Submit button enabled");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Submit check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isSubmitButtonEnabled(), "Submit button enabled");
 	}
 
 	@Then("user verifies the submit button is not enabled")
 	public void user_verifies_submit_button_disabled() {
-		try {
-			boolean isEnabled = loginpage.isSubmitButtonEnabledFast();
-			assertFalse(isEnabled, "Submit button should be disabled");
-			test.log(Status.PASS, "User successfully verified Submit button is disabled");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Submit button disabled check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertFalse(loginpage.isSubmitButtonEnabledFast(), "Submit button should be disabled");
 	}
 
 	@Then("user click on submit button")
@@ -186,19 +133,8 @@ public class StepDefOIDCLogin {
 	}
 
 	@Then("user prints verify message for mismatch")
-	public void user_verify_error_message_mismatch() throws Exception {
-
-		try {
-
-			assertEquals(loginpage.getMismatchErrorText().trim(), InjiWebConstants.MisMatchError);
-			test.log(Status.PASS,
-					"Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+	public void user_verify_error_message_mismatch() {
+		assertEquals(loginpage.getMismatchErrorText().trim(), InjiWebConstants.MisMatchError);
 	}
 
 	@Then("user click on logout button")
@@ -208,16 +144,7 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify confirmation passcode option for secondtime login")
 	public void user_verify_confirmation_passcode_option_missing() {
-		try {
-			boolean isVisile = loginpage.confirmPasscodeSecondTimeLogin();
-			assertTrue(isVisile, "confirm Password Shold Not Appear");
-			test.log(Status.PASS, "confirm Password Shold Not Appeared");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "confirm Password check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.confirmPasscodeSecondTimeLogin(), "confirm Password Shold Not Appear");
 	}
 
 	@Then("User click on cards button")
@@ -227,74 +154,29 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify current url userhome")
 	public void user_verify_current_url() {
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrlUserHome();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/home", "URL did not match expected user home");
-			test.log(Status.PASS, "User successfully redirected to user home page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrlUserHome();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/home", "URL did not match expected user home");
 	}
 
 	@Then("user verify profile details displayed")
 	public void user_verify_profile_details_displayed() throws InterruptedException {
-		try {
-			boolean isVisile = loginpage.isProfileDetailsDisplayed();
-			assertTrue(isVisile, "Profile details displayed");
-			test.log(Status.PASS, "User successfully verified Profile details disabled ");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Profile details displayed check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isProfileDetailsDisplayed(), "Profile details displayed");
 	}
 
 	@Then("user verify profile image displayed")
 	public void user_verify_profile_image_displayed() throws InterruptedException {
-		try {
-			boolean isVisile = loginpage.isProfileImageDisplayed();
-			assertTrue(isVisile, "Profile image displayed");
-			test.log(Status.PASS, "User successfully verified Profile image disabled ");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Profile details displayed check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isProfileImageDisplayed(), "Profile image displayed");
 	}
 
 	@Then("user verify profile name displayed")
 	public void user_verify_profile_name_displayed() throws InterruptedException {
-		try {
-			boolean isVisile = loginpage.isProfileNameDisplayed();
-			assertTrue(isVisile, "Profile name displayed");
-			test.log(Status.PASS, "User successfully verified Profile name disabled ");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Profile details displayed check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isProfileNameDisplayed(), "Profile name displayed");
 	}
 
 	@Then("user verify dropdown displayed")
 	public void user_verify_profile_dropdown_displayed() throws InterruptedException {
-		try {
-			boolean isVisile = loginpage.isProfileDropDownDisplayed();
-			assertTrue(isVisile, "Profile dropdown displayed");
-			test.log(Status.PASS, "User successfully verified Profile dropdown disabled ");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Profile details displayed check failed: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isProfileDropDownDisplayed(), "Profile dropdown displayed");
 	}
 
 	@Then("user click on dropdown box for profile")
@@ -309,32 +191,12 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify home button")
 	public void user_verify_home_button() throws InterruptedException {
-
-		try {
-			boolean isDisplayed = loginpage.isHomeButtonDisplayed();
-			assertTrue(isDisplayed, "Home button on home page Displayed");
-			test.log(Status.PASS, "User successfully verified Home button on home page Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isHomeButtonDisplayed(), "Home button on home page Displayed");
 	}
 
 	@Then("user verify stored cards button")
 	public void user_verify_storedcredentials_button() throws InterruptedException {
-		try {
-			boolean isDisplayed = loginpage.isVerifyStoredCredentialsButtonDisplayed();
-			assertTrue(isDisplayed, "Stored cards button on home page Displayed");
-			test.log(Status.PASS, "User successfully verified Stored cards  on home page Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isVerifyStoredCredentialsButtonDisplayed(), "Stored cards button on home page Displayed");
 	}
 
 	@Then("user click on stored credentials button")
@@ -344,60 +206,24 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify current url user credentials")
 	public void user_verify_current_url_credentials() {
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrlUserCredentials();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/credentials", "URL did not match expected user home");
-			test.log(Status.PASS, "User successfully redirected to user credentials page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrlUserCredentials();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/credentials", "URL did not match expected user home");
 	}
 
 	@Then("user verify collapse button")
 	public void user_verify_collapse_button() throws InterruptedException {
-		try {
-			boolean isDisplayed = loginpage.isCollapseButtonDisplayed();
-			assertTrue(isDisplayed, "Collapse button on home page Displayed");
-			test.log(Status.PASS, "User successfully verified Collapse on home page Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isCollapseButtonDisplayed(), "Collapse button on home page Displayed");
 	}
 
 	@Then("user verify no cards stored message")
 	public void user_verify_no_cardsstoredmessage() throws InterruptedException {
-		try {
-			boolean isDisplayed = loginpage.isnoCardsAddedMessageDisplayed();
-			assertTrue(isDisplayed, "no cards message displayed");
-			test.log(Status.PASS, "User successfully verified no cards message Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isnoCardsAddedMessageDisplayed(), "no cards message displayed");
 	}
 
 	@Then("user verify substring when no cards stored")
 	public void user_verify_substring_when_nocards_stored() throws InterruptedException {
-		try {
-			boolean isDisplayed = loginpage.isnoCardsAddedMessageSubstringMessage();
-			assertTrue(isDisplayed, "Substring for no cards message displayed");
-			test.log(Status.PASS, "User successfully verified Substring for no cards message Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isnoCardsAddedMessageSubstringMessage(), "Substring for no cards message displayed");
 	}
 
 	@Then("user toggles the password visibility using keyboard")
@@ -412,101 +238,38 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify My Profile Text")
 	public void user_verify_MyProfile_Text() {
-		try {
-			String ProfileText = loginpage.getTextMyProfile();
-			assertEquals(ProfileText, InjiWebConstants.ProfileText);
-			test.log(Status.PASS,
-					"Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		String ProfileText = loginpage.getTextMyProfile();
+		assertEquals(ProfileText, InjiWebConstants.ProfileText);
 	}
 
 	@Then("user verify back arrow button")
 	public void user_verify_back_arrow_button() {
-		try {
-			boolean isDisplayed = loginpage.isArrowButtonDisplayed();
-			assertTrue(isDisplayed, "Back arrow button on profile Displayed");
-			test.log(Status.PASS, "User successfully verified Back arrow button on profile Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isArrowButtonDisplayed(), "Back arrow button on profile Displayed");
 	}
 
 	@Then("user verify home arrow button")
 	public void user_verify_home_arrow_button() {
-		try {
-			boolean isDisplayed = loginpage.isHomeArrowButtonDisplayed();
-			assertTrue(isDisplayed, "Home arrow button on profile Displayed");
-			test.log(Status.PASS, "User successfully verified Home arrow button on profile Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isHomeArrowButtonDisplayed(), "Home arrow button on profile Displayed");
 	}
 
 	@Then("user verify label fullname")
 	public void user_verify_label_fullname() {
-		try {
-			boolean isDisplayed = loginpage.isLabelFullnameDisplayed();
-			assertTrue(isDisplayed, "Label fullname Displayed");
-			test.log(Status.PASS, "User successfully verified Label fullname Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isLabelFullnameDisplayed(), "Label fullname Displayed");
 	}
 
 	@Then("user verify label fullname value")
 	public void user_verify_label_fullname_value() {
-		try {
-			boolean isDisplayed = loginpage.isLabelFullnameValueDisplayed();
-			assertTrue(isDisplayed, "Label fullname value Displayed");
-			test.log(Status.PASS, "User successfully verified Label fullname value Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isLabelFullnameValueDisplayed(), "Label fullname value Displayed");
 	}
 
 	@Then("user verify label fullname info")
 	public void user_verify_label_fullname_info() {
-		try {
-			boolean isDisplayed = loginpage.isLabelFullnameInfoDisplayed();
-			assertTrue(isDisplayed, "Label fullname info Displayed");
-			test.log(Status.PASS, "User successfully verified Label fullname info Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isLabelFullnameInfoDisplayed(), "Label fullname info Displayed");
 	}
 
 	@Then("user verify label fullname info value")
 	public void user_verify_label_fullname_info_value_value() {
-		try {
-			boolean isDisplayed = loginpage.isLabelFullnameInfoValueDisplayed();
-			assertTrue(isDisplayed, "Label fullname info value Displayed");
-			test.log(Status.PASS, "User successfully verified Label fullname info value value Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isLabelFullnameInfoValueDisplayed(), "Label fullname info value Displayed");
 	}
 
 	@Then("user click on back arrow button verify userhome page")
@@ -521,16 +284,7 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify forget passcode option")
 	public void user_verify_forget_passcode_option() {
-		try {
-			boolean isDisplayed = loginpage.isForgetPasscodeOptionDisplayed();
-			assertTrue(isDisplayed, "Forget passcode option Displayed");
-			test.log(Status.PASS, "User successfully verified Forget passcode option Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isForgetPasscodeOptionDisplayed(), "Forget passcode option Displayed");
 	}
 
 	@Then("user click on forget passcode option")
@@ -540,110 +294,44 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify the title of the window")
 	public void user_verify_the_title_of_the_window() {
-		try {
-			String windowTitle = loginpage.getTitleOfTheForgetPasswordWindow();
-			assertEquals(windowTitle, InjiWebConstants.windowTitle);
-			test.log(Status.PASS, "Title of the forget Passcode window");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Text verification failed: " + e.getMessage());
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		String windowTitle = loginpage.getTitleOfTheForgetPasswordWindow();
+		assertEquals(windowTitle, InjiWebConstants.windowTitle);
 	}
 
 	@Then("user verify the current url userresetpasscode")
 	public void user_verify_the_current_url_userresetpasscode() {
-
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrluserresetpasscode();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/reset-passcode",
-					"URL did not match expected user reset passcode");
-			test.log(Status.PASS, "User successfully redirected to user reset pass code page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrluserresetpasscode();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/reset-passcode",
+				"URL did not match expected user reset passcode");
 	}
 
 	@Then("user verify the back button")
 	public void user_verify_the_back_button() {
-
-		try {
-			boolean isDisplayed = loginpage.isbackButtonDisplayedOnForgetpasscode();
-			assertTrue(isDisplayed, "Back button on Forget passcode option Displayed");
-			test.log(Status.PASS, "User successfully verified Back button on Forget passcode option Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isbackButtonDisplayedOnForgetpasscode(),
+				"Back button on Forget passcode option Displayed");
 	}
 
 	@Then("user verify passcode reset info1 available")
 	public void user_verify_passcode_reset_info1_available() {
-
-		try {
-			boolean isDisplayed = loginpage.isInfoTextForgetPasswordDisplayed();
-			assertTrue(isDisplayed, "User info1 for forget passcode button Displayed");
-			test.log(Status.PASS, "User successfully User info1 for forget passcode button Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isInfoTextForgetPasswordDisplayed(),
+				"User info1 for forget passcode button Displayed");
 	}
 
 	@Then("user verify user info on reset passcode available")
 	public void user_verify_user_info_on_reset_passcode_available() {
-
-		try {
-			boolean isDisplayed = loginpage.isResetUserInfoOnForgetPasswordDisplayed();
-			assertTrue(isDisplayed, "User info for forget passcode button Displayed");
-			test.log(Status.PASS, "User successfully User info for forget passcode button Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isResetUserInfoOnForgetPasswordDisplayed(),
+				"User info for forget passcode button Displayed");
 	}
 
 	@Then("user verify forget passcode button")
 	public void user_verify_forget_passcode_button() {
-
-		try {
-			boolean isDisplayed = loginpage.isForgetPasscodeButtonDisplayed();
-			assertTrue(isDisplayed, "Forget passcode button Displayed");
-			test.log(Status.PASS, "User successfully verified Forget passcode button Displayed");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isForgetPasscodeButtonDisplayed(), "Forget passcode button Displayed");
 	}
 
 	@Then("user verify forget passcode button enabled")
 	public void user_verify_forget_passcode_button_enabled() {
-		try {
-			boolean isEnabled = loginpage.isForgetPasscodeButtonenabled();
-			assertTrue(isEnabled, "Forget passcode button Enabled");
-			test.log(Status.PASS, "User successfully verified Forget passcode button Enabled");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
-
+		assertTrue(loginpage.isForgetPasscodeButtonenabled(), "Forget passcode button Enabled");
 	}
 
 	@Then("user click on forget passcode button")
@@ -658,17 +346,9 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify the userpasscode url")
 	public void user_verify_the_userpasscode_url() {
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrluserpasscode();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/passcode", "URL did not match expected user home");
-			test.log(Status.PASS, "User successfully redirected to user home page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrluserpasscode();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/passcode", "URL did not match expected user home");
 	}
 
 	Map<String, Boolean> menuHighlightStatus;
@@ -680,52 +360,22 @@ public class StepDefOIDCLogin {
 
 	@Then("user verifies {string} text is highlighted")
 	public void user_verifyMenu_Text(String menuName) {
-		try {
-			assertTrue(menuHighlightStatus.get("textHighlighted"), menuName + " text is not highlighted");
-			test.log(Status.PASS, "User successfully verified " + menuName + " text is highlighted");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Text highlight assertion failed: " + e.getMessage());
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(menuHighlightStatus.get("textHighlighted"), menuName + " text is not highlighted");
 	}
 
 	@Then("user verifies {string} icon is highlighted")
 	public void user_verify_MenuIcon(String menuName) {
-		try {
-			assertTrue(menuHighlightStatus.get("iconHighlighted"), menuName + " icon is not highlighted");
-			test.log(Status.PASS, "User successfully verified " + menuName + " icon is highlighted");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Icon highlight assertion failed: " + e.getMessage());
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(menuHighlightStatus.get("iconHighlighted"), menuName + " icon is not highlighted");
 	}
 
 	@Then("user verifies visual bar is present near {string}")
 	public void user_verifyMenuBar(String menuName) {
-		try {
-			assertTrue(menuHighlightStatus.get("barPresent"), "Visual bar is not present near " + menuName);
-			test.log(Status.PASS, "User successfully verified visual bar near " + menuName);
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Visual bar assertion failed: " + e.getMessage());
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(menuHighlightStatus.get("barPresent"), "Visual bar is not present near " + menuName);
 	}
 
 	@Then("user sees a valid welcome message")
 	public void user_Sees_Welcome_Message() {
-
-		try {
-			assertTrue(loginpage.isValidWelcomeMessage(), "Welcome message is invalid or not found.");
-			test.log(Status.PASS, "User successfully verified welcome message");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isValidWelcomeMessage(), "Welcome message is invalid or not found.");
 	}
 
 	@Then("user searches for mosip credentials")
@@ -745,107 +395,49 @@ public class StepDefOIDCLogin {
 
 	@Then("user verifies profile dropdown options are visible")
 	public void verifyProfileDropdownVisible() {
-		{
-			try {
-				boolean isDisplayed = loginpage.isProfileDropDownOptionsDisplayed();
-				assertTrue(isDisplayed, "profile drop down options are visible");
-				test.log(Status.PASS, "User successfully verified that profile drop down options are Displayed");
-			} catch (AssertionError | NoSuchElementException e) {
-				test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-				test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-				ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-				throw e;
-			}
-		}
-
+		assertTrue(loginpage.isProfileDropDownOptionsDisplayed(), "profile drop down options are visible");
 	}
 
 	@Then("user verifies {string} option is present in dropdown")
 	public void verifyOptionInDropdown(String optionText) {
-		try {
-			boolean isDisplayed = loginpage.isProfileDrownOptionsPresent(optionText);
-			assertTrue(isDisplayed, "profile drop down options" + optionText + " is visible");
-			test.log(Status.PASS,
-					"User successfully verified that profile drop down options" + optionText + "is visible");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isProfileDrownOptionsPresent(optionText),
+				"profile drop down options" + optionText + " is visible");
 	}
 
 	@And("user click on FAQ link")
 	public void user_click_on_faq_link() {
 		loginpage.clickonFAQLink();
-
 	}
 
 	@Then("user verify current url faq")
 	public void user_verify_faq_url() {
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrlUserFAQ();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/faq", "URL did not match expected user home");
-			test.log(Status.PASS, "User successfully redirected to user faq page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrlUserFAQ();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/faq", "URL did not match expected user home");
 	}
 
 	@Then("user verify current url issuer")
 	public void user_verify_issueer_url() throws Exception {
-		try {
-			loginpage.waituntilpagecompletelyloaded();
-			String currentUrl = loginpage.getCurrentUrlUserFAQ();
-			assertEquals(currentUrl, normalizedBaseUrl + "user/faq", "URL did not match expected user home");
-			test.log(Status.PASS, "User successfully redirected to user faq page");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		loginpage.waituntilpagecompletelyloaded();
+		String currentUrl = loginpage.getCurrentUrlUserFAQ();
+		assertEquals(currentUrl, normalizedBaseUrl + "user/faq", "URL did not match expected user home");
 	}
 
 	@Then("user click on collapse button")
 	public void user_click_on_collpase_button() {
-
 		loginpage.clickOnCollapseButton();
-
 	}
 
 	@And("user verify if home headings are displayed")
 	public void user_verify_only_icons_visible() {
-		try {
-			boolean isDisplayed = loginpage.isHomeStringDisplayedAfterCollpase();
-			assertTrue(isDisplayed, "After clicking on collpase button Home string is not visible");
-			test.log(Status.PASS,
-					"User successfully verified that After clicking on collpase button Home string is not visible");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isHomeStringDisplayedAfterCollpase(),
+				"After clicking on collpase button Home string is not visible");
 	}
 
 	@Then("user verify icons are visible")
 	public void user_verify_icons_visible() {
-		try {
-			boolean isDisplayed = loginpage.isIconVisibleAfterCollpase();
-			assertTrue(isDisplayed, "After clicking on collpase button icons are visble visible");
-			test.log(Status.PASS,
-					"User successfully verified that After clicking on collpase button icons are visible visible");
-		} catch (AssertionError | NoSuchElementException e) {
-			test.log(Status.FAIL, "Assertion/Element error: " + e.getMessage());
-			test.log(Status.FAIL, ExceptionUtils.getStackTrace(e));
-			ScreenshotUtil.attachScreenshot(driver, "FailureScreenshot");
-			throw e;
-		}
+		assertTrue(loginpage.isIconVisibleAfterCollpase(),
+				"After clicking on collpase button icons are visble visible");
 	}
 
 	@Then("user click on collapse button again")
@@ -855,7 +447,6 @@ public class StepDefOIDCLogin {
 
 	@Then("user enters the wrong passcode {string} to lessthan max failed attempts")
 	public void user_enters_wrong_passcode_to_lessthan_max_failed_attempts(String wrongPasscode) throws Exception {
-		// Get maxFailedAttempts from actuator and subtract 1
 		int noOfTimes = BaseTest.getWalletPasscodeSettings().get("maxFailedAttempts") - 1;
 
 		for (int i = 1; i <= noOfTimes; i++) {
@@ -869,7 +460,6 @@ public class StepDefOIDCLogin {
 	@Then("user enters the wrong passcode {string} to lessthan max failed attempts before perm lock")
 	public void user_enters_wrong_passcode_to_lessthan_max_failed_beforeperm_attempts(String wrongPasscode)
 			throws Exception {
-		// Get maxFailedAttempts from actuator and subtract 1
 		int noOfTimes = BaseTest.getWalletPasscodeSettings().get("maxFailedAttempts") - 1;
 
 		for (int i = 1; i <= noOfTimes; i++) {
@@ -926,7 +516,6 @@ public class StepDefOIDCLogin {
 	@Then("user verify the wallet permanently locked")
 	public void user_verify_the_wallet_permanently_locked() throws InterruptedException {
 		assertTrue(!loginpage.isPermLockMsgDisplayed(), "Permanent lock message is not displayed");
-
 	}
 
 }

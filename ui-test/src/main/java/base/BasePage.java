@@ -1,17 +1,16 @@
 package base;
 
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.openqa.selenium.*;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.yaml.snakeyaml.Yaml;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,11 +19,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import utils.BaseTest;
+import utils.ExtentReportManager;
 import utils.InjiWebConfigManager;
 
 public class BasePage {
+
+	// ─── Reporting helpers ────────────────────────────────────────────────────
+
+	protected static void logStep(String description, By locator) {
+		ExtentReportManager.logStepWithLocator(description, locator.toString());
+	}
+
+	protected static void logStep(String description) {
+		ExtentReportManager.logStep(description);
+	}
+
+	protected static void logWarning(String message, By locator) {
+
+		String html = message +
+				"<br><details style='margin-left:20px;'>" +
+				"<summary style='cursor:pointer;font-weight:500;'>▶ Locator Details</summary>" +
+				"<pre>" + locator.toString() + "</pre></details>";
+
+		ExtentReportManager.getTest().warning(html);
+	}
+
+	protected static void logWarning(String message) {
+		ExtentReportManager.logWarning(message);
+	}
+
+	// ─── Config ───────────────────────────────────────────────────────────────
 
 	public static int getConfiguredWaitTimeInSeconds() {
 		return InjiWebConfigManager.getWaitTimeInSeconds();
@@ -34,74 +59,161 @@ public class BasePage {
 		return InjiWebConfigManager.getShortWaitTimeInSeconds();
 	}
 
+	// ─── Click ────────────────────────────────────────────────────────────────
+
 	public void clickOnElement(WebDriver driver, By locator) {
-		// elementToBeClickable (visible + enabled) is always the correct condition for
-		// a click. presenceOfElementLocated only checks DOM existence — clicking a
-		// present-but-disabled element throws ElementNotInteractableException.
-		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.elementToBeClickable(locator));
-		element.click();
+		clickOnElement(driver, locator, "Clicked element");
 	}
 
-	public static boolean isElementIsVisible(WebDriver driver, By by) {
+	public void clickOnElement(WebDriver driver, By locator, String stepDesc) {
 		try {
-			(new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds())))
-					.until(ExpectedConditions.visibilityOfElementLocated(by));
-            return driver.findElement(by).isDisplayed();
-		} catch (Exception e) {
-			return false;
-		}
-	}
+			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.elementToBeClickable(locator));
 
-	public static boolean isElementIsVisible(WebDriver driver, By by, int timeoutInSeconds) {
-		try {
-			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
-					.until(ExpectedConditions.visibilityOfElementLocated(by));
-            return driver.findElement(by).isDisplayed();
+			element.click();
+			logStep(stepDesc, locator);
+
 		} catch (Exception e) {
-			return false;
+			ExtentReportManager.logFailure(stepDesc, locator.toString(), e);
+
+			// ✅ mark scenario failed
+			BaseTest.markScenarioFailed();
+
+			throw new AssertionError("Step failed: " + stepDesc, e);
 		}
 	}
 
 	public static void clickOnElement(WebDriver driver, By locator, int timeoutInSeconds) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
-			WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.elementToBeClickable(locator));
 			element.click();
+			logStep("Clicked element", locator);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to click on element: " + locator, e);
+			ExtentReportManager.logFailure("Failed to click element", locator.toString(), e);
+			throw new AssertionError("Failed to click on element: " + locator, e);
 		}
 	}
 
-	public static boolean isElementNotVisible(WebDriver driver, By by) {
+	// ─── Visibility ──────────────────────────────────────────────────────────
+
+	public static boolean isElementIsVisible(WebDriver driver, By by) {
+		return isElementIsVisible(driver, by, "Verified element is visible");
+	}
+
+	public static boolean isElementIsVisible(WebDriver driver, By by, int timeoutInSeconds) {
+		return isElementIsVisible(driver, by, timeoutInSeconds, "Verified element is visible");
+	}
+
+	public static boolean isElementIsVisible(WebDriver driver, By by, String stepDesc) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()));
-            return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+			new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.visibilityOfElementLocated(by));
+			logStep(stepDesc, by);
+			return driver.findElement(by).isDisplayed();
 		} catch (Exception e) {
-			return true; // Treat errors as "not visible"
+			logWarning(stepDesc + " — element not visible", by);
+			return false;
 		}
 	}
 
-	public static boolean isElementNotVisible(WebDriver driver, By by, int timeoutInSeconds) {
+	public static boolean isElementIsVisible(WebDriver driver, By by, int timeoutInSeconds, String stepDesc) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
-            return wait.until(ExpectedConditions.invisibilityOfElementLocated(by));
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.visibilityOfElementLocated(by));
+			logStep(stepDesc, by);
+			return driver.findElement(by).isDisplayed();
+		} catch (Exception e) {
+			logWarning(stepDesc + " — element not visible", by);
+			return false;
+		}
+	}
+
+	// ─── Silent probe (no log on either outcome) ─────────────────────────────
+
+	protected static boolean probeElementVisible(WebDriver driver, By by, int timeoutInSeconds) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.visibilityOfElementLocated(by));
+			return driver.findElement(by).isDisplayed();
 		} catch (Exception e) {
 			return false;
 		}
 	}
 
-	public void enterText(WebDriver driver, By locator, String text) {
-		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.presenceOfElementLocated(locator));
-		element.clear();
-		element.sendKeys(text);
+	// ─── Invisibility ────────────────────────────────────────────────────────
+
+	public static boolean isElementNotVisible(WebDriver driver, By by) {
+		return isElementNotVisible(driver, by, "Verified element is not visible");
 	}
 
+	public static boolean isElementNotVisible(WebDriver driver, By by, int timeoutInSeconds) {
+		try {
+			boolean result = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.invisibilityOfElementLocated(by));
+			logStep("Verified element is not visible", by);
+			return result;
+		} catch (Exception e) {
+			logWarning("Element still visible or error during invisibility check", by);
+			return false;
+		}
+	}
+
+	public static boolean isElementNotVisible(WebDriver driver, By by, String stepDesc) {
+		try {
+			boolean result = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.invisibilityOfElementLocated(by));
+
+			logStep(stepDesc, by);
+			return result;
+
+		} catch (TimeoutException e) {
+			logWarning(stepDesc + " — element still visible", by);
+			return false;
+
+		} catch (Exception e) {
+			logWarning(stepDesc + " — error while waiting", by);
+			return false;
+		}
+	}
+
+	// ─── Text input ──────────────────────────────────────────────────────────
+
+	public void enterText(WebDriver driver, By locator, String text) {
+		enterText(driver, locator, text, "Entered text");
+	}
+
+	public void enterText(WebDriver driver, By locator, String text, String stepDesc) {
+		try {
+			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.presenceOfElementLocated(locator));
+
+			element.clear();
+			element.sendKeys(text);
+
+			logStep(stepDesc + " [value: " + text + "]", locator);
+
+		} catch (Exception e) {
+			ExtentReportManager.logFailure(stepDesc, locator.toString(), e);
+			throw new AssertionError("Step failed: " + stepDesc, e);
+		}
+	}
+
+	// ─── Text retrieval ──────────────────────────────────────────────────────
+
 	public String getElementText(WebDriver driver, By locator) {
-		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.presenceOfElementLocated(locator));
-        return element.getText();
+		try {
+			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.presenceOfElementLocated(locator));
+
+			String text = element.getText();
+			logStep("Retrieved text [value: " + text + "]", locator);
+			return text;
+
+		} catch (Exception e) {
+			ExtentReportManager.logFailure("Failed to get text", locator.toString(), e);
+			throw new AssertionError("Failed to get text", e);
+		}
 	}
 
 	public List<String> getElementTexts(WebDriver driver, By locator) throws TimeoutException {
@@ -111,93 +223,71 @@ public class BasePage {
 		for (WebElement element : elements) {
 			textContents.add(element.getText());
 		}
+		logStep("Retrieved " + textContents.size() + " element texts", locator);
 		return textContents;
 	}
 
-	public static String getKeyValueFromYaml(String filePath, String key) {
-		FileReader reader = null;
-		try {
-			reader = new FileReader(System.getProperty("user.dir") + filePath);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		Yaml yaml = new Yaml();
-		Object data = yaml.load(reader);
+	// ─── Attribute retrieval ─────────────────────────────────────────────────
 
-		if (data instanceof Map) {
-			@SuppressWarnings("unchecked")
-			Map<String, String> map = (Map<String, String>) data;
-			return map.get(key);
-		} else {
-			throw new RuntimeException("Invalid YAML format, expected a map");
-		}
+	public String getElementAttribute(WebDriver driver, By locator, String attribute) {
+		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+				.until(ExpectedConditions.presenceOfElementLocated(locator));
+		String value = element.getAttribute(attribute);
+		logStep("Retrieved attribute [" + attribute + ": " + value + "]", locator);
+		return value;
 	}
 
-	public static void resetNetworkProfile(String sessionID) {
-		String baseURL = "https://api-cloud.browserstack.com";
-		String endpoint = "/app-automate/sessions/" + sessionID + "/update_network.json";
-
-		String accessKey = getKeyValueFromYaml("/browserstack.yml", "accessKey");
-		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
-		String networkSettingsJson = "{\"networkProfile\":\"reset\"}";
-
-		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
-				.header("Content-Type", "application/json").body(networkSettingsJson);
-
-		requestSpec.put(baseURL + endpoint);
-	}
-
-	public static void setNoNetworkProfile(String sessionID) {
-		String baseURL = "https://api-cloud.browserstack.com";
-		String endpoint = "/app-automate/sessions/" + sessionID + "/update_network.json";
-		String accessKey = getKeyValueFromYaml("/browserstack.yml", "accessKey");
-		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
-		String networkSettingsJson = "{\"networkProfile\":\"no-network\"}";
-		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
-				.header("Content-Type", "application/json").body(networkSettingsJson);
-		requestSpec.put(baseURL + endpoint);
-	}
+	// ─── Enabled state ───────────────────────────────────────────────────────
 
 	public static boolean isElementEnabled(WebDriver driver, By by) {
-		try {
-			(new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds())))
-					.until(ExpectedConditions.visibilityOfElementLocated(by));
-            return driver.findElement(by).isEnabled();
-		} catch (Exception e) {
-			return false;
-		}
+		return isElementEnabled(driver, by, "Verified element enabled state");
 	}
 
 	public static boolean isElementEnabled(WebDriver driver, By by, int timeoutInSeconds) {
 		try {
-			(new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds)))
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
 					.until(ExpectedConditions.visibilityOfElementLocated(by));
-            return driver.findElement(by).isEnabled();
+			boolean enabled = driver.findElement(by).isEnabled();
+			logStep("Verified element enabled state [enabled: " + enabled + "]", by);
+			return enabled;
 		} catch (Exception e) {
+			// Element not visible within timeout — treated as not enabled (valid outcome).
+			logStep("Element not visible within timeout — treated as not enabled", by);
 			return false;
 		}
 	}
 
-	public String waitForUrlContains(WebDriver driver, String partialUrl, int timeoutInSeconds) {
+	public static boolean isElementEnabled(WebDriver driver, By by, String stepDesc) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
-			wait.until(ExpectedConditions.urlContains(partialUrl));
-            return driver.getCurrentUrl();
-		} catch (TimeoutException e) {
-			throw new AssertionError("Timed out waiting for URL to contain: " + partialUrl, e);
+			new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.visibilityOfElementLocated(by));
+			boolean enabled = driver.findElement(by).isEnabled();
+			logStep(stepDesc + " [enabled: " + enabled + "]", by);
+			return enabled;
+		} catch (Exception e) {
+			// Element not visible within timeout — treated as not enabled (valid outcome).
+			logStep("Element not visible within timeout — treated as not enabled", by);
+			return false;
 		}
 	}
 
-	/**
-	 * Waits until the first visible element matching any of the provided locators appears,
-	 * then returns that element. Useful when the same logical field can have different
-	 * IDs/XPaths across environments or UI versions — all candidates are polled in parallel
-	 * on every tick, so no time is wasted waiting for a locator that will never match.
-	 *
-	 * @param locators       one or more locators tried simultaneously
-	 * @return the first visible WebElement found
-	 * @throws TimeoutException if none of the locators becomes visible within the timeout
-	 */
+	// ─── URL wait ────────────────────────────────────────────────────────────
+
+	public String waitForUrlContains(WebDriver driver, String partialUrl, int timeoutInSeconds) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.urlContains(partialUrl));
+			String currentUrl = driver.getCurrentUrl();
+			logStep("URL contains '" + partialUrl + "' [current: " + currentUrl + "]");
+			return currentUrl;
+		} catch (TimeoutException e) {
+			ExtentReportManager.logFailure("Timed out waiting for URL: " + partialUrl, null, e);
+			throw new AssertionError("Timed out waiting for URL", e);
+		}
+	}
+
+	// ─── Multi-locator wait ───────────────────────────────────────────────────
+
 	@SuppressWarnings("unchecked")
 	public WebElement waitForFirstVisible(WebDriver driver, By... locators) {
 		ExpectedCondition<?>[] conditions = Arrays.stream(locators)
@@ -209,30 +299,50 @@ public class BasePage {
 			try {
 				WebElement el = driver.findElement(locator);
 				if (el.isDisplayed()) {
+					logStep("First visible element found among candidates", locator);
 					return el;
 				}
 			} catch (NoSuchElementException ignored) {
 			}
 		}
+		ExtentReportManager.logFailure(
+				"None of the locators became visible: " + Arrays.toString(locators),
+				Arrays.toString(locators),
+				null
+		);
 		throw new TimeoutException("None of the provided locators were visible after "
-				+ getConfiguredWaitTimeInSeconds() + "s: "
-				+ Arrays.toString(locators));
+				+ getConfiguredWaitTimeInSeconds() + "s: " + Arrays.toString(locators));
 	}
 
-	/**
-	 * Convenience wrapper: waits for the first visible element among the given locators,
-	 * clears it, and types the supplied text.
-	 */
 	public void enterTextInFirstVisible(WebDriver driver, String text, By... locators) {
 		WebElement element = waitForFirstVisible(driver, locators);
 		element.clear();
 		element.sendKeys(text);
+		logStep("Entered text in first visible element [value: " + text + "]", locators[0]);
 	}
+
+	// ─── Scroll ──────────────────────────────────────────────────────────────
+
+	public static void scrollIntoView(WebDriver driver, By locator) {
+		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+				.until(ExpectedConditions.presenceOfElementLocated(locator));
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
+		logStep("Scrolled element into view", locator);
+	}
+
+	// ─── Wait until enabled ──────────────────────────────────────────────────
+
+	public void waitUntilElementEnabled(WebDriver driver, By locator, int timeoutSeconds) {
+		new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
+				.until(ExpectedConditions.elementToBeClickable(locator));
+		logStep("Waited until element is enabled/clickable", locator);
+	}
+
+	// ─── Fixed wait ──────────────────────────────────────────────────────────
 
 	public static void waitForSeconds(WebDriver driver, int seconds) {
 		Instant startTime = Instant.now();
-
-		new WebDriverWait(driver, Duration.ofSeconds(seconds + 1)) // a buffer
+		new WebDriverWait(driver, Duration.ofSeconds(seconds + 1))
 				.until(new Function<WebDriver, Boolean>() {
 					@Override
 					public Boolean apply(WebDriver driver) {
@@ -240,27 +350,50 @@ public class BasePage {
 						return elapsed >= seconds;
 					}
 				});
+		logStep("Waited for " + seconds + " seconds");
 	}
 
-	public String getElementAttribute(WebDriver driver, By locator, String data) {
-		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.presenceOfElementLocated(locator));
-		return element.getAttribute(data);
+	// ─── YAML ────────────────────────────────────────────────────────────────
+
+	public static String getKeyValueFromYaml(String filePath, String key) {
+		FileReader reader = null;
+		try {
+			reader = new FileReader(System.getProperty("user.dir") + filePath);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		Yaml yaml = new Yaml();
+		Object data = yaml.load(reader);
+		if (data instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> map = (Map<String, String>) data;
+			return map.get(key);
+		} else {
+			throw new RuntimeException("Invalid YAML format, expected a map");
+		}
 	}
 
-	public void waitUntilElementEnabled(WebDriver driver, By locator, int timeoutSeconds) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
-		wait.until(ExpectedConditions.elementToBeClickable(locator));
+	// ─── BrowserStack network ────────────────────────────────────────────────
+
+	public static void resetNetworkProfile(String sessionID) {
+		String baseURL = "https://api-cloud.browserstack.com";
+		String endpoint = "/app-automate/sessions/" + sessionID + "/update_network.json";
+		String accessKey = getKeyValueFromYaml("/browserstack.yml", "accessKey");
+		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
+		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
+				.header("Content-Type", "application/json").body("{\"networkProfile\":\"reset\"}");
+		requestSpec.put(baseURL + endpoint);
+		logStep("Reset BrowserStack network profile to default");
 	}
 
-	/**
-	 * Scrolls the element matching the given locator into the visible viewport
-	 * using JavaScript. Use this before visibility checks when the element exists
-	 * in the DOM but is outside the current viewport (e.g. below the fold).
-	 */
-	public static void scrollIntoView(WebDriver driver, By locator) {
-		WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.presenceOfElementLocated(locator));
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
+	public static void setNoNetworkProfile(String sessionID) {
+		String baseURL = "https://api-cloud.browserstack.com";
+		String endpoint = "/app-automate/sessions/" + sessionID + "/update_network.json";
+		String accessKey = getKeyValueFromYaml("/browserstack.yml", "accessKey");
+		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
+		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
+				.header("Content-Type", "application/json").body("{\"networkProfile\":\"no-network\"}");
+		requestSpec.put(baseURL + endpoint);
+		logStep("Set BrowserStack network profile to no-network");
 	}
 }

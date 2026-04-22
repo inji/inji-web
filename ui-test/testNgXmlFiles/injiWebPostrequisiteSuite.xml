@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-	<suite name="Mimoto Pre-requisite API Test">
+<suite name="Mimoto Pre-requisite API Test">
 
-	<test name="DeletePolicySunBirdR">
-		<parameter name="ymlFile"
-			value="injiweb/SunBirdR/DeletePolicySunBirdR/DeletePolicySunBirdR.yml" />
-		<parameter name="pathParams" value="insuranceid" />
-		<parameter name="prerequisite" value="Yes" />
-		<classes>
-			<class name="io.inji.testrig.apirig.injiweb.testscripts.DeleteWithParam" />
-		</classes>
-	</test>
-	
+    <test name="DeletePolicySunBirdR">
+        <parameter name="ymlFile"
+                   value="injiweb/SunBirdR/DeletePolicySunBirdR/DeletePolicySunBirdR.yml"/>
+        <parameter name="pathParams" value="insuranceid"/>
+        <parameter name="prerequisite" value="Yes"/>
+        <classes>
+            <class name="io.inji.testrig.apirig.injiweb.testscripts.DeleteWithParam"/>
+        </classes>
+    </test>
+
 </suite>

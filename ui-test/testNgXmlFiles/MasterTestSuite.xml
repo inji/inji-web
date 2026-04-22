@@ -2,9 +2,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="Mimoto API Test Rig Master Suite">
-	<suite-files>
-		<suite-file path="injiWebPrerequisiteSuite.xml" />
-		<suite-file path="TestNg.xml" />
-		<suite-file path="injiWebPostrequisiteSuite.xml" />
-	</suite-files>
+    <suite-files>
+        <suite-file path="injiWebPrerequisiteSuite.xml"/>
+        <suite-file path="TestNg.xml"/>
+        <suite-file path="injiWebPostrequisiteSuite.xml"/>
+    </suite-files>
 </suite>

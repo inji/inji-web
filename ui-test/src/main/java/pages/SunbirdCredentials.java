@@ -2,10 +2,15 @@ package pages;
 
 import base.BasePage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.InjiWebUtil;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -19,8 +24,12 @@ public class SunbirdCredentials extends BasePage {
 		this.driver = driver;
 	}
 
+	private static final By FIRST_ITEM = By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]");
+	private static final By SECOND_ITEM = By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-1-')]");
+
 	public Boolean isDownloadSunbirdCredentialsDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		return isElementIsVisible(driver, FIRST_ITEM,
+				"Verify Sunbird credential issuer card is displayed");
 	}
 
 	public Boolean isSunbirdInsuranceDisplayed() {
@@ -33,125 +42,99 @@ public class SunbirdCredentials extends BasePage {
 		pdfNameInsurance = getElementAttribute(driver,
 				By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"), "data-testid")
 				.replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
-		logger.info("Pdf Name for Insurance: " + pdfNameInsurance);
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		logger.info("PDF Name for Insurance: " + pdfNameInsurance);
+		clickOnElement(driver, FIRST_ITEM,
+				"Click on Sunbird Insurance issuer card");
 	}
 
 	public void clickOnDownloadSunbird() {
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"));
+		clickOnElement(driver, FIRST_ITEM,
+				"Click on Sunbird credential issuer card to start download");
 	}
 
 	public void enterPolicyNumber(String string) {
-		enterText(driver, By.xpath("//input[@id='_form_policyNumber']"), string);
+		enterText(driver, By.xpath("//input[@id='_form_policyNumber']"), string,
+				"Enter policy number");
 	}
 
 	public Boolean isPolicyNumeTextBoxDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//input[@id='_form_policyNumber']"));
+		return isElementIsVisible(driver,
+				By.xpath("//input[@id='_form_policyNumber']"),
+				"Verify policy number input box is displayed");
 	}
 
 	public void enterFullName(String string) {
-		enterText(driver, By.xpath("//input[@id='_form_fullName']"), string);
+		enterText(driver, By.xpath("//input[@id='_form_fullName']"), string,
+				"Enter full name");
 	}
 
-	public void selectDateOfBirth(String string) {
-		String formattedDob = formatDateForSystemLocale(string);
-		driver.findElement(By.xpath("//input[@id='_form_fullName']")).sendKeys(Keys.TAB);
-		driver.findElement(By.id("_form_dob")).sendKeys(formattedDob);
-		driver.findElement(By.xpath("//input[@id='_form_dob']")).click();
-	}
+	public void selectDateOfBirth(String dob) {
+		WebElement fullNameField = driver.findElement(By.id("_form_fullName"));
+		WebElement dobField = driver.findElement(By.id("_form_dob"));
+		InjiWebUtil injiWebUtil = new InjiWebUtil();
+		String formattedDob = injiWebUtil.resolveAcceptedDateOfBirthFormat(dob, dobField);
 
-	/**
-	 * Converts any supported date string (e.g. "1977-05-19" from PolicyManager) into
-	 * the short date format of the OS/JVM locale with a guaranteed 4-digit year.
-	 *
-	 * <p>Why not DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)?
-	 * FormatStyle.SHORT in many locales emits a 2-digit year pattern ("yy"), so
-	 * 1977 becomes "77". The date input then zero-pads it to "0077". To fix this,
-	 * we read the raw locale pattern via SimpleDateFormat (which exposes the pattern
-	 * string), replace "yy" with "yyyy" if needed, and reuse the rest of the pattern
-	 * (separator, day/month order) unchanged.
-	 *
-	 * <p>Example on an Indian locale with pattern "dd-MM-yy":
-	 *   pattern fixed → "dd-MM-yyyy"
-	 *   "1977-05-19" → "19-05-1977"  ✓  (was "19-05-0077" before)
-	 */
-	private String formatDateForSystemLocale(String inputDate) {
-		LocalDate parsedDate = parseDateInput(inputDate);
-		if (parsedDate == null) {
-			logger.warn("Could not parse DOB '{}', passing as-is", inputDate);
-			return inputDate;
-		}
-		// Get the raw short-date pattern for the current OS locale
-		String pattern = ((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())).toPattern();
-		// Ensure the year is always 4 digits — SHORT patterns often use "yy"
-		if (!pattern.contains("yyyy")) {
-			pattern = pattern.replace("yy", "yyyy");
-		}
-		String formatted = parsedDate.format(DateTimeFormatter.ofPattern(pattern).withLocale(Locale.getDefault()));
-		logger.info("DOB '{}' → pattern '{}' (locale '{}') → '{}'", inputDate, pattern, Locale.getDefault(), formatted);
-		return formatted;
-	}
+		fullNameField.sendKeys(Keys.TAB);
 
-	private LocalDate parseDateInput(String inputDate) {
-		if (inputDate == null || inputDate.trim().isEmpty()) {
-			return null;
-		}
+		dobField.clear();
+		dobField.sendKeys(formattedDob);
+		dobField.sendKeys(Keys.TAB);
 
-		String value = inputDate.trim();
-		DateTimeFormatter[] supportedFormats = new DateTimeFormatter[] {
-				DateTimeFormatter.ISO_LOCAL_DATE,
-				DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-				DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-				DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-				DateTimeFormatter.ofPattern("MM-dd-yyyy")
-		};
-
-		for (DateTimeFormatter formatter : supportedFormats) {
-			try {
-				return LocalDate.parse(value, formatter);
-			} catch (DateTimeParseException ignored) {
-				// Try next format
-			}
-		}
-		return null;
+		logStep("Enter date of birth [value: " + formattedDob + "]", By.id("_form_dob"));
 	}
 
 	public void clickOnLogin() {
-		clickOnElement(driver, By.xpath("//button[@id='verify_form']"));
+		clickOnElement(driver,
+				By.xpath("//button[@id='verify_form']"),
+				"Click 'Login' button to submit Sunbird credentials form");
 	}
 
 	public Boolean isLoginButtonDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//button[@id='verify_form']"),
-				getConfiguredWaitTimeInSeconds());
+		return isElementIsVisible(driver,
+				By.xpath("//button[@id='verify_form']"),
+				getConfiguredWaitTimeInSeconds(),
+				"Verify 'Login' submit button is displayed on Sunbird form");
 	}
 
 	public Boolean isLifeInceranceDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-1-')]"));
+		return isElementIsVisible(driver, SECOND_ITEM,
+				"Verify 'Life Insurance' issuer card is displayed");
 	}
 
 	public Boolean isLoginFailedDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//*[contains(text(), 'Login failed')]"),
-				getConfiguredWaitTimeInSeconds());
+		return isElementIsVisible(driver,
+				By.xpath("//*[contains(text(), 'Login failed')]"),
+				getConfiguredWaitTimeInSeconds(),
+				"Verify 'Login failed' error message is displayed");
 	}
 
 	public void clickOnLifeInsurance() {
-		clickOnElement(driver, By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-1-')]"));
+		clickOnElement(driver, SECOND_ITEM,
+				"Click on 'Life Insurance' issuer card");
 	}
 
 	public Boolean isEnterPolicyNumberHeaderDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//label[text() = 'Enter Policy Number']"));
+		return isElementIsVisible(driver,
+				By.xpath("//label[text() = 'Enter Policy Number']"),
+				"Verify 'Enter Policy Number' field header is displayed");
 	}
 
 	public Boolean isEnterFullNameHeaderDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//label[text() = 'Enter Full Name']"));
+		return isElementIsVisible(driver,
+				By.xpath("//label[text() = 'Enter Full Name']"),
+				"Verify 'Enter Full Name' field header is displayed");
 	}
 
 	public Boolean isEnterDOBHeaderDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//label[text() = 'Enter DOB']"));
+		return isElementIsVisible(driver,
+				By.xpath("//label[text() = 'Enter DOB']"),
+				"Verify 'Enter DOB' field header is displayed");
 	}
 
 	public Boolean isAuthenticationFailedDisplayed() {
-		return isElementIsVisible(driver, By.xpath("//div[@id='error-banner']"));
+		return isElementIsVisible(driver,
+				By.xpath("//div[@id='error-banner']"),
+				"Verify authentication-failed error banner is displayed");
 	}
 
 	public Boolean isVehicleInsuranceDisplayed() {
@@ -160,6 +143,20 @@ public class SunbirdCredentials extends BasePage {
 
 	public void clickOnVehicleInsurance() {
 		clickOnSunbirdInsurance();
+	}
+
+	public boolean waitForLoginFailure(int timeoutInSeconds) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.visibilityOfElementLocated(
+							By.xpath("//*[contains(text(),'Login failed')]")
+					));
+
+			return true; // failure appeared
+
+		} catch (TimeoutException e) {
+			return false; // failure did NOT appear → success assumed
+		}
 	}
 
 }

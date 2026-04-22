@@ -35,12 +35,17 @@ public class ScenarioRetryAnalyzer implements IRetryAnalyzer {
             return false;
         }
 
-        Throwable cause = result.getThrowable();
+        logger.info("🔁 Retry triggered for scenario: {}", scenarioName(result));
 
-        if (cause instanceof NoUINAvailableException) {
+        Throwable root = result.getThrowable();
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+
+        if (root instanceof NoUINAvailableException) {
             return retryForUIN(result);
         }
-        if (cause instanceof NoPolicyAvailableException) {
+        if (root instanceof NoPolicyAvailableException) {
             return retryForPolicy(result);
         }
         return false;

@@ -65,6 +65,14 @@ public class InjiWebConfigManager extends ConfigManager{
 	}
 	
 	
+	public static boolean isHeadless() {
+		String value = getproperty("headless");
+		if (value == null || value.trim().isEmpty()) {
+			return false;
+		}
+		return Boolean.parseBoolean(value.trim());
+	}
+
 	public static String getSunbirdBaseURL() {
 		return InjiWebUtil.getValueFromMimotoActuator("overrides", "mosip.sunbird.url");
 		

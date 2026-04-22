@@ -31,6 +31,7 @@ Feature: download mosip cridentials
   Scenario: Verify Search With Invalid String
     Then User gets the title of the page
     Then User click on continue as guest
+    And Issuers list should be displayed
     And User search the issuers with "qewqdda"
     And User Verify the no issuer found message
     And User search the issuers mosip

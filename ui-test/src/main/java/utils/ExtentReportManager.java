@@ -1,17 +1,14 @@
 package utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 
 public class ExtentReportManager {
+
 	private static ExtentReports extent;
 	private static final ThreadLocal<ExtentTest> TEST = new ThreadLocal<>();
 
@@ -20,66 +17,44 @@ public class ExtentReportManager {
 
 	public static synchronized void initReport() {
 		if (extent == null) {
+
 			String envUrl = BaseTest.url;
 			if (envUrl.endsWith("/")) {
 				envUrl = envUrl.substring(0, envUrl.length() - 1);
 			}
+
 			timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm").format(new Date());
 			String domainOnly = envUrl.replaceFirst("https?://", "");
 			String formattedEnvName = "InjiWebUi-" + domainOnly;
+
 			currentReportFileName = formattedEnvName + "-" + timestamp + ".html";
-			ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("test-output/" + currentReportFileName);
+
+			ExtentHtmlReporter htmlReporter =
+					new ExtentHtmlReporter("test-output/" + currentReportFileName);
+
 			htmlReporter.config().setTheme(Theme.DARK);
 			htmlReporter.config().setDocumentTitle("Automation Report");
 			htmlReporter.config().setReportName(formattedEnvName);
+
+			// ✅ CUSTOM CSS (TEXT instead of icons)
+			htmlReporter.config().setCss(
+					".status.pass::before {content:'PASS ';}" +
+							".status.fail::before {content:'FAIL ';}" +
+							".status.skip::before {content:'SKIP ';}" +
+							".status.warning::before {content:'WARNING ';}" +
+							".status.info::before {content:'INFO ';}" +
+
+							// KI badge colour in the summary pie/legend
+							".badge-warning {background-color:#e67e22 !important;}" +
+							".badge-primary {background-color:#3498db !important;}" +
+							".badge-success {background-color:#2ecc71 !important;}" +
+							".badge-danger {background-color:#e74c3c !important;}"
+			);
+
 			extent = new ExtentReports();
 			extent.attachReporter(htmlReporter);
+
 			addSystemInfo(envUrl, timestamp);
-		}
-	}
-
-	public static String getCurrentReportFileName() {
-		return currentReportFileName;
-	}
-
-	private static void addSystemInfo(String envUrl, String timestamp) {
-		String branch = getGitBranch();
-		String commitId = getGitCommitId();
-		String testUrl = System.getenv("TEST_URL");
-		if (testUrl == null || testUrl.trim().isEmpty()) {
-			testUrl = envUrl;
-		}
-
-		if (extent != null) {
-			extent.setSystemInfo("Git BRANCH", branch);
-			extent.setSystemInfo("COMMIT ID", commitId);
-			extent.setSystemInfo("TEST URL", testUrl);
-			extent.setSystemInfo("EXECUTIOM TIME", timestamp);
-		}
-	}
-
-	private static String getGitBranch() {
-		return getGitProperty("git.branch");
-	}
-
-	private static String getGitCommitId() {
-		return getGitProperty("git.commit.id");
-	}
-
-	private static String getGitProperty(String key) {
-		Properties properties = new Properties();
-		try (InputStream is = ExtentReportManager.class.getClassLoader().getResourceAsStream("git.properties")) {
-			if (is == null) {
-				throw new IllegalStateException("git.properties file not found in classpath.");
-			}
-			properties.load(is);
-			String value = properties.getProperty(key);
-			if (value == null) {
-				throw new IllegalStateException("Key '" + key + "' not found in git.properties.");
-			}
-			return value;
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to read git.properties", e);
 		}
 	}
 
@@ -87,11 +62,76 @@ public class ExtentReportManager {
 		TEST.set(extent.createTest(testName));
 	}
 
+	public static ExtentTest getTest() {
+		return TEST.get();
+	}
+
+	// ✅ NORMAL STEP (NO LOCATOR)
 	public static void logStep(String message) {
-		ExtentTest test = TEST.get();
-		if (test != null) {
-			test.info(message);
+		getTest().info(message);
+	}
+
+	// ✅ STEP LOGGING (clean)
+	public static void logStepWithLocator(String description, String locator) {
+
+		String html = description +
+				"<br><details style='margin-left:20px;'>" +
+				"<summary style='cursor:pointer;'>▶ Locator Details</summary>" +
+				"<pre>" + locator + "</pre></details>";
+
+		getTest().info(html);
+	}
+
+	// ✅ WARNING (uses info status to avoid polluting KI/warning bucket)
+	public static void logWarning(String message) {
+		getTest().warning(message);
+	}
+
+	// ✅ IGNORED
+	public static void logIgnored(String message) {
+		getTest().info("<span style='color:orange;font-weight:bold;'>IGNORED</span> - " + message);
+	}
+
+	// ✅ KNOWN ISSUE — warning status renders as KNOWN_ISSUE in the report summary
+	public static void logKnownIssue(String jiraId, String bugUrl) {
+
+		getTest().skip("🟠 KNOWN ISSUE: Test skipped due to a known issue.<br>Refer to Bug ID: "
+				+ "<a href='" + bugUrl + "' target='_blank'>" + jiraId + "</a>");
+
+		getTest().info("Test is Marked as Known Issue: "
+				+ "<a href='" + bugUrl + "' target='_blank'>" + jiraId + "</a>");
+	}
+
+	// ✅ FAILURE LOGGER
+	public static void logFailure(String stepDesc, String locator, Exception e) {
+
+		String html = "FAILED STEP: " + stepDesc +
+				"<br><details style='margin-left:20px;'>" +
+				"<summary style='cursor:pointer;'>▶ Locator Details</summary>" +
+				"<pre>" + locator;
+
+		if (e != null) {
+			html += "\n\n" + e.getMessage();
 		}
+
+		html += "</pre></details>";
+
+		getTest().fail(html);
+	}
+
+	public static void logFailure(String message, Exception e) {
+
+		String html = "FAILED: " + message;
+
+		if (e != null) {
+			html += "<br><pre>" + e.getMessage() + "</pre>";
+		}
+
+		getTest().fail(html);
+	}
+
+	public static void logIgnoredScenario(String reason) {
+		getTest().skip("🟡 IGNORED SCENARIO<br>" + reason);
 	}
 
 	public static synchronized void flushReport() {
@@ -100,7 +140,14 @@ public class ExtentReportManager {
 		}
 	}
 
-	public static ExtentTest getTest() {
-		return TEST.get();
+	private static void addSystemInfo(String envUrl, String timestamp) {
+		if (extent != null) {
+			extent.setSystemInfo("TEST URL", envUrl);
+			extent.setSystemInfo("EXECUTION TIME", timestamp);
+		}
+	}
+
+	public static String getCurrentReportFileName() {
+		return currentReportFileName;
 	}
 }

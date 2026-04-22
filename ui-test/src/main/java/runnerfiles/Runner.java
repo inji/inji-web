@@ -23,9 +23,15 @@ import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
 import utils.InjiWebConstants;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -36,8 +42,9 @@ import java.util.List;
 		monochrome = true,
 		plugin = {"pretty",
 				"html:reports",
+				"utils.StepListener",
 				"html:target/cucumber.html", "json:target/cucumber.json",
-				"summary","com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"}
+				"summary"}
 		//tags = "@smoke"
 )
 public class Runner extends AbstractTestNGCucumberTests{
@@ -47,7 +54,13 @@ public class Runner extends AbstractTestNGCucumberTests{
 
 	public static String jarUrl = Runner.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	public static OTPListener otpListener = null;
-	
+
+	// ── Known Issues ──────────────────────────────────────────────────────────────
+	public static final Map<String, String> knownIssues = new ConcurrentHashMap<>();
+
+	static {
+		loadKnownIssues();
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -287,5 +300,52 @@ public class Runner extends AbstractTestNGCucumberTests{
 		}
 		return Boolean.parseBoolean(propertyValue.trim());
 	}
+
+	// ── Known Issues ──────────────────────────────────────────────────────────────
+	/**
+	 * Loads known issues from {@code src/test/resources/Known_Issues.txt}.
+	 *
+	 * <p>Each non-blank, non-comment line must follow the format:
+	 * <pre>
+	 *   BUGID------Scenario Name
+	 * </pre>
+	 * Lines starting with {@code #} are treated as comments and skipped.
+	 */
+	private static void loadKnownIssues() {
+		InputStream knownIssuesStream = Runner.class.getClassLoader()
+				.getResourceAsStream("Known_Issues.txt");
+
+		if (knownIssuesStream == null) {
+			LOGGER.warn("Known issues file not found in classpath: config/Known_Issues.txt");
+			return;
+		}
+
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(knownIssuesStream, StandardCharsets.UTF_8))) {
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				line = line.trim();
+
+				// Skip blank lines and comments
+				if (line.isEmpty() || line.startsWith("#") || !line.contains("------")) {
+					continue;
+				}
+
+				String[] parts = line.split("------", 2);
+				if (parts.length == 2) {
+					String bugId        = parts[0].trim();
+					String scenarioName = parts[1].trim().replaceAll("\\s+", " ");
+					knownIssues.put(scenarioName, bugId);
+				}
+			}
+
+			LOGGER.info("Known Issues Loaded: " + knownIssues);
+
+		} catch (Exception e) {
+			LOGGER.warn("Error reading Known_Issues.txt: " + e.getMessage());
+		}
+	}
+	// ─────────────────────────────────────────────────────────────────────────────
 
 }

@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-	<suite name="Mimoto Pre-requisite API Test">
-	<test name="Adding Identity">
-		<parameter name="ymlFile" value="injiweb/AddIdentity/AddIdentity.yml" />
-		<parameter name="prerequisite" value="Yes" />
-		<classes>
-			<class name="io.inji.testrig.apirig.injiweb.testscripts.AddIdentity" />
-		</classes>
-	</test>
-	<test name="CreatePolicySunBirdR">
-		<parameter name="ymlFile"
-			value="injiweb/SunBirdR/CreatePolicySunBirdR/CreatePolicySunBirdR.yml" />
-		<parameter name="idKeyName" value="osid" />
-		<parameter name="prerequisite" value="Yes" />
-		<classes>
-			<class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId" />
-		</classes>
-	</test>
+<suite name="Mimoto Pre-requisite API Test">
+
+    <test name="Adding Identity">
+        <parameter name="ymlFile" value="injiweb/AddIdentity/AddIdentity.yml"/>
+        <parameter name="prerequisite" value="Yes"/>
+        <classes>
+            <class name="io.inji.testrig.apirig.injiweb.testscripts.AddIdentity"/>
+        </classes>
+    </test>
+    <test name="CreatePolicySunBirdR">
+        <parameter name="ymlFile"
+                   value="injiweb/SunBirdR/CreatePolicySunBirdR/CreatePolicySunBirdR.yml"/>
+        <parameter name="idKeyName" value="osid"/>
+        <parameter name="prerequisite" value="Yes"/>
+        <classes>
+            <class name="io.inji.testrig.apirig.injiweb.testscripts.SimplePostForAutoGenId"/>
+        </classes>
+    </test>
 
 </suite>
