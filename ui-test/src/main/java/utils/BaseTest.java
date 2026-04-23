@@ -541,16 +541,15 @@ public class BaseTest {
         // NoPolicyAvailableException before any report or browser was set up.
         // Clean up thread state and exit — the retry analyzer re-queues the scenario;
         // no counting or reporting for this transient attempt.
-        if (uinRetryAttempt.get()) {
+        if (uinRetryAttempt.get() || policyRetryAttempt.get()) {
             uinRetryAttempt.remove();
-            UINManager.releaseCurrentThreadUIN(); // no-op: nothing was acquired
-            clearScenarioState();
-            return;
-        }
-        if (policyRetryAttempt.get()) {
             policyRetryAttempt.remove();
-            PolicyManager.releaseCurrentThreadPolicy(); // no-op: nothing was acquired
+            UINManager.releaseCurrentThreadUIN();
+            PolicyManager.releaseCurrentThreadPolicy();
             clearScenarioState();
+            STEP_COUNTER.remove();
+            SCENARIO_FAILED.remove();
+            isKnownIssueScenario.remove();
             return;
         }
 
@@ -614,6 +613,7 @@ public class BaseTest {
                 }
             }
             ExtentReportManager.flushReport();
+            ExtentReportManager.clearTest();
             UINManager.releaseCurrentThreadUIN();
             PolicyManager.releaseCurrentThreadPolicy();
             clearScenarioState();

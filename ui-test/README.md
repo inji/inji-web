@@ -22,7 +22,7 @@ Install the following on the machine where tests will run:
 
 ## Project Structure
 
-```
+```text
 ui-test/
 ├── src/
 │   ├── main/
@@ -180,8 +180,8 @@ These variables override the corresponding `injiweb.properties` values when set:
 | `INJIWEB_GOOGLE_CLIENT_ID` | `INJIWEB_GOOGLE_CLIENT_ID` | `1234...apps.googleusercontent.com` |
 | `INJIWEB_GOOGLE_CLIENT_SECRET` | `INJIWEB_GOOGLE_CLIENT_SECRET` | `GOCSPX-...` |
 | `INJIWEB_GOOGLE_REFRESH_TOKEN` | `INJIWEB_GOOGLE_REFRESH_TOKEN` | `1//0g...` |
-| `Issuer_Text_Mosip` | `issuerSearchText` | `National Identity Department` |
-| `Issuer_Text_sunbird` | `issuerSearchTextforSunbird` | `StayProtected Insurance` |
+| `issuerSearchText` | `issuerSearchText` | `National Identity Department` |
+| `issuerSearchTextforSunbird` | `issuerSearchTextforSunbird` | `StayProtected Insurance` |
 
 ---
 
@@ -191,13 +191,13 @@ Scenarios matching an entry in `src/main/resources/Known_Issues.txt` are automat
 
 Format — one entry per line:
 
-```
+```text
 BUGID------Exact Scenario Name
 ```
 
 Example:
 
-```
+```text
 INJIWEB-1234------Verify the Credential Details Page for mosip in configured langauge
 ```
 
@@ -223,9 +223,9 @@ java -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
 Override properties at runtime:
 
 ```bash
-java -DTEST_URL=https://injiweb.dev.mosip.net/ \
-     -Dcucumber.filter.tags="@smoke" \
-     -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+TEST_URL=https://injiweb.dev.mosip.net/ \
+java -Dcucumber.filter.tags="@smoke" \
+     -jar target/uitest-injiweb-0.18.0-SNAPSHOT.jar
 ```
 
 Run a specific feature file or line:
@@ -279,16 +279,16 @@ java -Dcucumber.features="src/test/resources/featurefiles/downloadMosipCredentia
    - Open the **Maven** side panel → `uitest-injiweb > Plugins > exec` → or use the terminal:
    ```bash
    mvn clean package -DskipTests
-   java -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+   java -jar target/uitest-injiweb-0.18.0-SNAPSHOT.jar
    ```
 5. **Run with a tag filter** (terminal):
    ```bash
-   java -Dcucumber.filter.tags="@smoke" -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+   java -Dcucumber.filter.tags="@smoke" -jar target/uitest-injiweb-0.18.0-SNAPSHOT.jar
    ```
 6. **Run a single feature file** (terminal):
    ```bash
    java -Dcucumber.features="src/test/resources/featurefiles/downloadMosipCredentials.feature" \
-        -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+        -jar target/uitest-injiweb-0.18.0-SNAPSHOT.jar
    ```
 
 ---
@@ -299,7 +299,7 @@ Required for test scenarios that log in via Gmail.
 
 1. Open this URL in a browser (replace placeholders):
 
-```
+```text
 https://accounts.google.com/o/oauth2/auth?client_id=<CLIENT_ID>&redirect_uri=<REDIRECT_URI>&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent
 ```
 
@@ -335,7 +335,7 @@ curl --location 'https://oauth2.googleapis.com/token' \
 4. Control parallel thread count with `browserStackRunThreadCount` (max 5 for most plans).
 5. Run:
    ```bash
-   java -jar target/uitest-injiweb-0.15.0-SNAPSHOT.jar
+   java -jar target/uitest-injiweb-0.18.0-SNAPSHOT.jar
    ```
 
 ---
@@ -344,13 +344,13 @@ curl --location 'https://oauth2.googleapis.com/token' \
 
 HTML reports are generated in:
 
-```
+```text
 ui-test/test-output/
 ```
 
 Report filename format:
 
-```
+```text
 InjiWebUi-<env-domain>-<yyyy-MM-dd-HH-mm>-T-<total>-P-<passed>-F-<failed>-S-<skipped>-I-<ignored>-KI-<known-issues>.html
 ```
 

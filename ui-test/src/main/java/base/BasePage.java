@@ -1,8 +1,7 @@
 package base;
 
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -380,7 +379,13 @@ public class BasePage {
 		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
 		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
 				.header("Content-Type", "application/json").body("{\"networkProfile\":\"reset\"}");
-		requestSpec.put(baseURL + endpoint);
+		Response response = requestSpec.put(baseURL + endpoint);
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			ExtentReportManager.logFailure("Failed to reset BrowserStack network profile",
+					endpoint + " returned HTTP " + response.statusCode(), null);
+			BaseTest.markScenarioFailed();
+			throw new AssertionError("Failed to reset BrowserStack network profile: HTTP " + response.statusCode());
+		}
 		logStep("Reset BrowserStack network profile to default");
 	}
 
@@ -391,7 +396,14 @@ public class BasePage {
 		String userName = getKeyValueFromYaml("/browserstack.yml", "userName");
 		RequestSpecification requestSpec = RestAssured.given().auth().basic(userName, accessKey)
 				.header("Content-Type", "application/json").body("{\"networkProfile\":\"no-network\"}");
-		requestSpec.put(baseURL + endpoint);
+
+		Response response = requestSpec.put(baseURL + endpoint);
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			ExtentReportManager.logFailure("Failed to set BrowserStack network profile",
+					endpoint + " returned HTTP " + response.statusCode(), null);
+			BaseTest.markScenarioFailed();
+			throw new AssertionError("Failed to set BrowserStack network profile: HTTP " + response.statusCode());
+		}
 		logStep("Set BrowserStack network profile to no-network");
 	}
 }

@@ -162,4 +162,8 @@ public class ExtentReportManager {
 	public static String getCurrentReportFileName() {
 		return currentReportFileName;
 	}
+
+	public static void clearTest() {
+		TEST.remove();
+	}
 }

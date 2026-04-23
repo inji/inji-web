@@ -99,6 +99,10 @@ public class MosipCredentials extends BasePage {
 		} else if (isElementIsVisible(driver, getOtp, getConfiguredWaitTimeInSeconds(),
 				"Check if 'Get OTP' button is visible")) {
 			clickOnElement(driver, getOtp, "Click 'Get OTP' button");
+		} else {
+			logWarning("Neither 'Login with OTP' nor 'Get OTP' button is visible", loginWithOtp);
+			utils.BaseTest.markScenarioFailed();
+			throw new AssertionError("Step failed: no OTP action button is visible");
 		}
 	}
 

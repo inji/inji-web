@@ -155,7 +155,7 @@ public class GetWithParam extends InjiWebUtil implements ITest {
 					String sunbirdBaseUrl = InjiWebConfigManager.getSunbirdBaseURL();
 					if (sunbirdBaseUrl != null && !sunbirdBaseUrl.isBlank())
 						tempUrl = sunbirdBaseUrl;
-						testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
+					testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
 					}
 
 					response = getWithPathParamAndCookie(tempUrl + testCaseDTO.getEndPoint(), inputJson, auditLogCheck,
