@@ -56,7 +56,7 @@ public class StepDef {
 	@Given("User gets the title of the page")
 	public void getTheTitleOfThePage() {
 
-		WebDriverWait wait = new WebDriverWait(baseTest.getDriver(), Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(baseTest.getDriver(), Duration.ofSeconds(InjiWebConfigManager.getWaitTimeInSeconds()));
 
 		wait.until(ExpectedConditions.titleIs(InjiWebConstants.PAGE_TITLE));
 

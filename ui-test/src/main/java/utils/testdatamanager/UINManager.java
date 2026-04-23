@@ -45,14 +45,44 @@ public class UINManager {
      * so the calling thread is never stalled and can move on to other work.
      * The acquired UIN (uin + phone + email) is bound to the current thread
      * via ThreadLocal and can be retrieved with {@link #getCurrentUIN()}.
+     * Returns the already-held UIN if this thread already owns one, preventing
+     * silent overwrites and pool leaks.
      */
     public static Uin tryAcquireUIN() {
+        Uin existing = currentThreadUIN.get();
+        if (existing != null) {
+            logger.info("[Thread '{}'] Already holds a UIN – returning existing", Thread.currentThread().getName());
+            return existing;
+        }
         Uin uin = availableUINs.poll();
         if (uin != null) {
             currentThreadUIN.set(uin);
             logger.info("[Thread '{}'] Acquired UIN: {}", Thread.currentThread().getName(), uin.getUin());
         } else {
             logger.warn("[Thread '{}'] No UIN available in pool – all are in use", Thread.currentThread().getName());
+        }
+        return uin;
+    }
+
+    /**
+     * Blocking acquisition used by retry analyzers. Blocks up to {@code timeout} until
+     * a UIN is available, then atomically binds it to the current thread's ThreadLocal.
+     * This eliminates the race window that exists when using {@code waitForUIN} +
+     * {@code offerUIN} — ownership is established before the retry is authorized.
+     * Returns null on timeout or interrupt.
+     */
+    public static Uin blockingAcquireUIN(long timeout, java.util.concurrent.TimeUnit unit)
+            throws InterruptedException {
+        Uin existing = currentThreadUIN.get();
+        if (existing != null) {
+            logger.info("[Thread '{}'] Already holds a UIN – returning existing for blocking acquire",
+                    Thread.currentThread().getName());
+            return existing;
+        }
+        Uin uin = availableUINs.poll(timeout, unit);
+        if (uin != null) {
+            currentThreadUIN.set(uin);
+            logger.info("[Thread '{}'] Blocking-acquired UIN: {}", Thread.currentThread().getName(), uin.getUin());
         }
         return uin;
     }
@@ -96,24 +126,4 @@ public class UINManager {
         }
     }
 
-    /**
-     * Blocking poll used by {@code UINRetryAnalyzer}: waits up to {@code timeout} for any UIN
-     * to be released back to the pool. Returns null on timeout.
-     * The caller must put the UIN back via {@link #offerUIN(Uin)} so {@link #tryAcquireUIN()}
-     * can pick it up in the retried scenario's {@code @Before} hook.
-     */
-    public static Uin waitForUIN(long timeout, java.util.concurrent.TimeUnit unit)
-            throws InterruptedException {
-        return availableUINs.poll(timeout, unit);
-    }
-
-    /**
-     * Returns a UIN directly to the pool without touching the ThreadLocal.
-     * Used by {@code UINRetryAnalyzer} to put a peeked UIN back before the retry runs.
-     */
-    public static void offerUIN(Uin uin) {
-        if (uin != null) {
-            availableUINs.offer(uin);
-        }
-    }
 }

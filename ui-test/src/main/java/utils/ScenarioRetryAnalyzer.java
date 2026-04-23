@@ -61,10 +61,9 @@ public class ScenarioRetryAnalyzer implements IRetryAnalyzer {
         logger.info("[UINRetry] '{}' – retry {}/{}: blocking until a UIN is released (max {}s)",
                 scenarioName(result), uinRetryCount, MAX_RETRIES, WAIT_TIMEOUT_SECONDS);
         try {
-            Uin uin = UINManager.waitForUIN(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            Uin uin = UINManager.blockingAcquireUIN(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (uin != null) {
-                UINManager.offerUIN(uin);
-                logger.info("[UINRetry] '{}' – UIN released, queuing retry {}/{}",
+                logger.info("[UINRetry] '{}' – UIN acquired for retry {}/{}",
                         scenarioName(result), uinRetryCount, MAX_RETRIES);
                 return true;
             }
@@ -87,10 +86,9 @@ public class ScenarioRetryAnalyzer implements IRetryAnalyzer {
         logger.info("[PolicyRetry] '{}' – retry {}/{}: blocking until a Policy is released (max {}s)",
                 scenarioName(result), policyRetryCount, MAX_RETRIES, WAIT_TIMEOUT_SECONDS);
         try {
-            Policy policy = PolicyManager.waitForPolicy(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            Policy policy = PolicyManager.blockingAcquirePolicy(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (policy != null) {
-                PolicyManager.offerPolicy(policy);
-                logger.info("[PolicyRetry] '{}' – Policy released, queuing retry {}/{}",
+                logger.info("[PolicyRetry] '{}' – Policy acquired for retry {}/{}",
                         scenarioName(result), policyRetryCount, MAX_RETRIES);
                 return true;
             }

@@ -53,10 +53,9 @@ public class PolicyRetryAnalyzer implements IRetryAnalyzer {
                 scenarioName(result), retryCount, MAX_RETRIES, WAIT_TIMEOUT_SECONDS);
 
         try {
-            Policy policy = PolicyManager.waitForPolicy(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            Policy policy = PolicyManager.blockingAcquirePolicy(WAIT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (policy != null) {
-                PolicyManager.offerPolicy(policy);
-                logger.info("[PolicyRetry] '{}' – Policy released, queuing retry {}/{}",
+                logger.info("[PolicyRetry] '{}' – Policy acquired for retry {}/{}",
                         scenarioName(result), retryCount, MAX_RETRIES);
                 return true;
             }

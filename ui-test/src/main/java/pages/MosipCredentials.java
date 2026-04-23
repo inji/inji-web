@@ -32,10 +32,9 @@ public class MosipCredentials extends BasePage {
 	}
 
 	public void enterVid(String uinOrVid) {
-		enterTextInFirstVisible(driver, uinOrVid,
+		enterSensitiveTextInFirstVisible(driver, uinOrVid,
 				By.xpath("//input[@id='Otp_mosip-vid']"),
 				By.xpath("//input[@id='Otp_vid']"));
-		logStep("Enter UIN/VID value", By.xpath("//input[@id='Otp_vid']"));
 	}
 
 	public void clickOnGetOtpButton() {

@@ -31,9 +31,9 @@ public class Uin {
     @Override
     public String toString() {
         return "UIN{" +
-                "uin='" + uin + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
+                "uin='<redacted>'" +
+                ", phone='<redacted>'" +
+                ", email='<redacted>'" +
                 '}';
     }
 }

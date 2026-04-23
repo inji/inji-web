@@ -13,4 +13,8 @@ public class StepContext {
     public static String getCurrentStepText() {
         return CURRENT_STEP.get();
     }
+
+    public static void clear() {
+        CURRENT_STEP.remove();
+    }
 }

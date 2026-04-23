@@ -103,11 +103,11 @@ public class BaseTest {
             ThreadLocal.withInitial(() -> false);
 
     private static Local browserStackLocal;
-    private static int passedCount = 0;
-    private static int failedCount = 0;
-    private static int totalCount = 0;
-    private static int skippedCount = 0;  // S: prerequisite-failure skips
-    private static int ignoredCount = 0;  // I: threshold/environment-constraint ignores
+    private static final AtomicInteger passedCount  = new AtomicInteger();
+    private static final AtomicInteger failedCount  = new AtomicInteger();
+    private static final AtomicInteger totalCount   = new AtomicInteger();
+    private static final AtomicInteger skippedCount = new AtomicInteger(); // S: prerequisite-failure skips
+    private static final AtomicInteger ignoredCount = new AtomicInteger(); // I: threshold/environment-constraint ignores
     private static HashMap<String, Integer> walletPasscodeSettingsCache;
 
     private static final String buildIdentifier = "#" + new SimpleDateFormat("dd-MMM-HH:mm").format(new Date());
@@ -172,7 +172,7 @@ public class BaseTest {
             return;
         }
         isKnownIssueScenario.set(true);
-        totalCount++;
+        totalCount.incrementAndGet();
         ExtentReportManager.initReport();
         ExtentReportManager.createTest(scenario.getName());
         throw new SkipException("[KNOWN ISSUE] " + runnerfiles.Runner.knownIssues.get(scenario.getName()));
@@ -189,7 +189,9 @@ public class BaseTest {
             if (scenario.getSourceTagNames().contains("@NeedsUIN")) {
                 Uin uin = UINManager.tryAcquireUIN();
                 if (uin == null) {
-                    String msg = "...";
+                    String msg = "No UIN available in the pool for scenario '"
+                            + scenario.getName() + "' on thread '"
+                            + Thread.currentThread().getName() + "' — will be retried.";
                     logger.warn(msg);
                     uinRetryAttempt.set(true);
                     throw new NoUINAvailableException(msg);
@@ -199,7 +201,9 @@ public class BaseTest {
             if (scenario.getSourceTagNames().contains("@NeedsPolicy")) {
                 Policy policy = PolicyManager.tryAcquirePolicy();
                 if (policy == null) {
-                    String msg = "...";
+                    String msg = "No Policy available in the pool for scenario '"
+                            + scenario.getName() + "' on thread '"
+                            + Thread.currentThread().getName() + "' — will be retried.";
                     logger.warn(msg);
                     policyRetryAttempt.set(true);
                     throw new NoPolicyAvailableException(msg);
@@ -210,7 +214,7 @@ public class BaseTest {
             // 🔹 REPORT INIT (ONLY REAL RUN)
             // ============================
 
-            totalCount++;
+            totalCount.incrementAndGet();
             ExtentReportManager.initReport();
             ExtentReportManager.createTest(scenario.getName());
 
@@ -339,11 +343,12 @@ public class BaseTest {
                 markScenarioIgnored(reason);
                 throw new io.cucumber.java.PendingException("IGNORED: " + reason);
             }
+        } catch (io.cucumber.java.PendingException | org.testng.SkipException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Error checking threshold for scenario '{}'", scenario.getName(), e);
-
-            // ✅ fail fast OR mark ignored
             markScenarioIgnored("Error while evaluating threshold: " + e.getMessage());
+            throw new io.cucumber.java.PendingException("IGNORED: threshold evaluation failed");
         }
     }
 
@@ -378,7 +383,7 @@ public class BaseTest {
      * Skipped when the scenario is a UIN/Policy retry attempt so intermediate
      * retries don't prematurely release the gate.
      */
-    @After("@preResetPasscode")
+    @After(value = "@preResetPasscode", order = 10001)
     public void countDownPreResetLatch(Scenario scenario) {
         if (!uinRetryAttempt.get() && !policyRetryAttempt.get()) {
             if (preResetCompleted.add(scenario.getId())) {
@@ -550,6 +555,17 @@ public class BaseTest {
         }
 
         try {
+            // Early-skip hooks (checkPrerequisiteScenarioPassed order=500,
+            // checkResetPasscodeScenarioPassed order=600, acquireAfterResetPasscodeSemaphore
+            // order=700) throw SkipException before beforeAll (order=10000) runs, so
+            // no report node or totalCount increment has happened yet. Create them lazily.
+            if (ExtentReportManager.getTest() == null
+                    && !Boolean.TRUE.equals(isKnownIssueScenario.get())) {
+                totalCount.incrementAndGet();
+                ExtentReportManager.initReport();
+                ExtentReportManager.createTest(scenario.getName());
+            }
+
             if (Boolean.TRUE.equals(isKnownIssueScenario.get())) {
                 // KI bucket: scenario skipped because a known bug is tracked for it.
                 // Report node was already created in @Before(order=50); just log result.
@@ -559,16 +575,16 @@ public class BaseTest {
                 ExtentReportManager.logKnownIssue(bugId, bugUrl);
             } else if (isScenarioIgnored()) {
                 // I bucket: threshold/environment constraint — not a failure or pre-req issue.
-                ignoredCount++;
+                ignoredCount.incrementAndGet();
 
                 ExtentReportManager.logIgnoredScenario(getSkipReason());
             } else if (isScenarioSkipped()) {
                 // S bucket: prerequisite scenario failed or timed out.
-                skippedCount++;
+                skippedCount.incrementAndGet();
                 ExtentReportManager.getTest().skip(
                         "[SKIPPED] " + scenario.getName() + " — " + getSkipReason());
             } else if (scenario.isFailed() || SCENARIO_FAILED.get()) {
-                failedCount++;
+                failedCount.incrementAndGet();
 
                 if (DRIVER.get() != null) {
                     try {
@@ -578,7 +594,7 @@ public class BaseTest {
                 }
                 ExtentReportManager.getTest().fail("Scenario Failed: " + scenario.getName());
             } else {
-                passedCount++;
+                passedCount.incrementAndGet();
                 ExtentReportManager.getTest().pass("Scenario Passed: " + scenario.getName());
             }
         } finally {
@@ -665,8 +681,8 @@ public class BaseTest {
         String originalFileName = ExtentReportManager.getCurrentReportFileName();
         File originalReportFile = new File(System.getProperty("user.dir") + "/test-output/" + originalFileName);
         String nameWithoutExt = originalFileName.replace(".html", "");
-        String newFileName = nameWithoutExt + "-T-" + totalCount + "-P-" + passedCount + "-F-" + failedCount + "-S-"
-                + skippedCount + "-I-" + ignoredCount + "-KI-" + knownIssueCount.get() + ".html";
+        String newFileName = nameWithoutExt + "-T-" + totalCount.get() + "-P-" + passedCount.get() + "-F-" + failedCount.get() + "-S-"
+                + skippedCount.get() + "-I-" + ignoredCount.get() + "-KI-" + knownIssueCount.get() + ".html";
         File newReportFile = new File(System.getProperty("user.dir") + "/test-output/" + newFileName);
 
 		logger.info("Attempting to rename report file...");

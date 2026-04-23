@@ -62,36 +62,27 @@ public class BasePage {
 	// ─── Click ────────────────────────────────────────────────────────────────
 
 	public void clickOnElement(WebDriver driver, By locator) {
-		clickOnElement(driver, locator, "Clicked element");
+		performClick(driver, locator, "Clicked element", getConfiguredWaitTimeInSeconds());
 	}
 
 	public void clickOnElement(WebDriver driver, By locator, String stepDesc) {
-		try {
-			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-					.until(ExpectedConditions.elementToBeClickable(locator));
-
-			element.click();
-			logStep(stepDesc, locator);
-
-		} catch (Exception e) {
-			ExtentReportManager.logFailure(stepDesc, locator.toString(), e);
-
-			// ✅ mark scenario failed
-			BaseTest.markScenarioFailed();
-
-			throw new AssertionError("Step failed: " + stepDesc, e);
-		}
+		performClick(driver, locator, stepDesc, getConfiguredWaitTimeInSeconds());
 	}
 
 	public static void clickOnElement(WebDriver driver, By locator, int timeoutInSeconds) {
+		performClick(driver, locator, "Clicked element", timeoutInSeconds);
+	}
+
+	private static void performClick(WebDriver driver, By locator, String stepDesc, int timeoutInSeconds) {
 		try {
-			WebElement element = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
-					.until(ExpectedConditions.elementToBeClickable(locator));
-			element.click();
-			logStep("Clicked element", locator);
+			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))
+					.until(ExpectedConditions.elementToBeClickable(locator))
+					.click();
+			logStep(stepDesc, locator);
 		} catch (Exception e) {
-			ExtentReportManager.logFailure("Failed to click element", locator.toString(), e);
-			throw new AssertionError("Failed to click on element: " + locator, e);
+			ExtentReportManager.logFailure(stepDesc, locator.toString(), e);
+			BaseTest.markScenarioFailed();
+			throw new AssertionError("Step failed: " + stepDesc, e);
 		}
 	}
 
@@ -319,6 +310,13 @@ public class BasePage {
 		element.clear();
 		element.sendKeys(text);
 		logStep("Entered text in first visible element [value: " + text + "]", locators[0]);
+	}
+
+	public void enterSensitiveTextInFirstVisible(WebDriver driver, String text, By... locators) {
+		WebElement element = waitForFirstVisible(driver, locators);
+		element.clear();
+		element.sendKeys(text);
+		logStep("Entered text in first visible element [value: <redacted>]", locators[0]);
 	}
 
 	// ─── Scroll ──────────────────────────────────────────────────────────────

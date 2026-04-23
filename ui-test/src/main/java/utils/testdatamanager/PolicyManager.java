@@ -42,14 +42,43 @@ public class PolicyManager {
      * so the calling thread is never stalled and can move on to other work.
      * The acquired Policy (policyNumber + name + dob) is bound to the current
      * thread via ThreadLocal and can be retrieved with {@link #getCurrentPolicy()}.
+     * Returns the already-held Policy if this thread already owns one, preventing
+     * silent overwrites and pool leaks.
      */
     public static Policy tryAcquirePolicy() {
+        Policy existing = currentThreadPolicy.get();
+        if (existing != null) {
+            logger.info("[Thread '{}'] Already holds a Policy – returning existing", Thread.currentThread().getName());
+            return existing;
+        }
         Policy policy = availablePolicies.poll();
         if (policy != null) {
             currentThreadPolicy.set(policy);
             logger.info("[Thread '{}'] Acquired Policy: {}", Thread.currentThread().getName(), policy.getPolicyNumber());
         } else {
             logger.warn("[Thread '{}'] No Policy available in pool – all are in use", Thread.currentThread().getName());
+        }
+        return policy;
+    }
+
+    /**
+     * Blocking acquisition used by retry analyzers. Blocks up to {@code timeout} until
+     * a Policy is available, then atomically binds it to the current thread's ThreadLocal.
+     * This eliminates the race window that exists when using {@code waitForPolicy} +
+     * {@code offerPolicy} — ownership is established before the retry is authorized.
+     * Returns null on timeout or interrupt.
+     */
+    public static Policy blockingAcquirePolicy(long timeout, TimeUnit unit) throws InterruptedException {
+        Policy existing = currentThreadPolicy.get();
+        if (existing != null) {
+            logger.info("[Thread '{}'] Already holds a Policy – returning existing for blocking acquire",
+                    Thread.currentThread().getName());
+            return existing;
+        }
+        Policy policy = availablePolicies.poll(timeout, unit);
+        if (policy != null) {
+            currentThreadPolicy.set(policy);
+            logger.info("[Thread '{}'] Blocking-acquired Policy: {}", Thread.currentThread().getName(), policy.getPolicyNumber());
         }
         return policy;
     }
@@ -93,23 +122,4 @@ public class PolicyManager {
         }
     }
 
-    /**
-     * Blocking poll used by {@code PolicyRetryAnalyzer}: waits up to {@code timeout} for any
-     * Policy to be released back to the pool. Returns null on timeout.
-     * The caller must put the Policy back via {@link #offerPolicy(Policy)} so
-     * {@link #tryAcquirePolicy()} can pick it up in the retried scenario's {@code @Before} hook.
-     */
-    public static Policy waitForPolicy(long timeout, TimeUnit unit) throws InterruptedException {
-        return availablePolicies.poll(timeout, unit);
-    }
-
-    /**
-     * Returns a Policy directly to the pool without touching the ThreadLocal.
-     * Used by {@code PolicyRetryAnalyzer} to put a peeked Policy back before the retry runs.
-     */
-    public static void offerPolicy(Policy policy) {
-        if (policy != null) {
-            availablePolicies.offer(policy);
-        }
-    }
 }

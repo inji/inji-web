@@ -8,13 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.InjiWebUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
 
 public class SunbirdCredentials extends BasePage {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -80,7 +74,7 @@ public class SunbirdCredentials extends BasePage {
 		dobField.sendKeys(formattedDob);
 		dobField.sendKeys(Keys.TAB);
 
-		logStep("Enter date of birth [value: " + formattedDob + "]", By.id("_form_dob"));
+		logStep("Enter date of birth", By.id("_form_dob"));
 	}
 
 	public void clickOnLogin() {

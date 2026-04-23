@@ -102,8 +102,9 @@ public class DeleteWithParam extends InjiWebUtil implements ITest {
 				if (InjiWebConfigManager.isInServiceNotDeployedList("sunbirdrc"))
 					throw new SkipException(GlobalConstants.SERVICE_NOT_DEPLOYED_MESSAGE);
 
-				if (InjiWebConfigManager.getSunbirdBaseURL() != null && !InjiWebConfigManager.getSunbirdBaseURL().isBlank())
-					tempUrl = InjiWebConfigManager.getSunbirdBaseURL();
+				String sunbirdBaseUrl = InjiWebConfigManager.getSunbirdBaseURL();
+				if (sunbirdBaseUrl != null && !sunbirdBaseUrl.isBlank())
+					tempUrl = sunbirdBaseUrl;
 				testCaseDTO.setEndPoint(testCaseDTO.getEndPoint().replace("$SUNBIRDBASEURL$", ""));
 
 

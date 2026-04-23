@@ -68,42 +68,51 @@ public class ExtentReportManager {
 
 	// ✅ NORMAL STEP (NO LOCATOR)
 	public static void logStep(String message) {
-		getTest().info(message);
+		ExtentTest t = getTest();
+		if (t != null) t.info(message);
 	}
 
 	// ✅ STEP LOGGING (clean)
 	public static void logStepWithLocator(String description, String locator) {
+		ExtentTest t = getTest();
+		if (t == null) return;
 
 		String html = description +
 				"<br><details style='margin-left:20px;'>" +
 				"<summary style='cursor:pointer;'>▶ Locator Details</summary>" +
 				"<pre>" + locator + "</pre></details>";
 
-		getTest().info(html);
+		t.info(html);
 	}
 
-	// ✅ WARNING (uses info status to avoid polluting KI/warning bucket)
+	// ✅ WARNING (uses warning status for visual distinction in the report)
 	public static void logWarning(String message) {
-		getTest().warning(message);
+		ExtentTest t = getTest();
+		if (t != null) t.warning(message);
 	}
 
 	// ✅ IGNORED
 	public static void logIgnored(String message) {
-		getTest().info("<span style='color:orange;font-weight:bold;'>IGNORED</span> - " + message);
+		ExtentTest t = getTest();
+		if (t != null) t.info("<span style='color:orange;font-weight:bold;'>IGNORED</span> - " + message);
 	}
 
-	// ✅ KNOWN ISSUE — warning status renders as KNOWN_ISSUE in the report summary
+	// ✅ KNOWN ISSUE — skip status renders as KNOWN_ISSUE in the report summary
 	public static void logKnownIssue(String jiraId, String bugUrl) {
+		ExtentTest t = getTest();
+		if (t == null) return;
 
-		getTest().skip("🟠 KNOWN ISSUE: Test skipped due to a known issue.<br>Refer to Bug ID: "
+		t.skip("🟠 KNOWN ISSUE: Test skipped due to a known issue.<br>Refer to Bug ID: "
 				+ "<a href='" + bugUrl + "' target='_blank'>" + jiraId + "</a>");
 
-		getTest().info("Test is Marked as Known Issue: "
+		t.info("Test is Marked as Known Issue: "
 				+ "<a href='" + bugUrl + "' target='_blank'>" + jiraId + "</a>");
 	}
 
 	// ✅ FAILURE LOGGER
 	public static void logFailure(String stepDesc, String locator, Exception e) {
+		ExtentTest t = getTest();
+		if (t == null) return;
 
 		String html = "FAILED STEP: " + stepDesc +
 				"<br><details style='margin-left:20px;'>" +
@@ -116,10 +125,12 @@ public class ExtentReportManager {
 
 		html += "</pre></details>";
 
-		getTest().fail(html);
+		t.fail(html);
 	}
 
 	public static void logFailure(String message, Exception e) {
+		ExtentTest t = getTest();
+		if (t == null) return;
 
 		String html = "FAILED: " + message;
 
@@ -127,11 +138,12 @@ public class ExtentReportManager {
 			html += "<br><pre>" + e.getMessage() + "</pre>";
 		}
 
-		getTest().fail(html);
+		t.fail(html);
 	}
 
 	public static void logIgnoredScenario(String reason) {
-		getTest().skip("🟡 IGNORED SCENARIO<br>" + reason);
+		ExtentTest t = getTest();
+		if (t != null) t.skip("🟡 IGNORED SCENARIO<br>" + reason);
 	}
 
 	public static synchronized void flushReport() {

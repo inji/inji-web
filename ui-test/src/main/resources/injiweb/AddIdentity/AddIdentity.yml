@@ -31,7 +31,7 @@ AddIdentity:
    InjiWeb_AddIdentity_withValidParameters_smoke_UIN2_Pos:
       endPoint: /idrepository/v1/identity/
       description: Creating a new identity with all valid parameters
-      uniqueIdentifier: TC_InjiWeb_AddIdentity_01
+      uniqueIdentifier: TC_InjiWeb_AddIdentity_02
       role: idrepo
       restMethod: post
       inputTemplate: injiweb/AddIdentity/addIdentity_$LANGNUMBER$
@@ -60,7 +60,7 @@ AddIdentity:
    InjiWeb_AddIdentity_withValidParameters_smoke_UIN3_Pos:
       endPoint: /idrepository/v1/identity/
       description: Creating a new identity with all valid parameters
-      uniqueIdentifier: TC_InjiWeb_AddIdentity_01
+      uniqueIdentifier: TC_InjiWeb_AddIdentity_03
       role: idrepo
       restMethod: post
       inputTemplate: injiweb/AddIdentity/addIdentity_$LANGNUMBER$

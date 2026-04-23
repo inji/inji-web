@@ -8,6 +8,8 @@ public class StepListener implements ConcurrentEventListener {
     @Override
     public void setEventPublisher(EventPublisher publisher) {
 
+        publisher.registerHandlerFor(TestCaseFinished.class, event -> StepContext.clear());
+
         publisher.registerHandlerFor(TestStepStarted.class, event -> {
 
             if (ExtentReportManager.getTest() == null) {
