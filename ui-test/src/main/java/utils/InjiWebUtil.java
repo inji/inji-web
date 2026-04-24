@@ -1,12 +1,12 @@
 package utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 import javax.ws.rs.core.MediaType;
 
@@ -417,6 +417,58 @@ public class InjiWebUtil extends AdminTestUtil {
 
 	private String normalizeDateValue(String dateValue) {
 		return dateValue == null ? "" : dateValue.replaceAll("\\D", "");
+	}
+
+	public static File waitAndDownloadFile(JavascriptExecutor jse,
+	                                       String fileName,
+	                                       int timeoutSeconds,
+	                                       int pollIntervalMillis) throws Exception {
+
+		long startTime = System.currentTimeMillis();
+		String base64EncodedFile = null;
+
+		while ((System.currentTimeMillis() - startTime) < timeoutSeconds * 1000L) {
+
+			// 1️⃣ Check if file exists in BrowserStack VM
+			Object exists = jse.executeScript(
+					"browserstack_executor: {\"action\": \"fileExists\", \"arguments\": {\"fileName\": \"" + fileName + "\"}}"
+			);
+
+			if (exists != null && exists.toString().equalsIgnoreCase("true")) {
+
+				// 2️⃣ (Optional) Get metadata - size, last modified etc.
+				Object properties = jse.executeScript(
+						"browserstack_executor: {\"action\": \"getFileProperties\", \"arguments\": {\"fileName\": \"" + fileName + "\"}}"
+				);
+
+				System.out.println("File properties: " + properties);
+
+				// 3️⃣ Fetch file content as Base64
+				base64EncodedFile = (String) jse.executeScript(
+						"browserstack_executor: {\"action\": \"getFileContent\", \"arguments\": {\"fileName\": \"" + fileName + "\"}}"
+				);
+
+				if (base64EncodedFile != null && !base64EncodedFile.isEmpty()) {
+					break;
+				}
+			}
+
+			Thread.sleep(pollIntervalMillis);
+		}
+
+		if (base64EncodedFile == null) {
+			throw new RuntimeException("❌ File not downloaded within timeout: " + fileName);
+		}
+
+		// 4️⃣ Convert Base64 → File
+		byte[] data = Base64.getDecoder().decode(base64EncodedFile);
+		File file = new File(System.getProperty("user.dir"), fileName);
+
+		try (OutputStream stream = new FileOutputStream(file)) {
+			stream.write(data);
+		}
+
+		return file;
 	}
 
 }

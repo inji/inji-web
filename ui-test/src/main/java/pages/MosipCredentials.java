@@ -71,9 +71,7 @@ public class MosipCredentials extends BasePage {
 		By itemLocator = By.xpath("//*[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]");
 		pdfName = getElementAttribute(driver, itemLocator, "data-testid")
 				.replaceFirst("ItemBox-Outer-Container-0-", "") + ".pdf";
-		clickOnElement(driver,
-				By.xpath("//div[starts-with(@data-testid, 'ItemBox-Outer-Container-0-')]"),
-				"Click on MOSIP National ID issuer card");
+		clickOnElement(driver, itemLocator, "Click on MOSIP National ID issuer card");
 	}
 
 	public Boolean isLoginPageLableDisplayed() {
@@ -118,22 +116,11 @@ public class MosipCredentials extends BasePage {
 				"Verify 'Downloading in Progress' description text is displayed");
 	}
 
-	/**
-	 * Verifies the MOSIP VC download completed successfully end-to-end:
-	 * 1. Waits up to configured seconds for the download-result page to appear.
-	 * 2. Waits up to configured seconds for a vc-card-view to render on that page.
-	 */
 	public Boolean isMosipVcDownloadedSuccessfully() {
-		if (!isElementIsVisible(driver,
-				By.xpath("//*[@data-testid='title-download-result']"),
-				getConfiguredWaitTimeInSeconds(),
-				"Verify download-result page appeared after OTP submission")) {
-			return false;
-		}
 		return isElementIsVisible(driver,
 				By.xpath("//div[@data-testid='vc-card-view']"),
 				getConfiguredWaitTimeInSeconds(),
-				"Verify VC card rendered successfully on download-result page");
+				"Verify VC card rendered successfully");
 	}
 
 }

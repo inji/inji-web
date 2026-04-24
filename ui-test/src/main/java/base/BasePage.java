@@ -283,8 +283,17 @@ public class BasePage {
 		ExpectedCondition<?>[] conditions = Arrays.stream(locators)
 				.map(ExpectedConditions::visibilityOfElementLocated)
 				.toArray(ExpectedCondition[]::new);
-		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
-				.until(ExpectedConditions.or(conditions));
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.or(conditions));
+		} catch (TimeoutException te) {
+			ExtentReportManager.logFailure(
+					"None of the locators became visible: " + Arrays.toString(locators),
+					Arrays.toString(locators),
+					te);
+			BaseTest.markScenarioFailed();
+			throw te;
+		}
 		for (By locator : locators) {
 			try {
 				WebElement el = driver.findElement(locator);

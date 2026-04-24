@@ -17,6 +17,7 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.ExtentTest;
 
 import utils.InjiWebConfigManager;
+import utils.InjiWebUtil;
 import utils.testdatamanager.PolicyManager;
 
 import java.io.IOException;
@@ -126,24 +127,16 @@ public class StepDefSunbirdCredentials {
 	}
 
 	@Then("User verify pdf is downloaded for Insurance")
-	public String user_verify_pdf_is_downloaded_for_insurance() throws IOException {
+	public String user_verify_pdf_is_downloaded_for_insurance() throws Exception {
 		String pdfName = sunbirdCredentials.pdfNameInsurance;
 		File pdfFile;
 		if (BaseTest.isBrowserStackRunEnabled()) {
-			baseTest.getJse().executeScript(
-					"browserstack_executor: {\"action\": \"fileExists\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
-
-			baseTest.getJse().executeScript(
-					"browserstack_executor: {\"action\": \"getFileProperties\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
-
-			String base64EncodedFile = (String) baseTest.getJse().executeScript(
-					"browserstack_executor: {\"action\": \"getFileContent\", \"arguments\": {\"fileName\": \"" + pdfName + "\"}}");
-
-			byte[] data = Base64.getDecoder().decode(base64EncodedFile);
-			OutputStream stream = new FileOutputStream(pdfName);
-			stream.write(data);
-			stream.close();
-			pdfFile = new File(System.getProperty("user.dir"), pdfName);
+			pdfFile = InjiWebUtil.waitAndDownloadFile(
+					baseTest.getJse(),
+					pdfName,
+					BasePage.getConfiguredWaitTimeInSeconds(),     // timeout seconds
+					2000    // polling interval
+			);
 		} else {
 			pdfFile = waitForDownloadedFile(pdfName, BasePage.getConfiguredWaitTimeInSeconds());
 		}
@@ -151,8 +144,7 @@ public class StepDefSunbirdCredentials {
 		PDDocument document = PDDocument.load(pdfFile);
 
 		PDFTextStripper stripper = new PDFTextStripper();
-		String text = stripper.getText(document);
-		return text;
+		return stripper.getText(document);
 	}
 
 	private File waitForDownloadedFile(String fileName, int timeoutSeconds) {

@@ -685,26 +685,29 @@ public class BaseTest {
                 + skippedCount.get() + "-I-" + ignoredCount.get() + "-KI-" + knownIssueCount.get() + ".html";
         File newReportFile = new File(System.getProperty("user.dir") + "/test-output/" + newFileName);
 
-		logger.info("Attempting to rename report file...");
-		logger.info("Original: {}", originalReportFile.getAbsolutePath());
-		logger.info("Target: {}", newReportFile.getAbsolutePath());
+        logger.info("Attempting to rename report file...");
+        logger.info("Original: {}", originalReportFile.getAbsolutePath());
+        logger.info("Target: {}", newReportFile.getAbsolutePath());
 
-        if (originalReportFile.renameTo(newReportFile)) {
-			logger.info("Report renamed to: {}", newFileName);
+        boolean renamed = originalReportFile.renameTo(newReportFile);
+        if (renamed) {
+            logger.info("Report renamed to: {}", newFileName);
         } else {
-			logger.info("Failed to rename the report file.");
+            logger.warn("Failed to rename the report file; will upload the original instead.");
         }
+        File fileToUpload = renamed ? newReportFile : originalReportFile;
+        String uploadName = renamed ? newFileName : originalFileName;
 
-        if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
+        if ("yes".equalsIgnoreCase(ConfigManager.getPushReportsToS3())) {
             S3Adapter s3Adapter = new S3Adapter();
             boolean isStoreSuccess = false;
             try {
-                isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "", null, null, newFileName,
-                        newReportFile);
-				logger.info("isStoreSuccess:: {}", isStoreSuccess);
+                isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "", null, null, uploadName,
+                        fileToUpload);
+                logger.info("isStoreSuccess:: {}", isStoreSuccess);
             } catch (Exception e) {
-				logger.info("Error occurred while pushing the object: {}", e.getLocalizedMessage());
-				logger.info(e.getMessage());
+                logger.info("Error occurred while pushing the object: {}", e.getLocalizedMessage());
+                logger.info(e.getMessage());
             }
         }
     }
