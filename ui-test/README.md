@@ -113,7 +113,7 @@ mvn clean package
 6. Execute the test suite using the following command. Update the JAR version and environment details as required.
 
 ```bash
-java -Denv.user=api-internal.released -Denv.endpoint=https://api-internal.released.mosip.net -Denv.testLevel=smokeAndRegression -jar target/uitest-injiweb-0.17.0-SNAPSHOT.jar
+java -Denv.user=api-internal.released -Denv.endpoint=https://api-internal.released.mosip.net -Denv.testLevel=smokeAndRegression -jar target/uitest-injiweb-0.17.0.jar
 ```
 
 ---
