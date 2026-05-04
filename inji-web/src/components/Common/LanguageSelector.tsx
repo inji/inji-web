@@ -15,8 +15,8 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
     const [isOpen, setIsOpen] = useState(false);
 
 
-    const handleChange = (lang: string) => {
-    switchLanguage(lang);
+    const handleChange = async (lang: string) => {
+    await switchLanguage(lang);
     dispatch(storeLanguage(lang));
     setIsOpen(false);
 }
