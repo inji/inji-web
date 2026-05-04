@@ -14,20 +14,20 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
     language = language ?? window._env_.DEFAULT_LANG;
     const [isOpen, setIsOpen] = useState(false);
 
-    interface DropdownItem {
-        label: string;
-        value: string;
-    }
 
-    const handleChange = (item: DropdownItem) => {
-        setIsOpen(false);
-        switchLanguage(item.value);
-        dispatch(storeLanguage(item.value));
-    }
+    const handleChange = async (lang: string) => {
+    await switchLanguage(lang);
+    dispatch(storeLanguage(lang));
+    setIsOpen(false);
+}
 
     return <div className={"flex flex-row justify-center items-center"}
                 data-testid={testId ?? "LanguageSelector-Outer-Div"} 
-                onBlur={()=>setIsOpen(false)}
+                onBlur={(e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+        setIsOpen(false);
+    }
+}}
                 tabIndex={0}
                 role="button">
         
@@ -37,7 +37,10 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
                 type="button"
                 className="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none"
                 data-testid={"Language-Selector-Button"}
-                onMouseDown={() => setIsOpen(open => !isOpen)}>
+               onMouseDown={(e) => {
+    e.stopPropagation();
+    setIsOpen(open => !open);
+}}>
             
                 <GradientWrapper>
                     <VscGlobe
@@ -65,7 +68,11 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
                                         ${language === item.value
                                         ? "bg-iw-dropdownActiveBg text-iw-primary font-semibold"
                                         : "text-iw-dropdownText hover:bg-iw-dropdownActiveBg hover:text-iw-primary"} transition-colors`}
-                                    onMouseDown={(event) => {event.stopPropagation();handleChange(item)}}>
+                                    onClick={(event) => {
+    event.stopPropagation();
+    handleChange(item.value);
+}}
+>
                                     {language === item.value ? <span className="text-iw-primary font-semibold">{item.label}</span> : item.label}
                                     {language === item.value && <FaCheck className="text-iw-primary" /> }
                                 </button>
