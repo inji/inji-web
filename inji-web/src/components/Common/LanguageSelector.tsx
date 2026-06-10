@@ -27,7 +27,13 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
 
     return <div className={"flex flex-row justify-center items-center"}
                 data-testid={testId ?? "LanguageSelector-Outer-Div"} 
-                onBlur={()=>setIsOpen(false)}
+                onBlur={(e)=>{
+                    // relatedTarget = where focus is going. If it's still inside this
+                    // component, don't close — only close when focus truly leaves.
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                        setIsOpen(false);
+                    }
+                }}
                 tabIndex={0}
                 role="button">
         

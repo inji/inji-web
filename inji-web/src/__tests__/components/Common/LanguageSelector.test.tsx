@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, within } from '@testing-library/react';
 import { LanguageSelector } from '../../../components/Common/LanguageSelector';
 import { mockCrypto, renderWithProvider } from '../../../test-utils/mockUtils'; // Import from mockutils
 
@@ -23,13 +23,12 @@ describe("Testing the Functionality of Language Selector", () => {
         expect(screen.queryByTestId("Language-Selector-DropDown-Item-en")).not.toBeInTheDocument();
     });
 
-    // test('check if language changes on selection', () => {
-    //     renderWithProvider(<LanguageSelector />);
-    //     const button = screen.getByTestId("Language-Selector-Button");
-    //     fireEvent.mouseDown(button);
-    //     const dropdownItem = screen.getByTestId("Language-Selector-DropDown-Item-fr");
-    //     fireEvent.mouseDown(dropdownItem);
-    //     const selectedLanguage = screen.getByTestId("Language-Selector-Selected-DropDown-fr");
-    //     expect(selectedLanguage).toHaveTextContent("Français");
-    // });
+    test('Check if language changes on selection', () => {
+        renderWithProvider(<LanguageSelector />);
+        const button = screen.getByTestId("Language-Selector-Button");
+        fireEvent.mouseDown(button); // open dropdown
+        const dropdownItem = screen.getByTestId("Language-Selector-DropDown-Item-fr");
+        fireEvent.mouseDown(within(dropdownItem).getByRole("button")); // click the actual <button> inside the <li>
+        expect(screen.getByTestId("Language-Selector-Button")).toHaveTextContent("Français");
+    });
 });
