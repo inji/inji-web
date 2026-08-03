@@ -38,9 +38,12 @@ describe("Testing Header Container Functionality", () => {
         // Check Logo
         expect(screen.getByTestId("Header-InjiWeb-Logo")).toBeInTheDocument();
         
+        // Check About Platform
+        expect(screen.getByTestId("Header-Menu-AboutPlatform")).toBeInTheDocument();
+
         // Check FAQ
         expect(screen.getByTestId("Header-Menu-FAQ")).toBeInTheDocument();
-        
+
         // Check Language Selector
         expect(screen.getByTestId("Header-Menu-LanguageSelector")).toBeInTheDocument();
     });
@@ -52,11 +55,11 @@ describe("Testing Header Container Functionality", () => {
         expect(headerContainer.children.length).toBe(2);
     });
 
-    // Should match FAQ and Language-Selector Containers.
+    // Should match About Platform, FAQ and Language-Selector Containers.
     test('Check the length of FAQ-LanguageSelector container elements', () => {
         const headerContainer = screen.getByTestId("Header-FAQ-LanguageSelector-Container");
 
-        expect(headerContainer.children.length).toBe(2);
+        expect(headerContainer.children.length).toBe(3);
     });
 
     // Should match Logo and Hamburger menu.

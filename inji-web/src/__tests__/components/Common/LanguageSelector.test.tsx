@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent, within } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { LanguageSelector } from '../../../components/Common/LanguageSelector';
 import { mockCrypto, renderWithProvider } from '../../../test-utils/mockUtils'; // Import from mockutils
 
@@ -13,22 +13,21 @@ describe("Testing the Layout of Language Selector", () => {
 });
 
 describe("Testing the Functionality of Language Selector", () => {
-    test('Check if dropdown opens and closes', () => {
+    test('Check if modal opens on button click and closes on backdrop click', () => {
         renderWithProvider(<LanguageSelector />);
         const button = screen.getByTestId("Language-Selector-Button");
-        fireEvent.mouseDown(button);
-        const dropdownItem = screen.getByTestId("Language-Selector-DropDown-Item-en");
-        expect(dropdownItem).toBeInTheDocument();
-        fireEvent.mouseDown(button);
-        expect(screen.queryByTestId("Language-Selector-DropDown-Item-en")).not.toBeInTheDocument();
+        fireEvent.click(button);
+        expect(screen.getByTestId("Language-Selector-Modal")).toBeInTheDocument();
+        expect(screen.getByTestId("Language-Selector-Modal-Item-en")).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId("Language-Selector-Modal"));
+        expect(screen.queryByTestId("Language-Selector-Modal")).not.toBeInTheDocument();
     });
 
     test('Check if language changes on selection', () => {
         renderWithProvider(<LanguageSelector />);
-        const button = screen.getByTestId("Language-Selector-Button");
-        fireEvent.mouseDown(button); // open dropdown
-        const dropdownItem = screen.getByTestId("Language-Selector-DropDown-Item-fr");
-        fireEvent.mouseDown(within(dropdownItem).getByRole("button")); // click the actual <button> inside the <li>
+        fireEvent.click(screen.getByTestId("Language-Selector-Button"));
+        fireEvent.click(screen.getByTestId("Language-Selector-Modal-Item-fr"));
+        expect(screen.queryByTestId("Language-Selector-Modal")).not.toBeInTheDocument();
         expect(screen.getByTestId("Language-Selector-Button")).toHaveTextContent("Français");
     });
 });

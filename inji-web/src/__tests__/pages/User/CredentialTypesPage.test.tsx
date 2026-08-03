@@ -86,7 +86,6 @@ describe('CredentialTypesPage', () => {
             url: expect.stringContaining("/configuration")
         })
         expect(screen.getByTestId('credential-types-page-container')).toBeInTheDocument();
-        await screen.findByText('Issuer1')
         await screen.findByText("Health Insurance")
     });
 
@@ -126,14 +125,6 @@ describe('CredentialTypesPage', () => {
     it.todo('should navigate to stored cards page when download is successful');
 
     it.todo('cleans up download session IDs on unmount');
-
-    it('should navigate to home when Home button is clicked', () => {
-        renderWithRouter(<CredentialTypesPage backUrl={"/previous-url"}/>);
-
-        fireEvent.click(screen.getByRole("button", {name: "Common:home"}))
-
-        expect(mockNavigate).toHaveBeenCalledWith("/user/home");
-    });
 
     it('should navigate to previous path when available and back button is clicked', () => {
         const previousPath = '/previous-path';

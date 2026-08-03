@@ -10,10 +10,12 @@ import {CredentialConfigurationObject} from "../../types/data";
 
 type SearchCredentialProps = {
     issuerContainerBorderRadius?: string;
+    fullWidth?: boolean;
 }
 
 export const SearchCredential: React.FC<SearchCredentialProps> = ({
-    issuerContainerBorderRadius
+    issuerContainerBorderRadius,
+    fullWidth = false
 }) => {
     const {t} = useTranslation("CredentialsPage");
     const dispatch = useDispatch();
@@ -49,13 +51,15 @@ export const SearchCredential: React.FC<SearchCredentialProps> = ({
     return (
         <div
             className={
-                "flex items-center w-full justify-start sm:justify-end my-5 sm:my-0"
+                fullWidth
+                    ? "flex items-center w-full justify-center my-5 sm:my-0"
+                    : "flex items-center w-full justify-start sm:justify-end my-5 sm:my-0"
             }
             data-testid="NavBar-Search-Container"
         >
             <div
                 data-testid="Search-Issuer-Container"
-                className={`gradient-outline-input w-full sm:w-96 flex justify-center items-center bg-iw-background shadow-iw ${issuerContainerBorderRadius}`}
+                className={`gradient-outline-input ${fullWidth ? "w-full md:w-3/4" : "w-full sm:w-96"} flex justify-center items-center bg-iw-background shadow-iw ${issuerContainerBorderRadius}`}
             >
                 <FaSearch
                     data-testid="NavBar-Search-Icon"

@@ -4,6 +4,7 @@ import '../../index.css';
 import {useTranslation} from "react-i18next";
 import {BorderedButton} from "../Common/Buttons/BorderedButton";
 import {GoogleSignInButton} from "../Common/Buttons/GoogleSignInButton";
+import {ThirdPartyRedirectModal} from "./ThirdPartyRedirectModal";
 
 interface LoginProps {
   isOpenIdVpLogin?: boolean;
@@ -13,9 +14,15 @@ export const Login: React.FC<LoginProps> = ({ isOpenIdVpLogin = false }) => {
   const { t } = useTranslation("HomePage");
   const navigate = useNavigate();
   const [guestClicked, setGuestClicked] = useState(false);
+  const [showThirdPartyAlert, setShowThirdPartyAlert] = useState(false);
+  const [isRedirectingToGoogle, setIsRedirectingToGoogle] = useState(false);
   const location = useLocation();
 
-  const handleGoogleLogin = () => {
+  // Warn about the language hand-off first; the redirect happens on confirm.
+  const handleGoogleLogin = () => setShowThirdPartyAlert(true);
+
+  const redirectToGoogle = () => {
+      setIsRedirectingToGoogle(true);
       // Use replace() instead of href to prevent adding Google IdP to browser history
       // This way, pressing back won't navigate to Google's OAuth page
       window.location.replace(`${window._env_.MIMOTO_URL}/oauth2/authorize/google`);
@@ -56,12 +63,21 @@ export const Login: React.FC<LoginProps> = ({ isOpenIdVpLogin = false }) => {
           {t(isOpenIdVpLogin ? "Login.loginNoteOVP" : "Login.loginNote")}
         </div >
 
-        <GoogleSignInButton handleGoogleLogin={handleGoogleLogin} loadingText={t("Login.loggingIn")} text={t("Login.loginGoogle")}/>
+        <GoogleSignInButton handleGoogleLogin={handleGoogleLogin} isLoading={isRedirectingToGoogle} loadingText={t("Login.loggingIn")} text={t("Login.loginGoogle")}/>
+
+        {showThirdPartyAlert && (
+          <ThirdPartyRedirectModal
+            onContinue={redirectToGoogle}
+            onClose={() => setShowThirdPartyAlert(false)}
+          />
+        )}
 
         {!isOpenIdVpLogin && (
           <>
             <Separator/>
-            <div className="w-full">
+            {/* Tour spotlight anchor: the inner button only wraps its text, so the
+                tour highlights this full-width container instead. */}
+            <div className="w-full" data-testid="home-banner-guest-login-container">
               <BorderedButton
                   testId="home-banner-guest-login"
                   onClick={handleGuestLogin}

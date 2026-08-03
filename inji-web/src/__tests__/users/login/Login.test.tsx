@@ -79,7 +79,7 @@ describe("Login Page Tests", () => {
     );
   });
 
-  test("Google login button redirects to Google OAuth URL", () => {
+  const mockLocationReplace = () => {
     (window as any)._env_ = {
       MIMOTO_URL: "https://example.com",
     };
@@ -93,11 +93,41 @@ describe("Login Page Tests", () => {
       writable: true,
     });
 
+    return replaceMock;
+  };
+
+  test("Google login button shows the third party alert instead of redirecting immediately", () => {
+    const replaceMock = mockLocationReplace();
+
     render(<MemoryRouter><Login /></MemoryRouter>);
 
-    const googleButton = screen.getByTestId("google-login-button");
-    fireEvent.click(googleButton);
+    fireEvent.click(screen.getByTestId("google-login-button"));
+
+    expect(screen.getByTestId("third-party-redirect-modal")).toBeInTheDocument();
+    expect(replaceMock).not.toHaveBeenCalled();
+  });
+
+  test("Continuing from the third party alert redirects to Google OAuth URL", () => {
+    const replaceMock = mockLocationReplace();
+
+    render(<MemoryRouter><Login /></MemoryRouter>);
+
+    fireEvent.click(screen.getByTestId("google-login-button"));
+    fireEvent.click(screen.getByTestId("third-party-redirect-modal-continue"));
 
     expect(replaceMock).toHaveBeenCalledWith("https://example.com/oauth2/authorize/google");
+  });
+
+  test("Dismissing the third party alert cancels the redirect and re-enables the button", () => {
+    const replaceMock = mockLocationReplace();
+
+    render(<MemoryRouter><Login /></MemoryRouter>);
+
+    fireEvent.click(screen.getByTestId("google-login-button"));
+    fireEvent.keyDown(document, {key: "Escape"});
+
+    expect(screen.queryByTestId("third-party-redirect-modal")).not.toBeInTheDocument();
+    expect(replaceMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId("google-login-button")).not.toBeDisabled();
   });
 });

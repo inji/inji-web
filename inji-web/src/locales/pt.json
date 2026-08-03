@@ -76,6 +76,34 @@
       "failureMessage": "Falha no login",
       "failureDescription": "Sua tentativa de login falhou. Verifique suas credenciais e tente novamente",
       "retry": "Tentar novamente"
+    },
+    "Tour": {
+      "counter": "{{current}} de {{total}}",
+      "skip": "Pular",
+      "next": "Avançar",
+      "finish": "Concluir",
+      "previous": "Voltar",
+      "steps": {
+        "language": {
+          "title": "Configuração de idioma",
+          "subTitle": "Selecione o idioma de sua preferência para sua experiência.",
+          "heading": "O que é a configuração de idioma?",
+          "description": "As configurações de idioma permitem personalizar a interface para exibir o conteúdo no idioma de sua preferência. Essa configuração será aplicada a toda a sua experiência nesta plataforma."
+        },
+        "google": {
+          "title": "Entrar com a conta do Google",
+          "description": "Ao clicar em \"Continuar com o Google\", você será redirecionado para a plataforma de autenticação do Google para entrar com sua conta do Google. Isso oferece uma forma segura e prática de acessar sua carteira."
+        },
+        "guest": {
+          "title": "Entrar como convidado",
+          "description": "Ao clicar em \"Continuar como convidado\", você pode acessar a carteira sem fazer login. Essa opção é ideal se você quiser explorar os recursos sem criar uma conta."
+        }
+      }
+    },
+    "ThirdPartyRedirectModal": {
+      "title": "Alerta importante !",
+      "description": "Quaisquer alterações de idioma feitas aqui não serão transferidas para a plataforma terceirizada do Google durante o processo de autenticação e login.",
+      "continue": "Continuar"
     }
   },
   "Layout": {
@@ -145,9 +173,15 @@
       "subTitle": "Baixe e compartilhe suas credenciais com segurança instantaneamente.",
       "searchText": "Pesquisar emissores por nome"
     },
-    "emptyContainerContent": "Nenhum emissor encontrado. Atualize a janela do navegador ou tente novamente mais tarde",
+    "emptyContainerContent": "Nenhum emissor encontrado.",
+    "emptyContainerSubContent": "Atualize a janela do navegador ou tente novamente mais tarde",
     "containerHeading": "Lista de emissores",
     "containerSubHeading": "Pesquise seu emissor confiável e escolha um tipo de credencial na próxima etapa.",
+    "back": "Voltar",
+    "heroSubtitle1": "Pesquise seu cartão e",
+    "heroSubtitle2": "escolha os cartões",
+    "heroSubtitle3": "que deseja baixar na próxima etapa!",
+    "searchPlaceholder": "Pesquisar emissor (ex.: Nome 1, Nome 2, Nome 3)",
     "errorContent": "O serviço não está disponível no momento. Tente novamente mais tarde.",
     "searchIssuer": {
       "helpText": {
@@ -158,7 +192,8 @@
   },
   "CredentialsPage": {
     "searchText": "Pesquisar tipo de credencial",
-    "emptyContainerContent": "Nenhuma credencial encontrada. Atualize a janela do navegador ou tente novamente mais tarde",
+    "emptyContainerContent": "Nenhuma credencial encontrada.",
+    "emptyContainerSubContent": "Atualize a janela do navegador ou tente novamente mais tarde",
     "containerHeading": "Lista de tipos de credenciais",
     "containerSubHeading": "Escolha uma credencial e confirme sua identidade na próxima etapa.",
     "errorContent": "O serviço não está disponível no momento. Tente novamente mais tarde.",
@@ -409,7 +444,18 @@
   "User": {
     "Home": {
       "title": "Lar",
-      "welcome": "Bem-vindo"
+      "welcome": "Bem-vindo",
+      "subtitle": "Acesse seus cartões verificáveis",
+      "subtitle2": "com facilidade!",
+      "addCard": "Adicionar cartão",
+      "search": {
+        "placeholder": "Pesquise seus documentos por nome",
+        "noResults": "Nenhum cartão corresponde à sua pesquisa."
+      },
+      "emptyScreen": {
+        "title": "Nenhum cartão adicionado",
+        "message": "Adicione seu primeiro cartão para começar a usar sua carteira digital."
+      }
     },
     "ProfileDropdown": {
       "profile": "Perfil",
@@ -461,6 +507,7 @@
   "Common": {
     "home": "Lar",
     "goToHome": "Ir para a página inicial",
+    "tryAgain": "Tentar novamente",
     "confirm": "Confirmar",
     "cancel": "Cancelar",
     "error": {
@@ -557,9 +604,50 @@
     "goToHomeButton": "Volte"
   },
   "LogoutConfirmation": {
-    "title": "Tem certeza de que deseja sair?",
-    "message": "Se você voltar agora, será desconectado e precisará fazer login novamente para continuar.",
+    "title": "Sair da Inji Wallet?",
+    "message": "Voltar agora fará com que você seja desconectado. Você precisará fazer login novamente para continuar. Tem certeza de que deseja sair?",
     "logoutButton": "Sim, Sair",
     "stayButton": "Fique nesta página"
+  },
+  "AboutPlatform": {
+    "button": "Sobre a plataforma",
+    "hero": {
+      "title": "Sua identidade digital, simplificada",
+      "subTitle": "Armazene, gerencie e compartilhe suas credenciais verificadas com segurança — tudo em um só lugar.",
+      "highlights": {
+        "encryption": "Criptografia de nível bancário",
+        "offline": "Funciona offline",
+        "ownership": "Você controla seus dados"
+      },
+      "compatibility": {
+        "label": "Compatibilidade",
+        "title": "Exemplos de tipos de credenciais suportados",
+        "types": {
+          "nationalIds": "Documentos de identidade",
+          "driversLicenses": "Carteiras de motorista",
+          "professionalLicenses": "Licenças profissionais",
+          "passports": "Passaportes",
+          "insuranceCards": "Cartões de seguro",
+          "diplomas": "Diplomas e graus"
+        }
+      }
+    },
+    "howItWorks": {
+      "label": "Como funciona",
+      "steps": {
+        "receive": {
+          "title": "Receber cartões",
+          "description": "Emissores confiáveis como governos, universidades e empregadores entregam credenciais verificadas diretamente na sua wallet. Sem entrada manual, sem papelada."
+        },
+        "store": {
+          "title": "Armazenar com segurança",
+          "description": "Todas as credenciais são criptografadas de ponta a ponta e armazenadas localmente. Somente você tem as chaves! Nenhum terceiro pode acessar ou modificar seus cartões."
+        },
+        "share": {
+          "title": "Compartilhar e verificar",
+          "description": "Apresente credenciais por código QR ou compartilhamento direto. Os verificadores confirmam a autenticidade criptograficamente, sem necessidade de contato com o emissor, e funciona offline."
+        }
+      }
+    }
   }
 }

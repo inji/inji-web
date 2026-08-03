@@ -7,7 +7,7 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: { [key: string]: string } = {
-        'title': 'Are you sure you want to exit?',
+        'title': 'Exit Inji Wallet?',
         'message': 'Going back now will log you out. You\'ll need to Log in again to continue. Are you sure you want to exit?',
         'logoutButton': 'Yes, Log Out',
         'stayButton': 'Stay On This Page',
@@ -58,7 +58,7 @@ describe('LogoutConfirmationModal', () => {
       render(<LogoutConfirmationModal {...defaultProps} />);
       
       expect(screen.getByTestId('modal-logout-confirmation')).toBeInTheDocument();
-      expect(screen.getByTestId('title-logout-confirmation')).toHaveTextContent('Are you sure you want to exit?');
+      expect(screen.getByTestId('title-logout-confirmation')).toHaveTextContent('Exit Inji Wallet?');
       expect(screen.getByTestId('text-logout-confirmation')).toHaveTextContent(
         'Going back now will log you out. You\'ll need to Log in again to continue. Are you sure you want to exit?'
       );

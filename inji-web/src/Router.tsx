@@ -17,7 +17,6 @@ import LoginSessionStatusChecker from './components/Common/LoginSessionStatusChe
 import { PasscodePage } from './pages/User/Passcode/PasscodePage';
 import { Layout } from './components/User/Layout';
 import { HomePage as DashboardHomePage } from './pages/User/Home/HomePage';
-import { StoredCardsPage } from './pages/User/StoredCards/StoredCardsPage';
 import { useUser } from './hooks/User/useUser';
 import { CredentialTypesPage } from './pages/User/CredentialTypes/CredentialTypesPage';
 import { ResetPasscodePage } from './pages/User/ResetPasscode/ResetPasscodePage';
@@ -132,15 +131,17 @@ export const AppRouter = () => {
                     <Route path={Pages.AUTHORIZE} element={wrapElement(<VPAuthorizationPage />)} />
                     <Route element={<Layout />}>
 
-                        <Route path={Pages.ISSUERS} element={<RedirectToUserHome />} />
+                        {/* "Add Card" destination: issuer selection for downloading a new card */}
+                        <Route path={Pages.ISSUERS} element={<IssuersPage variant="dashboard" />} />
                         <Route path={Pages.HOME} element={<DashboardHomePage />} />
                         <Route
                             path={Pages.ISSUER_TEMPLATE}
                             element={
-                                <CredentialTypesPage backUrl={ROUTES.USER_HOME} />
+                                <CredentialTypesPage backUrl={ROUTES.USER_ISSUERS} />
                             }
                         />
-                        <Route path={Pages.CREDENTIALS} element={<StoredCardsPage />} />
+                        {/* Stored Cards was merged into Home; keep old links working */}
+                        <Route path={Pages.CREDENTIALS} element={<RedirectToUserHome />} />
                         <Route path={Pages.PROFILE} element={<ProfilePage />} />
                         <Route path={Pages.FAQ} element={<FAQPage withHome={true} />} />
                     </Route>

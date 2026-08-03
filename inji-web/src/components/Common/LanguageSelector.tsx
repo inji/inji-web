@@ -1,50 +1,39 @@
 import React, {useState} from "react";
+import ReactDOM from "react-dom";
 import {VscGlobe} from "react-icons/vsc";
-import {isRTL, LanguagesSupported, switchLanguage} from "../../utils/i18n";
+import {useTranslation} from "react-i18next";
+import {LanguagesSupported, switchLanguage} from "../../utils/i18n";
 import {useDispatch, useSelector} from "react-redux";
 import {storeLanguage} from "../../redux/reducers/commonReducer";
 import {RootState} from "../../types/redux";
-import {FaCheck} from "react-icons/fa6";
+import {LanguageObject} from "../../types/data";
 import {GradientWrapper} from './GradientWrapper';
+import {Clickable} from './Clickable';
 import DropdownArrowIcon from './DropdownArrowIcon';
 
 export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-testid": testId }) => {
     const dispatch = useDispatch();
+    const {t} = useTranslation('LanguageSelector');
     let language = useSelector((state: RootState) => state.common.language);
     language = language ?? window._env_.DEFAULT_LANG;
     const [isOpen, setIsOpen] = useState(false);
 
-    interface DropdownItem {
-        label: string;
-        value: string;
-    }
-
-    const handleChange = (item: DropdownItem) => {
+    const handleChange = (item: LanguageObject) => {
         setIsOpen(false);
         switchLanguage(item.value);
         dispatch(storeLanguage(item.value));
     }
 
     return <div className={"flex flex-row justify-center items-center"}
-                data-testid={testId ?? "LanguageSelector-Outer-Div"} 
-                onBlur={(e)=>{
-                    // relatedTarget = where focus is going. If it's still inside this
-                    // component, don't close — only close when focus truly leaves.
-                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                        setIsOpen(false);
-                    }
-                }}
-                tabIndex={0}
-                role="button">
-        
+                data-testid={testId ?? "LanguageSelector-Outer-Div"}>
 
-        <div className="relative inline-block ms-1 ml-3">
+        <div className="inline-block ms-1 ml-3">
             <button
                 type="button"
                 className="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none"
                 data-testid={"Language-Selector-Button"}
-                onMouseDown={() => setIsOpen(open => !isOpen)}>
-            
+                onClick={() => setIsOpen(true)}>
+
                 <GradientWrapper>
                     <VscGlobe
                     data-testid="Language-Selector-Icon"
@@ -55,31 +44,64 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
                         {LanguagesSupported.find(lang => lang.value === language)?.label}
                 </span>
                 <DropdownArrowIcon isOpen={isOpen} />
-            
-            </button>
 
-            {isOpen && (
-                <div
-                    className={`absolute w-60 z-40 ${isRTL(language) ? "left-0" : "right-0"} mt-2 rounded-xl shadow-lg bg-iw-background overflow-hidden font-normal border border-gray-200`}>
-                    <ul className="py-1">
-                        {LanguagesSupported.map((item) => (
-                            <li key={item.value}
-                                data-testid={`Language-Selector-DropDown-Item-${item.value}`}>
-                                <button
-                                    type="button"
-                                    className={`w-full px-4 py-3 text-left text-sm flex items-center justify-between flex-row
-                                        ${language === item.value
-                                        ? "bg-iw-dropdownActiveBg text-iw-primary font-semibold"
-                                        : "text-iw-dropdownText hover:bg-iw-dropdownActiveBg hover:text-iw-primary"} transition-colors`}
-                                    onMouseDown={(event) => {event.stopPropagation();handleChange(item)}}>
-                                    {language === item.value ? <span className="text-iw-primary font-semibold">{item.label}</span> : item.label}
-                                    {language === item.value && <FaCheck className="text-iw-primary" /> }
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
+            </button>
         </div>
+
+        {isOpen && ReactDOM.createPortal(
+            <Clickable
+                className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex justify-center items-center p-4"
+                onClick={() => setIsOpen(false)}
+                testId="Language-Selector-Modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="Language-Selector-Modal-Title">
+                <div
+                    className="bg-iw-background rounded-2xl shadow-2xl w-full max-w-[640px] max-h-[90vh] overflow-y-auto p-6 sm:p-10"
+                    onClick={(event) => event.stopPropagation()}>
+
+                    <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
+                        <GradientWrapper>
+                            <VscGlobe size={48} color={'var(--iw-color-languageGlobeIcon)'} />
+                        </GradientWrapper>
+                        <h2
+                            id="Language-Selector-Modal-Title"
+                            data-testid="Language-Selector-Modal-Title"
+                            className="mt-4 text-[20px] sm:text-[24px] font-semibold text-iw-title font-montserrat">
+                            {t('title')}
+                        </h2>
+                        <p className="mt-1 text-[14px] sm:text-[16px] text-iw-dropdownText font-montserrat font-light">
+                            {t('subTitle')}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                        {LanguagesSupported.map((item) => {
+                            const isSelected = language === item.value;
+                            return (
+                                <button
+                                    key={item.value}
+                                    type="button"
+                                    data-testid={`Language-Selector-Modal-Item-${item.value}`}
+                                    aria-pressed={isSelected}
+                                    onClick={() => handleChange(item)}
+                                    className={`flex flex-col items-center justify-center text-center rounded-xl border px-3 py-5 sm:py-6 transition-colors
+                                        ${isSelected
+                                        ? "border-iw-primary bg-iw-dropdownActiveBg text-iw-primary"
+                                        : "border-gray-200 text-iw-dropdownText hover:border-iw-primary hover:bg-iw-dropdownActiveBg hover:text-iw-primary"}`}>
+                                    <span className="font-semibold text-[16px] sm:text-[18px]">{item.label}</span>
+                                    {item.englishName && (
+                                        <span className="text-[13px] sm:text-[14px] font-normal mt-1">
+                                            ({item.englishName})
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </Clickable>,
+            document.body
+        )}
     </div>
 }

@@ -76,6 +76,34 @@
       "failureMessage":"Login Failed",
       "failureDescription":"Your login attempt has failed. Please check your credentials and try again",
       "retry":"Retry"
+    },
+    "ThirdPartyRedirectModal": {
+      "title": "Important Alert !",
+      "description": "Any language changes you made here will not be carried over to the third-party Google platform during authentication and log in process.",
+      "continue": "Continue"
+    },
+    "Tour":{
+      "counter":"{{current}} of {{total}}",
+      "skip":"Skip",
+      "next":"Next",
+      "finish":"Finish",
+      "previous":"Previous",
+      "steps":{
+        "language":{
+          "title":"Language Setting",
+          "subTitle":"Select preferred language for your experience.",
+          "heading":"What is Language Setting?",
+          "description":"Language settings allow you to customise the interface to display content in your preferred language. This setting will be applied throughout your experience on this platform."
+        },
+        "google":{
+          "title":"Log in with Google Account",
+          "description":"By clicking \"Continue with Google\", you will be redirected to Google's authentication platform to sign in with your Google account. This provides a secure and convenient way to access your wallet."
+        },
+        "guest":{
+          "title":"Log In as a Guest",
+          "description":"By clicking \"Continue as Guest\", you can access the wallet without signing in. This option is perfect if you want to explore the features without creating an account."
+        }
+      }
     }
   },
   "Layout": {
@@ -145,9 +173,15 @@
       "subTitle": "Securely download and share your credentials instantly.",
       "searchText": "Search issuers by name"
     },
-    "emptyContainerContent": "No issuers found. Please refresh your browser window or try again later",
+    "emptyContainerContent": "No issuers found.",
+    "emptyContainerSubContent": "Please refresh your browser window or try again later",
     "containerHeading": "List of Issuers",
     "containerSubHeading": "Search for your trusted issuer and choose a credential type in the next step.",
+    "back": "Back",
+    "heroSubtitle1": "Search for your card and",
+    "heroSubtitle2": "choose the Cards",
+    "heroSubtitle3": "you want to download in next step !",
+    "searchPlaceholder": "Search issuer (e.g. Name 1, Name 2, Name 3)",
     "errorContent": "The service is currently unavailable now. Please try again later.",
     "searchIssuer": {
       "helpText": {
@@ -158,7 +192,8 @@
   },
   "CredentialsPage": {
     "searchText": "Search Credential Type",
-    "emptyContainerContent": "No Credentials found. Please refresh your browser window or try again later",
+    "emptyContainerContent": "No Credentials found.",
+    "emptyContainerSubContent": "Please refresh your browser window or try again later",
     "containerHeading": "List of Credential Types",
     "containerSubHeading": "Choose a credential, and confirm your identity in the next step.",
     "errorContent": "The service is currently unavailable now. Please try again later.",
@@ -409,12 +444,23 @@
   "User": {
     "Home": {
       "title": "Home",
-      "welcome": "Welcome"
+      "welcome": "Welcome",
+      "subtitle": "Access your Verifiable Cards",
+      "subtitle2": "with ease!",
+      "addCard": "Add Card",
+      "search": {
+        "placeholder": "Search your documents by Name",
+        "noResults": "No cards match your search."
+      },
+      "emptyScreen": {
+        "title": "No Cards Added",
+        "message": "Add your first card to get started with your digital wallet."
+      }
     },
     "ProfileDropdown": {
       "profile": "Profile",
       "faq": "FAQ",
-      "logout": "Logout"
+      "logout": "Log out"
     },
     "ProfilePage":{
       "title":"My Profile",
@@ -461,6 +507,7 @@
   "Common": {
     "home": "Home",
     "goToHome": "Go to Home",
+    "tryAgain": "Try Again",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "error": {
@@ -555,9 +602,54 @@
     "goToHomeButton": "Go Back"
   },
   "LogoutConfirmation": {
-    "title": "Are you sure you want to exit?",
-    "message": "If you go back now, you will be logged out and must log in again to continue.",
+    "title": "Exit Inji Wallet?",
+    "message": "Going back now will log you out. You'll need to Log in again to continue. Are you sure you want to exit?",
     "logoutButton": "Yes, Log Out",
     "stayButton": "Stay On This Page"
+  },
+  "LanguageSelector": {
+    "title": "Choose Language",
+    "subTitle": "Select your preferred Language settings."
+  },
+  "AboutPlatform": {
+    "button": "About Platform",
+    "hero": {
+      "title": "Your Digital Identity, Simplified",
+      "subTitle": "Store, manage, and share your verified credentials securely—all in one place.",
+      "highlights": {
+        "encryption": "Bank-level encryption",
+        "offline": "Works offline",
+        "ownership": "You control your data"
+      },
+      "compatibility": {
+        "label": "Compatibility",
+        "title": "Supported Credential Types Examples",
+        "types": {
+          "nationalIds": "National IDs",
+          "driversLicenses": "Driver's Licenses",
+          "professionalLicenses": "Professional Licenses",
+          "passports": "Passports",
+          "insuranceCards": "Insurance Cards",
+          "diplomas": "Diplomas & Degrees"
+        }
+      }
+    },
+    "howItWorks": {
+      "label": "How it works",
+      "steps": {
+        "receive": {
+          "title": "Receive Cards",
+          "description": "Trusted issuers like; governments, universities, employers, deliver verified credentials directly to your wallet. No manual entry, no paperwork."
+        },
+        "store": {
+          "title": "Store Securely",
+          "description": "All credentials are end-to-end encrypted and stored locally. Only you hold the keys! No third party can access or modify your cards."
+        },
+        "share": {
+          "title": "Share & Verify",
+          "description": "Present credentials via QR code or direct share. Verifiers confirm authenticity cryptographically and no issuer contact required, works offline."
+        }
+      }
+    }
   }
 }

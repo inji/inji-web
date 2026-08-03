@@ -15,6 +15,14 @@ import {api} from "../../../utils/api";
 import {ErrorDisplay} from "../../../components/Error/ErrorDisplay";
 import {BorderedButton} from "../../../components/Common/Buttons/BorderedButton";
 
+const getProfileInitials = (displayName?: string): string => {
+    const parts = (displayName ?? "").trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "U";
+    const first = parts[0][0];
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (first + last).toUpperCase();
+};
+
 export const ProfilePage: React.FC = () => {
     const navigate = useNavigate();
     const {t} = useTranslation('User', {
@@ -44,19 +52,25 @@ export const ProfilePage: React.FC = () => {
         }
     };
 
+    // Always an initials avatar (per design): Google accounts without a photo
+    // return a generated single-letter image, so the photo URL can't be trusted
+    // to look like the mock's two-letter monogram.
     const renderProfilePicture = () => {
-        return state === RequestStatus.LOADING ? (
-            <CircleSkeleton
-                size={ProfilePageStyles.profilePictureSkeleton}
-                className="sm:m-7 flex-shrink-0"
-            />
-        ) : (
-            <img
-                data-testid="profile-page-picture"
-                alt="Profile"
-                className={ProfilePageStyles.profilePicture}
-                src={data?.profilePictureUrl}
-            />
+        if (state === RequestStatus.LOADING) {
+            return (
+                <CircleSkeleton
+                    size={ProfilePageStyles.profilePictureSkeleton}
+                    className="flex-shrink-0"
+                />
+            );
+        }
+        return (
+            <div
+                data-testid="profile-page-picture-initials"
+                className={ProfilePageStyles.profileInitials}
+            >
+                {getProfileInitials(data?.displayName)}
+            </div>
         );
     };
 

@@ -52,6 +52,46 @@ exports[`Header Container Layout Test Check if the layout is matching with the s
         <div
           class="hidden sm:block"
         >
+          <button
+            class="flex flex-row items-center gap-2 h-[3rem] px-5 rounded-xl text-white font-semibold shadow-sm bg-gradient-to-r from-iw-primary to-iw-secondary focus:outline-none whitespace-nowrap"
+            data-testid="Header-Menu-AboutPlatform"
+            type="button"
+          >
+            <svg
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+              />
+              <line
+                x1="12"
+                x2="12"
+                y1="16"
+                y2="12"
+              />
+              <line
+                x1="12"
+                x2="12.01"
+                y1="8"
+                y2="8"
+              />
+            </svg>
+            About Platform
+          </button>
+        </div>
+        <div
+          class="hidden sm:block"
+        >
           <div
             class="w-full"
           >
@@ -74,11 +114,9 @@ exports[`Header Container Layout Test Check if the layout is matching with the s
         <div
           class="flex flex-row justify-center items-center"
           data-testid="Header-Menu-LanguageSelector"
-          role="button"
-          tabindex="0"
         >
           <div
-            class="relative inline-block ms-1 ml-3"
+            class="inline-block ms-1 ml-3"
           >
             <button
               class="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none"

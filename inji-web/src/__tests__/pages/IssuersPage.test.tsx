@@ -1,5 +1,6 @@
 import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
+import {fireEvent, render, screen, waitFor} from "@testing-library/react";
+import {BrowserRouter} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {toast} from "react-toastify";
 import {mockApiResponse, mockUseApi} from "../../test-utils/setupUseApiMock";
@@ -45,6 +46,13 @@ jest.mock("../../utils/api", () => ({
     },
 }));
 
+const renderIssuersPage = (props: React.ComponentProps<typeof IssuersPage> = {}) =>
+    render(
+        <BrowserRouter>
+            <IssuersPage {...props}/>
+        </BrowserRouter>
+    );
+
 describe("IssuersPage", () => {
     const mockDispatch = jest.fn();
     const mockFetchUserProfile = jest.fn();
@@ -72,7 +80,7 @@ describe("IssuersPage", () => {
             state: RequestStatus.LOADING,
         });
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         expect(screen.getByTestId("Home-Page-Container")).toBeInTheDocument();
         expect(mockDispatch).not.toHaveBeenCalled();
@@ -86,7 +94,7 @@ describe("IssuersPage", () => {
             state: RequestStatus.DONE,
         });
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(mockFetchUserProfile).not.toHaveBeenCalled();
@@ -106,7 +114,7 @@ describe("IssuersPage", () => {
         });
         window._env_.IGNORED_ISSUER_IDS = "issuer1";
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(mockFetchUserProfile).not.toHaveBeenCalled();
@@ -133,7 +141,7 @@ describe("IssuersPage", () => {
         });
         window._env_.IGNORED_ISSUER_IDS = "";
 
-        render(<IssuersPage />);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(mockFetchUserProfile).not.toHaveBeenCalled();
@@ -157,7 +165,7 @@ describe("IssuersPage", () => {
             state: RequestStatus.DONE,
         });
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(mockFetchUserProfile).toHaveBeenCalled();
@@ -177,7 +185,7 @@ describe("IssuersPage", () => {
             status: 500,
         });
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("The service is currently unavailable now. Please try again later.");
@@ -199,7 +207,7 @@ describe("IssuersPage", () => {
             state: RequestStatus.DONE,
         });
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("The service is currently unavailable now. Please try again later.");
@@ -211,7 +219,7 @@ describe("IssuersPage", () => {
         mockFetchUserProfile.mockRejectedValue(new Error("User profile fetch failed"));
         mockUseApi.state = RequestStatus.ERROR;
 
-        render(<IssuersPage/>);
+        renderIssuersPage();
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith("The service is currently unavailable now. Please try again later.");
@@ -222,10 +230,46 @@ describe("IssuersPage", () => {
         mockIsUserLoggedIn.mockReturnValue(false);
         mockUseApi.state = RequestStatus.LOADING;
 
-        render(<IssuersPage className="custom-class"/>);
+        renderIssuersPage({className: "custom-class"});
 
         const introBoxContainer = screen.getByTestId("Home-Page-Container")
             .querySelector(".custom-class");
         expect(introBoxContainer).toBeInTheDocument();
+    });
+
+    describe("dashboard variant", () => {
+        beforeEach(() => {
+            mockIsUserLoggedIn.mockReturnValue(true);
+            mockFetchUserProfile.mockResolvedValue({});
+            mockUseApi.state = RequestStatus.DONE;
+            mockApiResponse({
+                data: {response: {issuers: mockIssuerObjectList}},
+                state: RequestStatus.DONE,
+            });
+        });
+
+        it("should render back button, heading, subtitles and search placeholder", () => {
+            renderIssuersPage({variant: "dashboard"});
+
+            expect(screen.getByTestId("Issuers-Back-Button")).toBeInTheDocument();
+            expect(screen.getByTestId("Issuers-Page-Title")).toHaveTextContent("List of Issuers");
+            expect(screen.getByTestId("Issuers-Page-SubTitle")).toHaveTextContent("choose the Cards");
+            expect(screen.getByTestId("Issuers-Page-Description"))
+                .toHaveTextContent("Securely download and share your credentials instantly.");
+            expect(screen.getByPlaceholderText("Search issuer (e.g. Name 1, Name 2, Name 3)")).toBeInTheDocument();
+        });
+
+        it("should not render the list header tile since the page title is shown on top", () => {
+            renderIssuersPage({variant: "dashboard"});
+
+            expect(screen.queryByTestId("HeaderTile-Text")).not.toBeInTheDocument();
+        });
+
+        it("should navigate to user home on back click when opened directly", () => {
+            renderIssuersPage({variant: "dashboard"});
+
+            fireEvent.click(screen.getByTestId("Issuers-Back-Button"));
+            expect(window.location.pathname).toBe("/user/home");
+        });
     });
 });

@@ -1,21 +1,7 @@
-import {mockusei18n } from '../../../../test-utils/mockUtils';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from '../../../../components/User/CredentialTypes/Header';
-import { IssuerWellknownDisplayArrayObject } from '../../../../types/data';
-const mockBackClick = jest.fn();
-const mockHomeClick = jest.fn();
 
-const mockDisplayObject: IssuerWellknownDisplayArrayObject = {
-  name: 'Issuer Display Name',
-  description: 'Test description',
-  language: 'en',
-  locale: 'en-US',
-  title: 'Issuer Title',
-  logo: {
-    url: 'https://example.com/logo.png',
-    alt_text: 'Issuer Logo',
-  },
-};
+const mockBackClick = jest.fn();
 
 jest.mock('../../../../components/Credentials/SearchCredential', () => ({
     SearchCredential: () => <div data-testid="search-credential" />,
@@ -29,85 +15,40 @@ jest.mock('../../../../components/Common/Buttons/NavBackArrowButton', () => ({
     ),
 }));
 
-jest.mock('../../../../components/Common/Buttons/TertiaryButton', () => ({
-    TertiaryButton: (props: { onClick: () => void; title: string; testId: string }) => (
-        <button data-testid={props.testId} onClick={props.onClick}>
-        {props.title}
-        </button>
-    ),
-}));
-
 beforeEach(() => {
   jest.clearAllMocks();
-  mockusei18n();
 });
 
-it('renders issuer name in the title', () => {
-  render(
-    <Header
-      onBackClick={mockBackClick}
-      onClick={mockHomeClick}
-      displayObject={mockDisplayObject}
-    />
-  );
+it('renders the page title and description', () => {
+  render(<Header onBackClick={mockBackClick} />);
 
-  const title = screen.getByTestId('Stored-Credentials');
+  const title = screen.getByTestId('CredentialTypes-Page-Title');
   expect(title).toBeInTheDocument();
-  expect(title).toHaveTextContent('Issuer Display Name');
+  expect(title).not.toBeEmptyDOMElement();
+
+  const description = screen.getByTestId('CredentialTypes-Page-Description');
+  expect(description).toBeInTheDocument();
+  expect(description).not.toBeEmptyDOMElement();
 });
 
 it('renders and calls back button', () => {
-  render(
-    <Header
-      onBackClick={mockBackClick}
-      onClick={mockHomeClick}
-      displayObject={mockDisplayObject}
-    />
-  );
+  render(<Header onBackClick={mockBackClick} />);
 
   const backButton = screen.getByTestId('back-button');
   fireEvent.click(backButton);
   expect(mockBackClick).toHaveBeenCalled();
 });
 
-it('renders and calls home button', () => {
-  render(
-    <Header
-      onBackClick={mockBackClick}
-      onClick={mockHomeClick}
-      displayObject={mockDisplayObject}
-    />
-  );
+it('calls back handler when the back row is clicked', () => {
+  render(<Header onBackClick={mockBackClick} />);
 
-  const homeButton = screen.getByTestId('home');
-  expect(homeButton).toHaveTextContent('Home');
-  fireEvent.click(homeButton);
-  expect(mockHomeClick).toHaveBeenCalled();
+  fireEvent.click(screen.getByTestId('CredentialTypes-Back-Button'));
+  expect(mockBackClick).toHaveBeenCalled();
 });
 
 it('renders the SearchCredential component', () => {
-  render(
-    <Header
-      onBackClick={mockBackClick}
-      onClick={mockHomeClick}
-      displayObject={mockDisplayObject}
-    />
-  );
+  render(<Header onBackClick={mockBackClick} />);
 
   const search = screen.getByTestId('search-credential');
   expect(search).toBeInTheDocument();
-});
-
-it('renders empty name gracefully when displayObject is empty', () => {
-  render(
-    <Header
-      onBackClick={mockBackClick}
-      onClick={mockHomeClick}
-      displayObject={{} as IssuerWellknownDisplayArrayObject}
-    />
-  );
-
-  const title = screen.getByTestId('Stored-Credentials');
-  expect(title).toBeInTheDocument();
-  expect(title).toBeEmptyDOMElement();
 });

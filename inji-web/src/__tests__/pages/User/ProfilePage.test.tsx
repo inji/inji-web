@@ -76,7 +76,8 @@ describe('ProfilePage', () => {
 
     renderWithRouter();
 
-    await screen.findByTestId('profile-page-picture');
+    const avatar = await screen.findByTestId('profile-page-picture-initials');
+    expect(avatar).toHaveTextContent('JD');
     expect(screen.getByText('Full Name')).toBeInTheDocument();
     expect(screen.getByText('Email Address')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
