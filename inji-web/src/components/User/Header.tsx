@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {LanguageSelector} from '../Common/LanguageSelector';
+import {AboutPlatform} from '../Common/AboutPlatform';
 import {api} from '../../utils/api';
 import {toast} from 'react-toastify';
 import {useUser} from '../../hooks/User/useUser';
@@ -10,6 +11,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../types/redux';
 import {useTranslation} from 'react-i18next';
 import DropdownArrowIcon from '../Common/DropdownArrowIcon';
+import {MdLogout, MdOutlineAccountCircle} from 'react-icons/md';
 import {ROUTES} from '../../utils/constants';
 import {convertStringIntoPascalCase} from "../../utils/misc";
 import {navigateToUserHome} from "../../utils/navigationUtils";
@@ -99,26 +101,19 @@ export const Header: React.FC<UserHeaderProps> = ({
         {
             label: t('ProfileDropdown.profile'),
             onClick: () => {
-                setIsProfileDropdownOpen(false);    
+                setIsProfileDropdownOpen(false);
                 navigate(ROUTES.USER_PROFILE,{state: {from: window.location.pathname}});
             },
             textColor: 'text-gray-700',
-            key: 'Profile-Dropdown-Profile'
-        },
-        {
-            label: t('ProfileDropdown.faq'),
-            onClick: () => {
-                setIsProfileDropdownOpen(false);
-                navigate(ROUTES.USER_FAQ, {state: {from: window.location.pathname}});
-            },
-            textColor: 'text-gray-700',
-            key: 'Profile-Dropdown-FAQ'
+            key: 'Profile-Dropdown-Profile',
+            icon: <MdOutlineAccountCircle size={18}/>
         },
         {
             label: t('ProfileDropdown.logout'),
             onClick: handleLogout,
             textColor: 'text-red-700',
-            key: 'Profile-Dropdown-Logout'
+            key: 'Profile-Dropdown-Logout',
+            icon: <MdLogout size={18}/>
         }
     ];
 
@@ -241,6 +236,9 @@ export const Header: React.FC<UserHeaderProps> = ({
                 </div>
 
                 <div className="flex items-center space-x-6">
+                    <div className="hidden sm:block">
+                        <AboutPlatform data-testid="header-about-platform" />
+                    </div>
                     <LanguageSelector />
 
                     {(isLoading || user) && (
@@ -271,9 +269,10 @@ export const Header: React.FC<UserHeaderProps> = ({
                                     {dropdownItems.map((item) => (
                                         <div
                                             key={item.key}
-                                            className={`px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary`}
+                                            className={`px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary flex items-center gap-2`}
                                             onClick={item.onClick}
                                         >
+                                            {item.icon}
                                             {item.label}
                                         </div>
                                     ))}
@@ -297,12 +296,16 @@ export const Header: React.FC<UserHeaderProps> = ({
                             <div className="flex items-center px-4 py-2">
                                 {getUserProfileIconWithName()}
                             </div>
+                            <div className="px-4 py-2">
+                                <AboutPlatform data-testid="header-mobile-about-platform" />
+                            </div>
                             {!disableProfileDropdown && user && dropdownItems.map((item, index) => (
                                 <React.Fragment key={item.key}>
                                     <div
-                                        className={`px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium`}
+                                        className={`px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium flex items-center gap-2`}
                                         onClick={item.onClick}
                                     >
+                                        {item.icon}
                                         {item.label}
                                     </div>
                                     {index !== dropdownItems.length - 1 && (

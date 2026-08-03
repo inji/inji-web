@@ -4,8 +4,11 @@ import {ContentTypes, MethodType} from "../utils/api";
 import axios, {AxiosError} from "axios";
 import {HTTP_STATUS_CODES, RequestStatus} from "../utils/constants";
 
+// No baseURL: request URLs from utils/api.ts already include the full mimoto
+// prefix (api.mimotoHost). With a path-relative MIMOTO_URL (e.g. "/v1/mimoto"
+// in local dev), a baseURL here would get prepended again, producing doubled
+// paths like /v1/mimoto/v1/mimoto/users/me.
 export const apiInstance = axios.create({
-    baseURL: window._env_.MIMOTO_URL,
     withCredentials: true,
     xsrfCookieName: "XSRF-TOKEN",
     xsrfHeaderName: "X-XSRF-TOKEN"

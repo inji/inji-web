@@ -18,12 +18,12 @@ const resources = {en, ta, kn, hi, fr, ar, pt};
 
 export const LanguagesSupported: LanguageObject[] = [
     {label: "English", value: 'en'},
-    {label: "தமிழ்", value: 'ta'},
-    {label: "ಕನ್ನಡ", value: 'kn'},
-    {label: "हिंदी", value: 'hi'},
-    {label: "Français", value: 'fr'},
-    {label: "عربي", value: 'ar'},
-    {label: "Português", value:'pt'}
+    {label: "தமிழ்", value: 'ta', englishName: "Tamil"},
+    {label: "ಕನ್ನಡ", value: 'kn', englishName: "Kannada"},
+    {label: "हिंदी", value: 'hi', englishName: "Hindi"},
+    {label: "Français", value: 'fr', englishName: "French"},
+    {label: "عربي", value: 'ar', englishName: "Arabic"},
+    {label: "Português", value:'pt', englishName: "Portuguese"}
 ]
 
 export const defaultLanguage = window._env_.DEFAULT_LANG;

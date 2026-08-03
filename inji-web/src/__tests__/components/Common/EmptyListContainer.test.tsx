@@ -12,9 +12,24 @@ describe("Testing the Layouts of EmptyListContainer", () => {
     });
 });
 describe("Testing the Functionality EmptyListContainer", () => {
-   
+
     test('Check if content is rendered properly', () => {
         renderWithProvider(<EmptyListContainer content={"No Issuers Found"} />);
         expect(screen.getByTestId("EmptyList-Text")).toHaveTextContent("No Issuers Found");
+    });
+
+    test('Check if icon is rendered', () => {
+        renderWithProvider(<EmptyListContainer content={"No Issuers Found"} />);
+        expect(screen.getByTestId("EmptyList-Icon")).toBeInTheDocument();
+    });
+
+    test('Check if subContent is rendered when provided', () => {
+        renderWithProvider(<EmptyListContainer content={"No Issuers Found"} subContent={"Please refresh your browser window or try again later"} />);
+        expect(screen.getByTestId("EmptyList-SubText")).toHaveTextContent("Please refresh your browser window or try again later");
+    });
+
+    test('Check if subContent is not rendered when absent', () => {
+        renderWithProvider(<EmptyListContainer content={"No Issuers Found"} />);
+        expect(screen.queryByTestId("EmptyList-SubText")).not.toBeInTheDocument();
     });
 });

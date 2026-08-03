@@ -9,7 +9,12 @@ import {RootState} from "../../types/redux";
 import {getIssuerDisplayObjectForCurrentLanguage} from "../../utils/i18n";
 import { SearchIssuerStyles } from "./SearchIssuerStyles.ts";
 
-export const SearchIssuer: React.FC = () => {
+type SearchIssuerProps = {
+    placeholder?: string;
+    showHelpText?: boolean;
+};
+
+export const SearchIssuer: React.FC<SearchIssuerProps> = ({placeholder, showHelpText = true}) => {
 
     const {t} = useTranslation("IssuersPage");
     const dispatch = useDispatch();
@@ -44,7 +49,7 @@ export const SearchIssuer: React.FC = () => {
                     data-testid="Search-Issuer-Input"
                     type="text"
                     value={searchText}
-                    placeholder={t("Intro.searchText")}
+                    placeholder={placeholder ?? t("Intro.searchText")}
                     onChange={(event) => filterIssuers(event.target.value)}
                     className={SearchIssuerStyles.searchInput}
                 />
@@ -64,7 +69,7 @@ export const SearchIssuer: React.FC = () => {
                     { t("searchIssuer.helpText.error") }
                 </p>)
             }
-            {isSearchValid && (
+            {isSearchValid && showHelpText && (
                 <p className={SearchIssuerStyles.infoMsg}>
                     { t("searchIssuer.helpText.info") }
                 </p>)

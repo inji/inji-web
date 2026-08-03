@@ -100,6 +100,7 @@ export type ApiRequest = {
 export type LanguageObject = {
     label: string;
     value: string;
+    englishName?: string;
 };
 
 export type WalletCredential = {
@@ -156,6 +157,7 @@ export type DropdownItem = {
     onClick: () => void;
     textColor: string;
     key: string;
+    icon?: React.ReactNode;
 };
 
 export type RouteValue = (typeof ROUTES)[keyof typeof ROUTES];

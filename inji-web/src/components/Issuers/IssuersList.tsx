@@ -11,7 +11,7 @@ import {HeaderTile} from "../Common/HeaderTile";
 import {GradientWrapper} from "../Common/GradientWrapper";
 import {RequestStatus} from "../../utils/constants";
 
-export const IssuersList: React.FC<IssuersListProps> = ({state}) => {
+export const IssuersList: React.FC<IssuersListProps> = ({state, showHeader = true}) => {
     const issuers = useSelector((state: RootState) => state.issuers);
     const {t} = useTranslation("IssuersPage");
 
@@ -21,15 +21,15 @@ export const IssuersList: React.FC<IssuersListProps> = ({state}) => {
 
     if(state === RequestStatus.ERROR || !issuers?.filtered_issuers || (issuers?.filtered_issuers && issuers?.filtered_issuers?.length === 0)) {
         return <div data-testid="Issuers-List-Container" className={" flex flex-col items-center justify-center"}>
-            <HeaderTile content={t("containerHeading")} subContent={t("containerSubHeading")}/>
-            <EmptyListContainer content={t("emptyContainerContent")}/>
+            {showHeader && <HeaderTile content={t("containerHeading")} subContent={t("containerSubHeading")}/>}
+            <EmptyListContainer content={t("emptyContainerContent")} subContent={t("emptyContainerSubContent")}/>
         </div>
     }
 
 
     return <React.Fragment>
         <div data-testid="Issuers-List-Container" className={"flex flex-col items-center justify-center"}>
-            <HeaderTile content={t("containerHeading")} subContent={t("containerSubHeading")}/>
+            {showHeader && <HeaderTile content={t("containerHeading")} subContent={t("containerSubHeading")}/>}
             <div className={`flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 pb-16 sm:pb-20`}>
                 {issuers.filtered_issuers.map((issuer: IssuerObject, index: number) =>
                     <div className={`flex items-center justify-center`} key={issuer.issuer_id}>

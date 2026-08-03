@@ -13,9 +13,10 @@ import {RequestStatus} from "../../utils/constants";
 
 interface CredentialListProps {
     state: RequestStatus;
+    showHeader?: boolean;
 }
 
-export const CredentialList: React.FC<CredentialListProps> = ({state}) => {
+export const CredentialList: React.FC<CredentialListProps> = ({state, showHeader = true}) => {
     const [errorObj, setErrorObj] = useState({
         code: "",
         message: ""
@@ -74,12 +75,14 @@ export const CredentialList: React.FC<CredentialListProps> = ({state}) => {
                 0)
     ) {
         return (
-            <div>
-                <HeaderTile
-                    content={t("containerHeading")}
-                    subContent={t("containerSubHeading")}
-                />
-                <EmptyListContainer content={t("emptyContainerContent")} />
+            <div className="w-full">
+                {showHeader && (
+                    <HeaderTile
+                        content={t("containerHeading")}
+                        subContent={t("containerSubHeading")}
+                    />
+                )}
+                <EmptyListContainer content={t("emptyContainerContent")} subContent={t("emptyContainerSubContent")} />
             </div>
         );
     }
@@ -96,10 +99,12 @@ export const CredentialList: React.FC<CredentialListProps> = ({state}) => {
 
     return (
         <>
-            <HeaderTile
-                content={t("containerHeading")}
-                subContent={t("containerSubHeading")}
-            />
+            {showHeader && (
+                <HeaderTile
+                    content={t("containerHeading")}
+                    subContent={t("containerSubHeading")}
+                />
+            )}
             <div className="flex flex-wrap gap-3 p-4 pb-20 justify-start">
                 {filteredCredentialsWithLangSupport.map(
                     (

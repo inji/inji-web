@@ -44,7 +44,6 @@ import {
     getDcqlNoMatchState,
     hasCredentialSets,
 } from "../utils/dcqlCredentialSetUtils";
-import { StoredCardsPageStyles } from "./User/StoredCards/StoredCardsPageStyles";
 import { SearchBar } from "../components/Common/SearchBar/SearchBar";
 import { VpAuthPageBackgroundStyles } from "../components/Ovp/OvpPageStyles";
 import { rejectVerifierRequest } from "../utils/verifierUtils";
@@ -646,7 +645,7 @@ export const VPAuthorizationPage: React.FC = () => {
         }
 
         return (
-            <div className={StoredCardsPageStyles.searchContainer}>
+            <div className={VpAuthPageBackgroundStyles.searchContainer}>
                 <SearchBar
                     testId="search-credentials"
                     placeholder={t("mainPage.searchPlaceholder")}

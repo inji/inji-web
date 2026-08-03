@@ -76,6 +76,34 @@
       "failureMessage": "Échec de la connexion",
       "failureDescription": "Votre tentative de connexion a échoué. Veuillez vérifier vos identifiants et réessayer",
       "retry": "Réessayer"
+    },
+    "Tour": {
+      "counter": "{{current}} sur {{total}}",
+      "skip": "Passer",
+      "next": "Suivant",
+      "finish": "Terminer",
+      "previous": "Précédent",
+      "steps": {
+        "language": {
+          "title": "Paramètre de langue",
+          "subTitle": "Sélectionnez la langue de votre choix pour votre expérience.",
+          "heading": "Qu'est-ce que le paramètre de langue ?",
+          "description": "Les paramètres de langue vous permettent de personnaliser l'interface afin d'afficher le contenu dans la langue de votre choix. Ce paramètre s'appliquera à toute votre expérience sur cette plateforme."
+        },
+        "google": {
+          "title": "Se connecter avec un compte Google",
+          "description": "En cliquant sur « Continuer avec Google », vous serez redirigé vers la plateforme d'authentification de Google pour vous connecter avec votre compte Google. Cela offre un moyen sûr et pratique d'accéder à votre portefeuille."
+        },
+        "guest": {
+          "title": "Se connecter en tant qu'invité",
+          "description": "En cliquant sur « Continuer en tant qu'invité », vous pouvez accéder au portefeuille sans vous connecter. Cette option est idéale si vous souhaitez explorer les fonctionnalités sans créer de compte."
+        }
+      }
+    },
+    "ThirdPartyRedirectModal": {
+      "title": "Alerte importante !",
+      "description": "Les changements de langue effectués ici ne seront pas répercutés sur la plateforme tierce Google pendant le processus d'authentification et de connexion.",
+      "continue": "Continuer"
     }
   },
   "Layout": {
@@ -145,9 +173,15 @@
       "subTitle": "Téléchargez et partagez en toute sécurité vos informations d'identification instantanément.",
       "searchText": "Rechercher des émetteurs par nom"
     },
-    "emptyContainerContent": "Aucun émetteur trouvé. ",
+    "emptyContainerContent": "Aucun émetteur trouvé.",
+    "emptyContainerSubContent": "Veuillez actualiser la fenêtre de votre navigateur ou réessayer plus tard",
     "containerHeading": "Liste des émetteurs",
     "containerSubHeading": "Recherchez votre émetteur de confiance et choisissez un type d'identifiant à l'étape suivante.",
+    "back": "Retour",
+    "heroSubtitle1": "Recherchez votre carte et",
+    "heroSubtitle2": "choisissez les cartes",
+    "heroSubtitle3": "que vous souhaitez télécharger à l'étape suivante !",
+    "searchPlaceholder": "Rechercher un émetteur (ex. Nom 1, Nom 2, Nom 3)",
     "errorContent": "Le service est actuellement indisponible. ",
     "searchIssuer": {
       "helpText": {
@@ -158,7 +192,8 @@
   },
   "CredentialsPage": {
     "searchText": "Rechercher un type d'identifiant",
-    "emptyContainerContent": "Aucune information d'identification trouvée. ",
+    "emptyContainerContent": "Aucune information d'identification trouvée.",
+    "emptyContainerSubContent": "Veuillez actualiser la fenêtre de votre navigateur ou réessayer plus tard",
     "containerHeading": "Liste des types d'informations d'identification",
     "containerSubHeading": "Choisissez un identifiant et confirmez votre identité à l'étape suivante.",
     "errorContent": "Le service est actuellement indisponible.",
@@ -412,7 +447,18 @@
   "User": {
     "Home": {
       "title": "Maison",
-      "welcome": "Bienvenu"
+      "welcome": "Bienvenu",
+      "subtitle": "Accédez à vos cartes vérifiables",
+      "subtitle2": "en toute simplicité !",
+      "addCard": "Ajouter une carte",
+      "search": {
+        "placeholder": "Recherchez vos documents par nom",
+        "noResults": "Aucune carte ne correspond à votre recherche."
+      },
+      "emptyScreen": {
+        "title": "Aucune carte ajoutée",
+        "message": "Ajoutez votre première carte pour commencer à utiliser votre portefeuille numérique."
+      }
     },
     "ProfileDropdown": {
       "profile": "Profil",
@@ -464,6 +510,7 @@
   "Common": {
     "home": "Maison",
     "goToHome": "Aller à l'accueil",
+    "tryAgain": "Réessayer",
     "confirm": "Confirmer",
     "cancel": "Annuler",
     "error": {
@@ -657,9 +704,50 @@
     "requiredCount": "{{count}} obligatoires"
   },
   "LogoutConfirmation": {
-    "title": "Êtes-vous sûr de vouloir partir ?",
-    "message": "Si vous revenez en arrière maintenant, vous serez déconnecté et devrez vous reconnecter pour continuer.",
+    "title": "Quitter Inji Wallet ?",
+    "message": "Revenir en arrière maintenant vous déconnectera. Vous devrez vous reconnecter pour continuer. Êtes-vous sûr de vouloir quitter ?",
     "logoutButton": "Oui, se déconnecter",
     "stayButton": "Rester sur cette page"
+  },
+  "AboutPlatform": {
+    "button": "À propos de la plateforme",
+    "hero": {
+      "title": "Votre identité numérique, simplifiée",
+      "subTitle": "Stockez, gérez et partagez vos identifiants vérifiés en toute sécurité — le tout en un seul endroit.",
+      "highlights": {
+        "encryption": "Chiffrement de niveau bancaire",
+        "offline": "Fonctionne hors ligne",
+        "ownership": "Vous contrôlez vos données"
+      },
+      "compatibility": {
+        "label": "Compatibilité",
+        "title": "Exemples de types d'identifiants pris en charge",
+        "types": {
+          "nationalIds": "Pièces d'identité",
+          "driversLicenses": "Permis de conduire",
+          "professionalLicenses": "Licences professionnelles",
+          "passports": "Passeports",
+          "insuranceCards": "Cartes d'assurance",
+          "diplomas": "Diplômes et titres"
+        }
+      }
+    },
+    "howItWorks": {
+      "label": "Comment ça marche",
+      "steps": {
+        "receive": {
+          "title": "Recevoir des cartes",
+          "description": "Des émetteurs de confiance tels que les gouvernements, les universités et les employeurs remettent des identifiants vérifiés directement dans votre wallet. Aucune saisie manuelle, aucune paperasse."
+        },
+        "store": {
+          "title": "Stocker en toute sécurité",
+          "description": "Tous les identifiants sont chiffrés de bout en bout et stockés localement. Vous seul détenez les clés ! Aucun tiers ne peut accéder à vos cartes ni les modifier."
+        },
+        "share": {
+          "title": "Partager et vérifier",
+          "description": "Présentez vos identifiants via un code QR ou un partage direct. Les vérificateurs confirment l'authenticité de manière cryptographique, sans contact avec l'émetteur, et cela fonctionne hors ligne."
+        }
+      }
+    }
   }
 }

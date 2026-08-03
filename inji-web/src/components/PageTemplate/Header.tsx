@@ -8,6 +8,7 @@ import {RootState} from '../../types/redux';
 import {useSelector} from 'react-redux';
 import {isRTL} from '../../utils/i18n';
 import { PlainButton } from '../Common/Buttons/PlainButton';
+import {AboutPlatform} from '../Common/AboutPlatform';
 import {ROUTES} from "../../utils/constants";
 
 type HeaderProps = {
@@ -67,6 +68,9 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                     data-testid="Header-FAQ-LanguageSelector-Container"
                 >
                     <div className="hidden sm:block">
+                        <AboutPlatform data-testid="Header-Menu-AboutPlatform" />
+                    </div>
+                    <div className="hidden sm:block">
                         <PlainButton
                             fullWidth={true}
                             onClick={() => navigate(ROUTES.FAQ)}
@@ -87,6 +91,9 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                         onMouseDown={() => setIsOpen(false)}
                         onBlur={() => setIsOpen(false)}
                     >
+                        <div className="py-5 w-full">
+                            <AboutPlatform data-testid="Header-Menu-Mobile-AboutPlatform" />
+                        </div>
                         <div
                             data-testid="Header-Menu-Faq"
                             role="button"

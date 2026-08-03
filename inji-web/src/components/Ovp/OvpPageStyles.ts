@@ -13,6 +13,7 @@ export const VpAuthPageBackgroundStyles = {
     credentialSelectionActionsCell:
         "w-full self-start lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:w-[260px]",
     credentialSelectionList: "min-w-0 lg:col-start-1 lg:row-start-2",
+    searchContainer: "flex-shrink-0 px-4 py-0",
 };
 
 
