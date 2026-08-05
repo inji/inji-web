@@ -1,7 +1,7 @@
 import React from "react";
 import {IconProps} from "../../../types/components";
 
-export function DownloadIcon({gradient = false, style, ...props}: IconProps) {
+export function DownloadIcon({gradient = false, style, testId, ...props}: IconProps) {
     if (gradient) {
         return <GradientDownloadIcon/>
     }
@@ -15,7 +15,7 @@ export function DownloadIcon({gradient = false, style, ...props}: IconProps) {
             xmlns="http://www.w3.org/2000/svg"
             style={style}
             aria-label="icon-download"
-            data-testid={props.testId}
+            data-testid={testId}
             {...props}
         >
             <path

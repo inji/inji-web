@@ -402,9 +402,12 @@
     "message": "Preparing your secure credential presentation..."
   },
   "CredentialShareSuccessModal": {
-    "sharedWith": "Shared with {{verifierName}}",
-    "credentialsPresented": "Your credentials were successfully presented to {{verifierName}}",
-    "redirectMessage": "Redirecting to verifier in {{count}} seconds..."
+    "title": "Credentials Shared",
+    "subtitle": "Successfully shared with {{verifierName}}",
+    "cardsShared": "CARDS SHARED ({{count}})",
+    "sharedTodayAt": "Today at {{time}}",
+    "trustedLabel": "Trusted",
+    "redirectMessage": "Returning to verifier in {{count}} seconds..."
   },
   "User": {
     "Home": {
@@ -491,6 +494,15 @@
     }
   },
   "VerifierTrustPage": {
+      "mainPage":{
+        "unknownVerifier": "Verifier Name",
+        "description": " Requesting access to your card(s)",
+        "descriptionSubtext": "Review the requested information and choose the card(s) you want to share. Only the selected information from your chosen card(s) will be shared with the verifier.",
+        "trustedLabel": "Trusted",
+        "footerInfo": "Select the credentials below to approve this request",
+        "addCards" :"Add Cards",
+        "searchPlaceholder": "Search your documents by Name"
+      },
       "modal": {
         "title": "Verifier Name",
         "description": "Make sure you recognize or trust this verifier. \nOnce you trust this verifier:",
@@ -529,7 +541,65 @@
       "loadingCard": {
       "title": "Fetching verifier info...",
       "subtitle": "Please wait while we verify the request and prepare your credentials."
-    }
+      },
+      "credentialTile":{
+        "unselectedTitle": "Select credential to be shared",
+        "selectedTitle": "Credential selected",
+        "shareCredentialsButton": "Confirm and Share",
+        "shareCredentialsDeclineButton": "Decline"
+      },
+      "consentRequiredModal": {
+        "title": "Consent Required",
+        "description": "Please review your selection before continuing.",
+        "credentialsTitle": "Cards Being Shared ({{count}})",
+        "credentialsDescription": "Only the selected information from your chosen card(s) will be shared with the verifier. No additional information will be shared.",
+        "consentButtonTitle": "Confirm and Share",
+        "backButtonTitle": "No, Take Me Back"
+      },
+      "leaveConfirmation": {
+        "title": "Are you sure you want to leave?",
+        "description": "If you leave this page, you will exit the process of sending your Cards and your progress may be lost.",
+        "confirmButton": "Yes, Leave",
+        "cancelButton": "No, back"
+      },
+      "dcql": {
+        "mandatorySection": "Mandatory",
+        "optionalSection": "Optional",
+        "mandatoryCards": "MANDATORY CARDS",
+        "optionalCards": "OPTIONAL CARDS",
+        "optionalAddOns": "OPTIONAL ADD-ONS",
+        "required": "Required",
+        "multipleCards": "Multiple Cards",
+        "allRequired": "All cards in this option are required",
+        "credentialsCount": "{{count}} credentials",
+        "or": "OR",
+        "instruction": "Select one credential from the list to securely share with the verifier.",
+        "instructionSelectOne": "Select one card from the available options.",
+        "instructionSelectAll": "Select all required cards to continue.",
+        "instructionSelectCount": "Select {{count}} cards from the available options.",
+        "instructionOnePerSet": "Select one card from each group.",
+        "instructionComplex": "Follow the selection instructions to satisfy the verifier's request.",
+        "selectShareableFields": "Required Information",
+        "selectRequiredClaims": "Select Required Information",
+        "viewCard": "View Card",
+        "showAllCards": "Show all {{count}} cards",
+        "clearAll": "Clear all",
+        "unknownCredential": "Credential",
+        "noSatisfiableOptions": "No matching credentials are available for this request.",
+        "requirementInfo": {
+          "title": "Credential Request",
+          "description": "{{verifierName}} is requesting access to your identity credentials to verify your identity and open your account securely.",
+          "requiredTitle": "Required Cards",
+          "requiredDescription": "These cards are included in the verifier's required request(s). Follow the selection instructions shown for each request to continue.",
+          "optionalTitle": "Optional Cards",
+          "optionalDescription": "These cards are included in the verifier's optional request(s). You may choose whether to share them.",
+          "footerNote": "Only the requested information from your selected cards will be shared with the verifier. Please review your selection before confirming.",
+          "close": "Close",
+          "securityFooter": "End-to-end encrypted · Verified by {{verifierName}}",
+          "requiredAriaLabel": "Learn more about required credentials",
+          "optionalAriaLabel": "Learn more about optional credentials"
+        }
+      }
   },
   "CredentialRequestModal": {
     "loading": {
@@ -549,10 +619,39 @@
       "consentShare": "I Consent & Share"
     }
   },
+  "SDClaimsSelectionModal": {
+    "subtitle": "Credential preview · select fields to share",
+    "subtitleReadOnly": "Credential preview · all fields will be shared",
+    "confirmProceed": "Confirm & Proceed",
+    "done": "Done",
+    "disclosableFields": "Disclosable INFORMATION",
+    "defaultShareable": "Default Shareable Information",
+    "defaultShareableNote": "Included · cannot be deselected.",
+    "checkAll": "Check All",
+    "clearAll": "Clear All",
+    "credentialPreview": "Credential preview",
+    "shareableFields": "Shareable fields",
+    "previewUnavailable": "Preview is not available for this credential.",
+    "fieldsCount": "{{count}} fields",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
   "NoMatchingCredentialsModal": {
-    "title": "No matching credentials found",
-    "description": "Please download the corresponding credentials and retry the sharing process",
-    "goToHomeButton": "Go Back"
+    "title": "Required Card(s) Not Found!",
+    "claimsIntro": "Your wallet does not contain all the required cards or information needed to complete the verifier's request.",
+    "missingInfoLabel": "Missing Information:",
+    "showMore": "Show more (+{{count}})",
+    "whatYouCanDo": "WHAT YOU CAN DO",
+    "verifierHelp": "Reach out to this verifier for more information on which card(s) are required to proceed.",
+    "matchingCards": "PARTIALLY MATCHING CARDS",
+    "goToHomeButton": "Go to Home",
+    "continueWithAvailableButton": "Continue with available cards",
+    "trustedLabel": "Trusted",
+    "unknownVerifier": "Unknown Verifier"
+  },
+  "MissingClaimsListModal": {
+    "title": "Missing Information",
+    "requiredCount": "{{count}} required"
   },
   "LogoutConfirmation": {
     "title": "Are you sure you want to exit?",

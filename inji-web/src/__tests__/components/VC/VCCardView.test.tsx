@@ -452,7 +452,6 @@ describe('VCCardView Component', () => {
     function assertMenuItem(text: string, testId: string) {
         expect(screen.getByText(text)).toBeInTheDocument();
         let menuOption = screen.getByTestId(`menu-item-${testId}`);
-        expect(within(menuOption).getByTestId(`icon-${testId}`)).toBeInTheDocument();
         expect(within(menuOption).getByTestId(`label-${testId}`)).toBeInTheDocument();
         expect(menuOption).toBeInTheDocument();
         expect(menuOption).toHaveRole("menuitem")

@@ -54,11 +54,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the "N
           class=""
         >
           <button
-            class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+            class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
           >
             <div
-              class="flex items-center justify-center gap-1.5"
+              class="flex items-center justify-center gap-1.5 md:gap-1"
             >
               <span>
                 Add Cards
@@ -113,11 +113,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the "N
             class=""
           >
             <button
-              class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+              class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
               data-testid="btn-add-cards"
             >
               <div
-                class="flex items-center justify-center gap-1.5"
+                class="flex items-center justify-center gap-1.5 md:gap-1"
               >
                 <span>
                   Add Cards
@@ -186,11 +186,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the lo
           class=""
         >
           <button
-            class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+            class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
           >
             <div
-              class="flex items-center justify-center gap-1.5"
+              class="flex items-center justify-center gap-1.5 md:gap-1"
             >
               <span>
                 Add Cards
@@ -321,11 +321,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           class=""
         >
           <button
-            class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+            class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
           >
             <div
-              class="flex items-center justify-center gap-1.5"
+              class="flex items-center justify-center gap-1.5 md:gap-1"
             >
               <span>
                 Add Cards
@@ -467,11 +467,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           class=""
         >
           <button
-            class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+            class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
           >
             <div
-              class="flex items-center justify-center gap-1.5"
+              class="flex items-center justify-center gap-1.5 md:gap-1"
             >
               <span>
                 Add Cards
@@ -509,7 +509,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
             />
           </svg>
           <input
-            class="py-6 w-11/12 flex text-iw-searchTitle focus:outline-none overflow-ellipsis mr-10 text-[14px] leading-[20px] font-medium"
+            class="py-6 w-11/12 flex text-iw-searchTitle focus:outline-none overflow-ellipsis me-10 text-[14px] leading-[20px] font-medium text-start"
             data-testid="input-search"
             placeholder="Search your cards by Name"
             type="text"
@@ -531,7 +531,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
             tabindex="0"
           >
             <div
-              class="flex items-center gap-6 sm:gap-4 min-w-0 overflow-x-auto scrollbar-hide"
+              class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
             >
               <img
                 alt="Credential Type Logo"
@@ -540,7 +540,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 src="logo1.png"
               />
               <span
-                class="text-sm font-semibold text-iw-title whitespace-nowrap flex-shrink-0"
+                class="text-sm font-semibold text-iw-title min-w-0 flex-1 break-words leading-snug"
                 data-testid="credential-type-display-name"
               >
                 Drivers License
@@ -555,7 +555,6 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 data-testid="icon-download"
                 fill="currentColor"
                 height="24"
-                testid="icon-download"
                 viewBox="0 0 24 24"
                 width="24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -602,7 +601,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
             tabindex="0"
           >
             <div
-              class="flex items-center gap-6 sm:gap-4 min-w-0 overflow-x-auto scrollbar-hide"
+              class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
             >
               <img
                 alt="Credential Type Logo"
@@ -611,7 +610,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 src="logo2.png"
               />
               <span
-                class="text-sm font-semibold text-iw-title whitespace-nowrap flex-shrink-0"
+                class="text-sm font-semibold text-iw-title min-w-0 flex-1 break-words leading-snug"
                 data-testid="credential-type-display-name"
               >
                 Health Card
@@ -626,7 +625,6 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 data-testid="icon-download"
                 fill="currentColor"
                 height="24"
-                testid="icon-download"
                 viewBox="0 0 24 24"
                 width="24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -675,11 +673,11 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           class=""
         >
           <button
-            class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
+            class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
           >
             <div
-              class="flex items-center justify-center gap-1.5"
+              class="flex items-center justify-center gap-1.5 md:gap-1"
             >
               <span>
                 Add Cards

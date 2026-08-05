@@ -34,16 +34,6 @@ jest.mock("../../modals/ErrorCard", () => ({
     }
 }));
 
-jest.mock("../../modals/CredentialShareSuccessModal", () => ({
-    CredentialShareSuccessModal: ({ isOpen, returnUrl, onClose }: { isOpen: boolean; returnUrl?: string; onClose?: () => void }) =>
-        isOpen ? (
-            <div data-testid="success-modal">
-                <div data-testid="modal-return-url">{returnUrl || 'no-url'}</div>
-                {onClose && <button data-testid="modal-close-btn" onClick={onClose}>Close</button>}
-            </div>
-        ) : null,
-}));
-
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key === 'message' ? 'Sharing credentials...' : key,
@@ -51,6 +41,7 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe("CredentialShareHandler", () => {
+    const mockOnShareSuccess = jest.fn();
     const defaultProps = {
         verifierName: "TestVerifier",
         returnUrl: "https://verifier.example.com/callback",
@@ -64,6 +55,7 @@ describe("CredentialShareHandler", () => {
         ],
         presentationId: "pres-123",
         onClose: jest.fn(),
+        onShareSuccess: mockOnShareSuccess,
     };
 
     const mockHandleApiError = jest.fn();
@@ -73,6 +65,7 @@ describe("CredentialShareHandler", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockOnShareSuccess.mockReset();
         mockErrorHandlerReturnValue = {
             showError: false,
             isRetrying: false,
@@ -92,13 +85,217 @@ describe("CredentialShareHandler", () => {
         expect(screen.getByTestId("modal-loader-card")).toBeInTheDocument();
     });
 
-    it("shows success modal when API call succeeds", async () => {
+    it("calls onShareSuccess when API call succeeds", async () => {
         mockFetchData.mockResolvedValueOnce({ ok: () => true });
         render(<CredentialShareHandler {...defaultProps} />);
-        await waitFor(() =>
-            expect(screen.getByTestId("success-modal")).toBeInTheDocument()
-        );
+        await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalledWith({
+            verifierName: "TestVerifier",
+            verifierLogo: undefined,
+            verifierTrusted: undefined,
+            credentials: defaultProps.selectedCredentials,
+            returnUrl: defaultProps.returnUrl,
+        }));
         expect(screen.queryByTestId("modal-loader-card")).not.toBeInTheDocument();
+    });
+
+    it("submits selectedSdClaims with empty array for sd-jwt credential", async () => {
+        mockFetchData.mockResolvedValueOnce({ ok: () => true });
+        render(
+            <CredentialShareHandler
+                {...defaultProps}
+                selectedCredentials={[
+                    {
+                        credentialId: "f392fa77-2b24-4bc1-9203-7162fcdaff02",
+                        credentialTypeDisplayName: "SD-JWT VC",
+                        credentialTypeLogo: "https://example.com/logo.png",
+                        format: "dc+sd-jwt",
+                    },
+                ]}
+                selectedSdClaims={{
+                    "f392fa77-2b24-4bc1-9203-7162fcdaff02": [],
+                }}
+            />
+        );
+
+        await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+        expect(mockFetchData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: {
+                    selectedCredentials: ["f392fa77-2b24-4bc1-9203-7162fcdaff02"],
+                    selectedSdClaims: {
+                        "f392fa77-2b24-4bc1-9203-7162fcdaff02": [],
+                    },
+                },
+            })
+        );
+    });
+
+    it("submits selectedSdClaims in presentation body when provided", async () => {
+        mockFetchData.mockResolvedValueOnce({ ok: () => true });
+        render(
+            <CredentialShareHandler
+                {...defaultProps}
+                selectedCredentials={[
+                    {
+                        credentialId: "cred-123",
+                        credentialTypeDisplayName: "SD-JWT VC",
+                        credentialTypeLogo: "https://example.com/logo.png",
+                        format: "dc+sd-jwt",
+                    },
+                ]}
+                selectedSdClaims={{
+                    "cred-123": ["$.name", "$.age"],
+                }}
+            />
+        );
+
+        await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+        expect(mockFetchData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                body: {
+                    selectedCredentials: ["cred-123"],
+                    selectedSdClaims: {
+                        "cred-123": ["$.name", "$.age"],
+                    },
+                },
+            })
+        );
+    });
+
+    describe("DCQL submission", () => {
+        it("sends selectedCredentials as objects (queryId+selectedCredentialIds) for DCQL presentations", async () => {
+            mockFetchData.mockResolvedValueOnce({ ok: () => true });
+            render(
+                <CredentialShareHandler
+                    {...defaultProps}
+                    isDcqlPresentation={true}
+                    dcqlSelection={{
+                        "government-identity": ["vc-pan-uuid"],
+                        "age-proof": ["vc-mdl-uuid"],
+                    }}
+                />
+            );
+
+            await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+            expect(mockFetchData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        selectedCredentials: [
+                            { queryId: "government-identity", selectedCredentialIds: ["vc-pan-uuid"] },
+                            { queryId: "age-proof", selectedCredentialIds: ["vc-mdl-uuid"] },
+                        ],
+                    },
+                })
+            );
+        });
+
+        it("excludes query slots with no selected credential from DCQL selectedCredentials", async () => {
+            mockFetchData.mockResolvedValueOnce({ ok: () => true });
+            render(
+                <CredentialShareHandler
+                    {...defaultProps}
+                    isDcqlPresentation={true}
+                    dcqlSelection={{
+                        "government-identity": ["vc-pan-uuid"],
+                        "optional-query": [],
+                    }}
+                />
+            );
+
+            await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+            expect(mockFetchData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        selectedCredentials: [
+                            { queryId: "government-identity", selectedCredentialIds: ["vc-pan-uuid"] },
+                        ],
+                    },
+                })
+            );
+        });
+
+        it("sends multiple selectedCredentialIds in one object for a multiple:true query", async () => {
+            mockFetchData.mockResolvedValueOnce({ ok: () => true });
+            render(
+                <CredentialShareHandler
+                    {...defaultProps}
+                    isDcqlPresentation={true}
+                    dcqlSelection={{
+                        "documents": ["vc-1", "vc-2"],
+                    }}
+                />
+            );
+
+            await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+            expect(mockFetchData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        selectedCredentials: [
+                            { queryId: "documents", selectedCredentialIds: ["vc-1", "vc-2"] },
+                        ],
+                    },
+                })
+            );
+        });
+
+        it("includes selectedSdClaims alongside DCQL selectedCredentials for SD-JWT credentials", async () => {
+            mockFetchData.mockResolvedValueOnce({ ok: () => true });
+            render(
+                <CredentialShareHandler
+                    {...defaultProps}
+                    isDcqlPresentation={true}
+                    dcqlSelection={{
+                        "government-identity": ["cred-sdjwt-uuid"],
+                        "age-proof": ["cred-ldp-uuid"],
+                    }}
+                    selectedSdClaims={{
+                        "cred-sdjwt-uuid": ["$.given_name", "$.birth_date"],
+                    }}
+                />
+            );
+
+            await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+            expect(mockFetchData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        selectedCredentials: [
+                            { queryId: "government-identity", selectedCredentialIds: ["cred-sdjwt-uuid"] },
+                            { queryId: "age-proof", selectedCredentialIds: ["cred-ldp-uuid"] },
+                        ],
+                        selectedSdClaims: {
+                            "cred-sdjwt-uuid": ["$.given_name", "$.birth_date"],
+                        },
+                    },
+                })
+            );
+        });
+
+        it("falls back to selectedCredentials when isDcqlPresentation is false", async () => {
+            mockFetchData.mockResolvedValueOnce({ ok: () => true });
+            render(
+                <CredentialShareHandler
+                    {...defaultProps}
+                    isDcqlPresentation={false}
+                    dcqlSelection={{ "some-query": ["vc-uuid"] }}
+                />
+            );
+
+            await waitFor(() => expect(mockOnShareSuccess).toHaveBeenCalled());
+
+            expect(mockFetchData).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        selectedCredentials: ["cred-1"],
+                    },
+                })
+            );
+        });
     });
 
     it("shows error card when API call fails (response error)", async () => {
@@ -190,7 +387,7 @@ describe("CredentialShareHandler", () => {
             expect(retryCard).toHaveTextContent("Temporary Issue: Server busy, please retry");
             expect(screen.getByText("Retry")).toBeInTheDocument();
         });
-        expect(screen.queryByTestId("success-modal")).not.toBeInTheDocument();
+        expect(mockOnShareSuccess).not.toHaveBeenCalled();
     });
 
     it("calls onRetry from hook when Retry button is clicked", async () => {
@@ -228,17 +425,11 @@ describe("CredentialShareHandler", () => {
         mockUseApiErrorHandler.mockReturnValue(mockErrorHandlerReturnValue);
         render(<CredentialShareHandler {...defaultProps} />);
         expect(screen.getByTestId("modal-loader-card")).toBeInTheDocument();
-        expect(screen.queryByTestId("success-modal")).not.toBeInTheDocument();
+        expect(mockOnShareSuccess).not.toHaveBeenCalled();
         expect(screen.queryByTestId("modal-error-card")).not.toBeInTheDocument();
     });
 
     describe("redirectUri handling", () => {
-        beforeEach(() => {
-            // Mock window.location.href
-            delete (window as any).location;
-            (window as any).location = { href: '' };
-        });
-
         it("uses redirectUri from API response when available", async () => {
             const apiRedirectUri = "https://api-response.com/redirect";
             mockFetchData.mockResolvedValueOnce({
@@ -249,27 +440,25 @@ describe("CredentialShareHandler", () => {
             render(<CredentialShareHandler {...defaultProps} />);
 
             await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+                expect(mockOnShareSuccess).toHaveBeenCalledWith(
+                    expect.objectContaining({ returnUrl: apiRedirectUri })
+                )
             );
-
-            const modalReturnUrl = screen.getByTestId("modal-return-url");
-            expect(modalReturnUrl).toHaveTextContent(apiRedirectUri);
         });
 
         it("falls back to returnUrl prop when redirectUri is not in API response", async () => {
             mockFetchData.mockResolvedValueOnce({
                 ok: () => true,
-                data: {}, // No redirectUri in response
+                data: {},
             });
 
             render(<CredentialShareHandler {...defaultProps} />);
 
             await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+                expect(mockOnShareSuccess).toHaveBeenCalledWith(
+                    expect.objectContaining({ returnUrl: defaultProps.returnUrl })
+                )
             );
-
-            const modalReturnUrl = screen.getByTestId("modal-return-url");
-            expect(modalReturnUrl).toHaveTextContent(defaultProps.returnUrl);
         });
 
         it("falls back to returnUrl prop when redirectUri is null in API response", async () => {
@@ -281,73 +470,10 @@ describe("CredentialShareHandler", () => {
             render(<CredentialShareHandler {...defaultProps} />);
 
             await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+                expect(mockOnShareSuccess).toHaveBeenCalledWith(
+                    expect.objectContaining({ returnUrl: defaultProps.returnUrl })
+                )
             );
-
-            const modalReturnUrl = screen.getByTestId("modal-return-url");
-            expect(modalReturnUrl).toHaveTextContent(defaultProps.returnUrl);
-        });
-
-        it("calls onClose when both redirectUri and returnUrl are empty", async () => {
-            const onCloseMock = jest.fn();
-            const propsWithoutReturnUrl = {
-                ...defaultProps,
-                returnUrl: "",
-                onClose: onCloseMock,
-            };
-
-            mockFetchData.mockResolvedValueOnce({
-                ok: () => true,
-                data: {}, // No redirectUri
-            });
-
-            render(<CredentialShareHandler {...propsWithoutReturnUrl} />);
-
-            await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
-            );
-
-            const closeButton = screen.getByTestId("modal-close-btn");
-            fireEvent.click(closeButton);
-
-            expect(onCloseMock).toHaveBeenCalledTimes(1);
-        });
-
-        it("redirects to redirectUri from API response when modal close is clicked", async () => {
-            const apiRedirectUri = "https://api-response.com/redirect";
-            mockFetchData.mockResolvedValueOnce({
-                ok: () => true,
-                data: { redirectUri: apiRedirectUri },
-            });
-
-            render(<CredentialShareHandler {...defaultProps} />);
-
-            await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
-            );
-
-            const closeButton = screen.getByTestId("modal-close-btn");
-            fireEvent.click(closeButton);
-
-            expect(window.location.href).toBe(apiRedirectUri);
-        });
-
-        it("redirects to returnUrl prop when redirectUri is not available and modal close is clicked", async () => {
-            mockFetchData.mockResolvedValueOnce({
-                ok: () => true,
-                data: {}, // No redirectUri
-            });
-
-            render(<CredentialShareHandler {...defaultProps} />);
-
-            await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
-            );
-
-            const closeButton = screen.getByTestId("modal-close-btn");
-            fireEvent.click(closeButton);
-
-            expect(window.location.href).toBe(defaultProps.returnUrl);
         });
 
         it("extracts redirectUri from API response on retry success", async () => {
@@ -360,32 +486,26 @@ describe("CredentialShareHandler", () => {
                 data: { redirectUri: "https://retry-success.com/redirect" },
             };
 
-            // First call fails
             mockFetchData.mockResolvedValueOnce(retryableErrorResponse);
 
-            // Store the retry callback and success callback
             let storedRetryCallback: (() => Promise<any>) | null = null;
             let storedRetrySuccessCallback: ((response: any) => void) | null = null;
 
             mockUseApiErrorHandler.mockImplementation(() => {
                 if (mockHandleApiError.mock.calls.length > 0) {
-                    // Extract the retry callback and success callback from handleApiError call
                     const lastCall = mockHandleApiError.mock.calls[mockHandleApiError.mock.calls.length - 1];
                     if (lastCall && lastCall.length >= 3) {
-                        storedRetryCallback = lastCall[2]; // retryFn is the 3rd argument
-                        storedRetrySuccessCallback = lastCall[3]; // onRetrySuccess is the 4th argument
+                        storedRetryCallback = lastCall[2];
+                        storedRetrySuccessCallback = lastCall[3];
                     }
 
                     return {
                         ...mockErrorHandlerReturnValue,
                         showError: true,
                         onRetry: async () => {
-                            // Simulate retry: call the retry function which triggers API call
                             if (storedRetryCallback) {
-                                // Mock the retry API call to succeed
                                 mockFetchData.mockResolvedValueOnce(successResponseWithRedirectUri);
                                 const response = await storedRetryCallback();
-                                // Call the success callback if retry succeeded
                                 if (response && response.ok() && storedRetrySuccessCallback) {
                                     storedRetrySuccessCallback(response);
                                 }
@@ -400,23 +520,21 @@ describe("CredentialShareHandler", () => {
             render(<CredentialShareHandler {...defaultProps} />);
             await waitFor(() => expect(mockHandleApiError).toHaveBeenCalled());
 
-            // Wait for error card to appear
             await waitFor(() =>
                 expect(screen.getByTestId("modal-error-card")).toBeInTheDocument()
             );
 
-            // Trigger retry
             const retryButton = screen.getByRole('button', { name: 'Retry' });
             fireEvent.click(retryButton);
 
-            // Wait for success modal with redirectUri from retry
             await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument(),
+                expect(mockOnShareSuccess).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        returnUrl: "https://retry-success.com/redirect",
+                    })
+                ),
                 { timeout: 3000 }
             );
-
-            const modalReturnUrl = screen.getByTestId("modal-return-url");
-            expect(modalReturnUrl).toHaveTextContent("https://retry-success.com/redirect");
         });
 
         it("prioritizes redirectUri from API response over returnUrl prop", async () => {
@@ -436,34 +554,10 @@ describe("CredentialShareHandler", () => {
             render(<CredentialShareHandler {...propsWithDifferentReturnUrl} />);
 
             await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
+                expect(mockOnShareSuccess).toHaveBeenCalledWith(
+                    expect.objectContaining({ returnUrl: apiRedirectUri })
+                )
             );
-
-            const modalReturnUrl = screen.getByTestId("modal-return-url");
-            expect(modalReturnUrl).toHaveTextContent(apiRedirectUri);
-            expect(modalReturnUrl).not.toHaveTextContent(propReturnUrl);
-        });
-
-        it("passes onClose handler to success modal", async () => {
-            const onCloseMock = jest.fn();
-            const propsWithOnClose = {
-                ...defaultProps,
-                onClose: onCloseMock,
-            };
-
-            mockFetchData.mockResolvedValueOnce({
-                ok: () => true,
-                data: {},
-            });
-
-            render(<CredentialShareHandler {...propsWithOnClose} />);
-
-            await waitFor(() =>
-                expect(screen.getByTestId("success-modal")).toBeInTheDocument()
-            );
-
-            const closeButton = screen.getByTestId("modal-close-btn");
-            expect(closeButton).toBeInTheDocument();
         });
     });
 });

@@ -3,6 +3,7 @@ import { withErrorHandling } from "./errorHandling";
 import { ROUTES } from "./constants";
 import { UseApiReturn } from "../hooks/useApi";
 import { ApiResult } from "../types/data";
+import { safeExternalRedirect } from "./navigationUtils";
 
 export type UserRejectVerifierResponse = {
     success?: boolean;
@@ -47,12 +48,10 @@ export const rejectVerifierRequest = async (options: RejectVerifierOptions): Pro
     if (error || !response?.ok()) {
         return false;
     }
-
-    const redirectTarget =
-        response.data?.redirectUri || redirectUri || "";
-
+    
+    const redirectTarget = redirectUri ?? response.data?.redirectUri ?? "";
     if (redirectTarget) {
-        window.location.href = redirectTarget;
+        safeExternalRedirect(redirectTarget);
         return true;
     }
 

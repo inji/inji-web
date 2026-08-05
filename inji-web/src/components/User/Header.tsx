@@ -21,11 +21,15 @@ import {useApi} from "../../hooks/useApi";
 type UserHeaderProps = {
     headerRef: React.RefObject<HTMLDivElement>;
     headerHeight: number;
+    disableProfileDropdown?: boolean;
+    disableLogoNavigation?: boolean;
 };
 
 export const Header: React.FC<UserHeaderProps> = ({
     headerRef,
-    headerHeight
+    headerHeight,
+    disableProfileDropdown = false,
+    disableLogoNavigation = false,
 }) => {
     const language = useSelector((state: RootState) => state.common.language);
     const navigate = useNavigate();
@@ -120,6 +124,7 @@ export const Header: React.FC<UserHeaderProps> = ({
 
     const toggleProfileDropdown = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation(); // Prevent global click handler from immediately closing the dropdown
+        if (disableProfileDropdown) return;
         setIsProfileDropdownOpen(!isProfileDropdownOpen);
     };
 
@@ -139,9 +144,13 @@ export const Header: React.FC<UserHeaderProps> = ({
                 <InfoFieldSkeleton width="w-24" height="h-2" />
               </div>
             );
-          }
-        
-          return (
+        }
+
+        if (!user) {
+            return null;
+        }
+
+        return (
             <div className="flex gap-2 items-center">
               <div
                 className={`aspect-square w-12 rounded-full bg-iw-avatarPlaceholder overflow-hidden flex items-center justify-center text-iw-avatarText font-medium text-lg ${
@@ -159,12 +168,31 @@ export const Header: React.FC<UserHeaderProps> = ({
                   getProfileInitials(displayName)
                 )}
               </div>
-              <span className="font-semibold text-gray-800">
-                {convertStringIntoPascalCase(displayName)}
-              </span>
+              {displayName && (
+                <span className="font-semibold text-gray-800">
+                  {convertStringIntoPascalCase(displayName)}
+                </span>
+              )}
             </div>
           );
         };
+
+    const handleLogoNavigate = () => {
+        if (disableLogoNavigation) {
+            return;
+        }
+        navigateToUserHome(navigate);
+    };
+
+    const handleLogoKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (disableLogoNavigation) {
+            return;
+        }
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            navigateToUserHome(navigate);
+        }
+    };
 
     return (
         <header
@@ -188,17 +216,24 @@ export const Header: React.FC<UserHeaderProps> = ({
                         />
                     </div>
                     <div
-                        className="w-[130px] sm:w-[160px] md:w-[170px]"
-                        role={'button'}
-                        tabIndex={0}
-                        onMouseDown={() => navigateToUserHome(navigate)}
-                        onKeyUp={() => navigateToUserHome(navigate)}
+                        className={`w-[130px] sm:w-[160px] md:w-[170px] ${
+                            disableLogoNavigation ? "" : "cursor-pointer"
+                        }`}
+                        role={disableLogoNavigation ? "img" : "button"}
+                        tabIndex={disableLogoNavigation ? undefined : 0}
+                        onClick={
+                            disableLogoNavigation ? undefined : handleLogoNavigate
+                        }
+                        onKeyDown={
+                            disableLogoNavigation ? undefined : handleLogoKeyDown
+                        }
+                        aria-disabled={disableLogoNavigation || undefined}
                     >
                         <img
                             src={require('../../assets/InjiWebLogo.png')}
-                            className={`max-w-full h-auto object-contain cursor-pointer ${
-                                isRTL(language) ? 'mr-4' : ''
-                            }`}
+                            className={`max-w-full h-auto object-contain ${
+                                disableLogoNavigation ? "" : "cursor-pointer"
+                            } ${isRTL(language) ? 'mr-4' : ''}`}
                             data-testid="header-injiWeb-logo"
                             alt="Inji Web Logo"
                         />
@@ -208,6 +243,7 @@ export const Header: React.FC<UserHeaderProps> = ({
                 <div className="flex items-center space-x-6">
                     <LanguageSelector />
 
+                    {(isLoading || user) && (
                     <div
                         data-testid="profile-details"
                         className="hidden sm:block relative"
@@ -215,7 +251,7 @@ export const Header: React.FC<UserHeaderProps> = ({
                     >
                         <div className="flex items-center space-x-2">
                             {getUserProfileIconWithName()}
-                            {!isLoading && (
+                            {!isLoading && user && !disableProfileDropdown && (
                                 <div
                                 className="relative inline-block cursor-pointer"
                                 onClick={toggleProfileDropdown}
@@ -225,7 +261,7 @@ export const Header: React.FC<UserHeaderProps> = ({
                             )}
                         </div>
 
-                        {isProfileDropdownOpen && (
+                        {isProfileDropdownOpen && !disableProfileDropdown && (
                             <div
                                 data-testid="profile-dropdown"
                                 className="absolute -right-7 top-100 mt-8 w-56 bg-white rounded-lg shadow-lg z-50 font-medium"
@@ -245,13 +281,14 @@ export const Header: React.FC<UserHeaderProps> = ({
                             </div>
                         )}
                     </div>
+                    )}
                 </div>
             </div>
             <div
                 data-testid="hamburger-menu-dropdown"
                 className="block sm:hidden w-full"
             >
-                {isHamburgerMenuOpen && (
+                {isHamburgerMenuOpen && (isLoading || user) && (
                     <div
                         style={{marginTop: headerHeight}}
                         className="absolute top-1 bg-white shadow-iw-hamburger-dropdown p-2 w-full"
@@ -260,7 +297,7 @@ export const Header: React.FC<UserHeaderProps> = ({
                             <div className="flex items-center px-4 py-2">
                                 {getUserProfileIconWithName()}
                             </div>
-                            {dropdownItems.map((item, index) => (
+                            {!disableProfileDropdown && user && dropdownItems.map((item, index) => (
                                 <React.Fragment key={item.key}>
                                     <div
                                         className={`px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium`}

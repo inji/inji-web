@@ -383,8 +383,7 @@ describe('Testing of StoredCardsPage ->', () => {
         let menu = screen.getAllByTestId("icon-three-dots-menu")[0];
         fireEvent.click(menu);
         expect(screen.getByRole("menu")).toBeInTheDocument()
-        const deleteButton = screen.getByTestId('icon-delete');
-        fireEvent.click(deleteButton);
+        fireEvent.click(screen.getByTestId('menu-item-delete'));
         fireEvent.click(screen.getByRole('button', {name: "Confirm"}));
         expect(mockUseApi.fetchData).toHaveBeenCalledWith(
             {

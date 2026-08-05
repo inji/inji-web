@@ -19,12 +19,18 @@ jest.mock('../../../hooks/useApi', () => ({
 import { useUser } from '../../../hooks/User/useUser';
 import { useApi } from '../../../hooks/useApi';
 
+let lastHeaderProps: Record<string, unknown> = {};
+
 jest.mock('../../../components/User/Header', () => ({
-  Header: ({ headerRef, headerHeight }: any) => (
-    <div data-testid="Header" ref={headerRef}>
-      Header - height: {headerHeight}
-    </div>
-  ),
+  Header: (props: any) => {
+    lastHeaderProps = props;
+    const { headerRef, headerHeight } = props;
+    return (
+      <div data-testid="Header" ref={headerRef}>
+        Header - height: {headerHeight}
+      </div>
+    );
+  },
 }));
 
 jest.mock('../../../components/User/Sidebar', () => ({
@@ -74,6 +80,7 @@ const mockLocationReplace = jest.fn();
 describe('Layout component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    lastHeaderProps = {};
     mockusei18n();
 
     // Setup window mocks
@@ -141,6 +148,15 @@ describe('Layout component', () => {
     expect(screen.getByTestId('Sidebar')).toBeInTheDocument();
     expect(screen.getByTestId('Footer')).toBeInTheDocument();
     expect(screen.getByTestId('Outlet')).toBeInTheDocument();
+  });
+
+  it('disables logo navigation on VP authorize route', () => {
+    setMockUseLocation({ pathname: ROUTES.USER_AUTHORIZE });
+
+    render(<Layout />);
+
+    expect(lastHeaderProps.disableProfileDropdown).toBe(true);
+    expect(lastHeaderProps.disableLogoNavigation).toBe(true);
   });
 
   it('sets dir attribute based on current language', () => {

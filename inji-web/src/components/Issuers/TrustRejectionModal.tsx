@@ -1,93 +1,55 @@
 import React, { useCallback } from "react";
 import { ModalWrapper } from "../../modals/ModalWrapper";
-import { useTranslation } from "react-i18next";
-import { SolidButton } from "../Common/Buttons/SolidButton";
-import { BorderedButton } from "../Common/Buttons/BorderedButton";
 import { useApi } from "../../hooks/useApi";
 import { useNavigate } from "react-router-dom";
 import { rejectVerifierRequest } from "../../utils/verifierUtils";
+import {
+    TrustRejectionModalContent,
+    TrustRejectionModalContentProps,
+} from "./TrustRejectionModalContent";
 
-const TrustRejectionModalStyles = {
-    wrapper: "flex flex-col items-center text-center px-6 py-12 sm:p-8",
-    title: "text-md sm:text-2xl font-semibold text-gray-900 mb-7 mt-8",
-    description: "text-gray-600 mb-6 mx-2 md:mx-8 text-sm sm:text-base",
-    buttonsContainer: "space-y-3 w-full mb-8",
-    confirmButton: `
-        !py-2.5 mt-4 mb-2 !text-base
-    `,
-    goBackButton: "!py-2.5"
-};
-
-
-interface TrustRejectionModalProps {
-  isOpen: boolean;
-  presentationId: string;
-  redirectUri?: string | null;
-  onConfirm?: () => void;
-  onClose?: () => void;
-  testId: string;
+interface TrustRejectionModalProps
+    extends Omit<TrustRejectionModalContentProps, "onConfirm"> {
+    isOpen: boolean;
+    presentationId: string;
+    redirectUri?: string | null;
+    onConfirm?: () => void;
 }
 
 export const TrustRejectionModal: React.FC<TrustRejectionModalProps> = ({
-  isOpen,
-  presentationId,
-  redirectUri,
-  onConfirm,
-  onClose = () => { },
-  testId,
+    isOpen,
+    presentationId,
+    redirectUri,
+    onConfirm,
+    ...contentProps
 }) => {
-  const { t } = useTranslation("VerifierTrustPage");
-  const { fetchData } = useApi();
-  const navigate = useNavigate();
+    const { fetchData } = useApi();
+    const navigate = useNavigate();
 
-  const handleConfirm = useCallback(async () => {
-    await rejectVerifierRequest({
-      presentationId,
-      fetchData,
-      redirectUri,
-      onSuccess: onConfirm,
-      navigate
-    });
-  }, [presentationId, fetchData, redirectUri, onConfirm, navigate]);
+    const handleConfirm = useCallback(async () => {
+        await rejectVerifierRequest({
+            presentationId,
+            fetchData,
+            redirectUri,
+            onSuccess: onConfirm,
+            navigate,
+        });
+    }, [presentationId, fetchData, redirectUri, onConfirm, navigate]);
 
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
-  const styles = TrustRejectionModalStyles;
-
-  return (
-    <ModalWrapper
-      zIndex={50}
-      size="xl"
-      header={<></>}
-      footer={<></>}
-      content={
-        <div data-testid={testId} className={styles.wrapper}>
-
-          <h2 data-testid="title-cancel-confirmation" className={styles.title}>
-            {t(`TrustRejectionModal.title`)}
-          </h2>
-
-          <p data-testid="text-cancel-confirmation-description" className={styles.description}>
-            {t(`TrustRejectionModal.description`)}
-          </p>
-
-          <div className={styles.buttonsContainer}>
-            <SolidButton
-              testId="btn-confirm-cancel"
-              onClick={handleConfirm}
-              title={t(`TrustRejectionModal.confirmButton`)}
-              fullWidth
-              className={styles.confirmButton}
-            />
-            <BorderedButton
-              testId="btn-go-back"
-              onClick={onClose}
-              title={t(`TrustRejectionModal.goBackButton`)}
-              className={styles.goBackButton}
-            />
-          </div>
-        </div>
-      }
-    />
-  );
+    return (
+        <ModalWrapper
+            zIndex={50}
+            size="xl"
+            header={<></>}
+            footer={<></>}
+            content={
+                <TrustRejectionModalContent
+                    {...contentProps}
+                    onConfirm={handleConfirm}
+                />
+            }
+        />
+    );
 };

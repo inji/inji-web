@@ -182,11 +182,11 @@ exports[`ResetPasscodePage Component should match snapshot 1`] = `
               class="w-full"
             >
               <button
-                class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white mt-3 mb-0 sm:mt-3"
+                class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white mt-3 mb-0 sm:mt-3"
                 data-testid="btn-set-new-passcode"
               >
                 <div
-                  class="flex items-center justify-center gap-1.5"
+                  class="flex items-center justify-center gap-1.5 md:gap-1"
                 >
                   <span>
                     set new passcode

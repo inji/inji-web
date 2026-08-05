@@ -7,7 +7,8 @@ module.exports = {
     theme: {
         extend: {
             screens: {
-                'sm-md': {min: '640px', max: '1024px'}
+                'sm-md': {min: '640px', max: '1024px'},
+                '3xl': '1800px',
             },
             fontFamily: {
                 base: 'var(--iw-font-montserrat)',
@@ -81,7 +82,14 @@ module.exports = {
                     darkgreen: 'var(--iw-color-darkGreen)',
                     disabled: 'var(--iw-color-disabled)',
                     dropdownActiveBg: 'var(--iw-color-dropdown-active-bg)',
-                    dropdownText: 'var(--iw-color-dropdown-text)'
+                    dropdownText: 'var(--iw-color-dropdown-text)',
+                    borderGrayLight: 'var(--iw-color-borderGrayLight)',
+                    lightGrayBg: 'var(--iw-color-lightGrayBg)',
+                    mediumGrayText: 'var(--iw-color-mediumGrayText)',
+                    lightGrayBorder: 'var(--iw-color-lightGrayBorder)',
+                    successBg: 'var(--iw-color-successBg)',
+                    successText: 'var(--iw-color-successText)',
+                    consentDescription: 'var(--iw-color-consentDescription)'
                 }
             },
             boxShadow: {
@@ -92,6 +100,14 @@ module.exports = {
                 'iw-layout': `0px -2px 4px -2px rgba(16, 24, 40, 0.06), 0px 4px 8px -2px rgba(16, 24, 40, 0.10)`,
                 'iw-hamburger-dropdown': `0px 3px 6px rgb(0,0,0,0.07), 0px -1px 6px rgb(0,0,0,0.07)`
             },
+            backgroundImage: {
+                'credential-share-card': 'url("./assets/credentialShareCardBG.png")',
+                'selected-credential-info-tile':
+                    'linear-gradient(90deg, rgba(255, 83, 0, 0.1) 0%, rgba(251, 81, 3, 0.1) 16%, rgba(240, 76, 15, 0.1) 31%, rgba(222, 67, 34, 0.1) 46%, rgba(197, 54, 60, 0.1) 61%, rgba(164, 38, 95, 0.1) 75%, rgba(124, 19, 137, 0.1) 90%, rgba(91, 3, 173, 0.1) 100%), linear-gradient(0deg, #FFFFFF, #FFFFFF)',
+                'selected-credential-check-icon':
+                    'linear-gradient(90deg, #FF5300 0%, #FB5103 16%, #F04C0F 31%, #DE4322 46%, #C5363C 61%, #A4265F 75%, #7C1389 90%, #5B03AD 100%)',
+                'iw-brand-horizontal': 'var(--iw-gradient-brand-horizontal)'
+            }
         }
     },
     plugins: [

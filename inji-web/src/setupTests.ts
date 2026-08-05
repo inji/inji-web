@@ -12,9 +12,15 @@ global.window._env_ = {
     DEFAULT_TITLE: "Inji Web Test",
     DEFAULT_LANG: 'en',
     MIMOTO_URL: 'https://mimoto.inji.io',
+    IGNORED_ISSUER_IDS: "",
 };
 
-jest.mock('react-pdf', () => ({}));
+jest.mock('react-pdf', () => ({
+    pdfjs: {
+        GlobalWorkerOptions: { workerSrc: '' },
+        version: 'mock-version'
+    }
+}));
 jest.mock('pdfjs-dist', () => ({
     GlobalWorkerOptions: {workerSrc: ''},
     version: 'mock-version'

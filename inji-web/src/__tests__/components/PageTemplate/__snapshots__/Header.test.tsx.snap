@@ -59,11 +59,12 @@ exports[`Header Container Layout Test Check if the layout is matching with the s
               class="rounded-lg text-center cursor-pointer"
             >
               <div
-                class="py-2 px-2 font-bold bg-white rounded-lg "
+                class="py-2 px-2 font-bold bg-white rounded-lg"
               >
                 <button
                   class="font-bold"
                   data-testid="Header-Menu-FAQ"
+                  type="button"
                 >
                   FAQ
                 </button>

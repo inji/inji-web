@@ -36,8 +36,10 @@ export function useInterceptor() {
             // Avoid redirecting to passcode related pages in case of unauthorized access and re-login. This avoids unnecessary redirections to passcode related pages. If this is not leads to below sort of scenario.
             // Scenario: User authenticated via Provider -> tries to access passcode related page -> session expire & got unauthorized access
             // -> redirect to log in -> user logs in again -> enter passcode -> submit -> user is redirected to passcode page again // Here user is required to enter passcode again, which is not required.
-            if (!isPasscodeRelatedRoute)
+            
+            if (!isPasscodeRelatedRoute && location.pathname !== ROUTES.ROOT) {
                 AppStorage.setItem(KEYS.REDIRECT_TO, currentRoute, true);
+            }
 
             if (isUserLoggedIn() || isSessionActive) {
                 removeUser()

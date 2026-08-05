@@ -129,11 +129,11 @@ export const AppRouter = () => {
                 <Route path={Pages.USER}>
                     <Route path={Pages.PASSCODE} element={renderBasedOnAuthStatus(PasscodePage)} />
                     <Route path={Pages.RESET_PASSCODE} element={renderBasedOnAuthStatus(ResetPasscodePage)} />
-                    <Route path={Pages.AUTHORIZE} element={wrapElement(<VPAuthorizationPage />)} />
                     <Route element={<Layout />}>
 
                         <Route path={Pages.ISSUERS} element={<RedirectToUserHome />} />
                         <Route path={Pages.HOME} element={<DashboardHomePage />} />
+                        <Route path={Pages.AUTHORIZE} element={<VPAuthorizationPage />} />
                         <Route
                             path={Pages.ISSUER_TEMPLATE}
                             element={

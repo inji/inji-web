@@ -402,9 +402,12 @@
     "message": "Preparando sua apresentação de credencial segura..."
   },
   "CredentialShareSuccessModal": {
-    "sharedWith": "Compartilhado com {{verifierName}}",
-    "credentialsPresented": "Suas credenciais foram apresentadas com sucesso a {{verifierName}}",
-    "redirectMessage": "Redirecionando para o verificador em {{count}} segundos..."
+    "title": "Credenciais compartilhadas",
+    "subtitle": "Compartilhadas com sucesso com {{verifierName}}",
+    "cardsShared": "CARTÕES COMPARTILHADOS ({{count}})",
+    "sharedTodayAt": "Hoje às {{time}}",
+    "trustedLabel": "Confiável",
+    "redirectMessage": "Retornando ao verificador em {{count}} segundos..."
   },
   "User": {
     "Home": {
@@ -491,6 +494,15 @@
     }
   },
   "VerifierTrustPage": {
+    "mainPage": {
+      "unknownVerifier": "Nome do Verificador",
+      "description": "Solicitando acesso ao(s) seu(s) cartão(ões)",
+      "descriptionSubtext": "Revise as informações solicitadas e escolha o(s) cartão(ões) que deseja compartilhar. Somente as informações selecionadas do cartão escolhido serão compartilhadas com o verificador.",
+      "trustedLabel": "Confiável",
+      "footerInfo": "Selecione as credenciais abaixo para aprovar este pedido",
+      "addCards": "Adicionar Cartões",
+      "searchPlaceholder": "Pesquise os seus documentos por nome"
+    },
     "modal": {
       "title": "Verificador desconhecido",
       "description": "Certifique-se de que você reconhece ou confia neste Verificador. \nDepois que confiar neste verificador:",
@@ -499,6 +511,7 @@
       "benefitSkipReviewFuture": "Futuros pedidos de verificação deste Verificador serão confiados automaticamente.",
       "trustButton": "Sim, eu confio neste Verificador",
       "notTrustButton": "Não, eu não confio neste Verificador",
+      "cancelButton": "Cancelar",
       "infoTooltipButton": "O que significa confiar?",
       "infoTooltipText": "Confiar num verificador permite que ele solicite as suas credenciais. Ainda escolherá quais as credenciais a partilhar na próxima etapa."
     },
@@ -528,6 +541,64 @@
     "loadingCard": {
       "title": "A buscar informações do verificador...",
       "subtitle": "Por favor, aguarde enquanto verificamos o pedido e preparamos as suas credenciais."
+    },
+    "credentialTile": {
+      "unselectedTitle": "Selecione a credencial a ser partilhada",
+      "selectedTitle": "Credencial selecionada",
+      "shareCredentialsButton": "Confirmar e compartilhar",
+      "shareCredentialsDeclineButton": "Recusar"
+    },
+    "consentRequiredModal": {
+      "title": "Consentimento necessário",
+      "description": "Revise sua seleção antes de continuar.",
+      "credentialsTitle": "CARTÕES A SEREM COMPARTILHADOS ({{count}})",
+      "credentialsDescription": "Somente as informações selecionadas dos cartões escolhidos serão compartilhadas com o verificador. Nenhuma informação adicional será compartilhada.",
+      "consentButtonTitle": "Confirmar e Compartilhar",
+      "backButtonTitle": "Não, voltar"
+    },
+    "leaveConfirmation": {
+      "title": "Tem certeza de que deseja sair?",
+      "description": "Se você sair desta página, sairá do processo de envio de sua Credencial Verificável e seu progresso poderá ser perdido.",
+      "confirmButton": "Sim, sair",
+      "cancelButton": "Não, voltar"
+    },
+    "dcql": {
+      "mandatorySection": "Obrigatório",
+      "optionalSection": "Opcional",
+      "mandatoryCards": "CARTÕES OBRIGATÓRIOS",
+      "optionalCards": "CARTÕES OPCIONAIS",
+      "optionalAddOns": "COMPLEMENTOS OPCIONAIS",
+      "required": "Obrigatório",
+      "multipleCards": "Vários cartões",
+      "allRequired": "Todos os cartões desta opção são obrigatórios",
+      "credentialsCount": "{{count}} credenciais",
+      "or": "OU",
+      "instruction": "Selecione uma credencial da lista para compartilhá-la com segurança com o verificador.",
+      "instructionSelectOne": "Selecione um cartão entre as opções disponíveis.",
+      "instructionSelectAll": "Selecione todos os cartões necessários para continuar.",
+      "instructionSelectCount": "Selecione {{count}} cartões entre as opções disponíveis.",
+      "instructionOnePerSet": "Selecione um cartão de cada grupo.",
+      "instructionComplex": "Siga as instruções de seleção para atender à solicitação do verificador.",
+      "selectShareableFields": "Informações obrigatórias",
+      "selectRequiredClaims": "Selecionar informações obrigatórias",
+      "viewCard": "Ver cartão",
+      "showAllCards": "Mostrar todos os {{count}} cartões",
+      "clearAll": "Limpar tudo",
+      "unknownCredential": "Credencial",
+      "noSatisfiableOptions": "Não há credenciais compatíveis disponíveis para esta solicitação.",
+      "requirementInfo": {
+        "title": "Solicitação de credenciais",
+        "description": "{{verifierName}} está solicitando acesso às suas credenciais de identidade para verificar sua identidade e abrir sua conta com segurança.",
+        "requiredTitle": "Cartas obrigatórias",
+        "requiredDescription": "Estes cartões estão incluídos na(s) solicitação(ões) exigida(s) do verificador. Siga as instruções de seleção apresentadas para cada solicitação para prosseguir.",
+        "optionalTitle": "Cartas Opcionais",
+        "optionalDescription": "Estes cartões estão incluídos nas solicitações opcionais do verificador. Você pode escolher se deseja compartilhá-los.",
+        "footerNote": "Somente as informações solicitadas dos cartões selecionados serão compartilhadas com o verificador. Revise sua seleção antes de confirmar.",
+        "close": "Fechar",
+        "securityFooter": "Criptografia de ponta a ponta · Verificado por {{verifierName}}",
+        "requiredAriaLabel": "Saiba mais sobre as credenciais obrigatórias",
+        "optionalAriaLabel": "Saiba mais sobre os complementos opcionais"
+      }
     }
   },
   "CredentialRequestModal": {
@@ -551,10 +622,39 @@
       "consentShare": "Eu consinto e partilho"
     }
   },
+  "SDClaimsSelectionModal": {
+    "subtitle": "Visualização da credencial · selecione os campos para compartilhar",
+    "subtitleReadOnly": "Visualização da credencial · todos os campos serão compartilhados",
+    "confirmProceed": "Confirmar e continuar",
+    "done": "Concluído",
+    "disclosableFields": "Informações divulgáveis",
+    "defaultShareable": "Informações compartilháveis por padrão",
+    "defaultShareableNote": "Incluído · não pode ser desmarcado.",
+    "checkAll": "Selecionar tudo",
+    "clearAll": "Limpar tudo",
+    "credentialPreview": "Visualização da credencial",
+    "shareableFields": "Campos compartilháveis",
+    "previewUnavailable": "A visualização não está disponível para esta credencial.",
+    "fieldsCount": "{{count}} campos",
+    "expand": "Expandir",
+    "collapse": "Recolher"
+  },
   "NoMatchingCredentialsModal": {
-    "title": "Nenhuma credencial correspondente encontrada",
-    "description": "Por favor, descarregue as credenciais correspondentes e tente novamente o processo de partilha",
-    "goToHomeButton": "Volte"
+    "title": "Nenhum cartão correspondente encontrado",
+    "claimsIntro": "Sua carteira não contém todos os cartões ou informações necessários para concluir a solicitação do verificador.",
+    "missingInfoLabel": "Informações ausentes:",
+    "showMore": "Mostrar mais (+{{count}}) >",
+    "whatYouCanDo": "O QUE VOCÊ PODE FAZER",
+    "verifierHelp": "Entre em contato com o verificador para obter mais informações sobre os cartões necessários para continuar.",
+    "matchingCards": "CARTÕES PARCIALMENTE CORRESPONDENTES",
+    "goToHomeButton": "Ir para a página inicial",
+    "continueWithAvailableButton": "Continuar com os cartões disponíveis",
+    "trustedLabel": "Confiável",
+    "unknownVerifier": "Verificador desconhecido"
+  },
+  "MissingClaimsListModal": {
+    "title": "Informações ausentes",
+    "requiredCount": "{{count}} obrigatórias"
   },
   "LogoutConfirmation": {
     "title": "Tem certeza de que deseja sair?",

@@ -108,6 +108,27 @@ export type WalletCredential = {
     credentialTypeDisplayName: string;
     credentialTypeLogo: string;
     credentialId: string;
+    format: string;
+    claims?: string[];
+    sdClaims?: string[];
+};
+
+export type SelectedSdClaimsMap = Record<string, string[]>;
+
+export type DcqlSelectionEntry = {
+    queryId: string;
+    selectedCredentialIds: string[];
+};
+
+export type SubmitPresentationBody = {
+    /**
+     * Polymorphic field — Mimoto inspects the first element to detect the spec version:
+     *   Draft-23  → array of strings  (credential UUIDs)
+     *   DCQL/OVP1 → array of objects  ({ queryId, selectedCredentialIds })
+     */
+    selectedCredentials?: string[] | DcqlSelectionEntry[];
+    /** SD-JWT claim disclosure paths, keyed by credentialId (both modes) */
+    selectedSdClaims?: SelectedSdClaimsMap;
 };
 
 export type FAQAccordionItemType = {

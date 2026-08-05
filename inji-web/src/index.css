@@ -71,7 +71,29 @@
         --iw-color-disabled: #ADB6BD;
         --iw-color-dropdown-active-bg: #F7F3F0;
         --iw-color-dropdown-text: #232B38;
+        --iw-color-borderGrayLight: #E5E7EB;
+        --iw-color-lightGrayBg: #F9FAFB;
+        --iw-color-mediumGrayText: #4A5565;
+        --iw-color-lightGrayBorder: #F3F4F6;
+        --iw-color-successBg: #00C950;
+        --iw-color-successText: #49CF00;
+        --iw-color-consentDescription: #5D5D5D;
+        --iw-color-credentialSelectedBg: #00C950;
+        --iw-color-credentialSelectedText: #49CF00;
         --iw-color-paleViolet: #FAF8FF;
+        /* Brand stroke (8 stops, same as border-image / Credential request UI) */
+        --iw-gradient-brand-horizontal: linear-gradient(
+            90deg,
+            #ff5300 0%,
+            #fb5103 16%,
+            #f04c0f 31%,
+            #de4322 46%,
+            #c5363c 61%,
+            #a4265f 75%,
+            #7c1389 90%,
+            #5b03ad 100%
+        );
+        --iw-gradient-brand-border-inner: var(--iw-color-tileBackground);
     }
     [class="emerald_theme"] {
         --iw-font-base: "Inter", sans-serif;
@@ -130,6 +152,15 @@
         --iw-color-disabled: #ADB6BD;
         --iw-color-dropdown-active-bg: #F7F3F0;
         --iw-color-dropdown-text: #232B38;
+        --iw-color-borderGrayLight: #E5E7EB;
+        --iw-color-lightGrayBg: #F9FAFB;
+        --iw-color-mediumGrayText: #4A5565;
+        --iw-color-lightGrayBorder: #F3F4F6;
+        --iw-color-successBg: #00C950;
+        --iw-color-successText: #49CF00;
+        --iw-color-consentDescription: #5D5D5D;
+        --iw-color-credentialSelectedBg: #00C950;
+        --iw-color-credentialSelectedText: #49CF00;
         --iw-color-paleViolet: #FAF8FF;
     }
 }
@@ -164,6 +195,40 @@
 
   .gradient-outline-input:-moz-focusring {
     outline: none;
+  }
+
+  /**
+   * Brand border using the same stops as border-image-source (8 stops).
+   * Rounded corners: use this. Inner fill: --iw-gradient-brand-border-inner (default white tile).
+   */
+  .border-iw-brand-gradient {
+    border: 2px solid transparent;
+    background: linear-gradient(
+        var(--iw-gradient-brand-border-inner),
+        var(--iw-gradient-brand-border-inner)
+    )
+        padding-box,
+    var(--iw-gradient-brand-horizontal) border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  .iw-scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+  }
+
+  .iw-scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .iw-scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 9999px;
+  }
+
+  .iw-scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 

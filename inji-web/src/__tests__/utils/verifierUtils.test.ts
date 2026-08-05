@@ -117,7 +117,7 @@ describe('verifierUtils', () => {
                 redirectUri: propUri
             });
 
-            expect(window.location.href).toBe(apiUri);
+            expect(window.location.href).toBe(propUri);
         });
 
         it('should not call onSuccess or redirect when API result is not ok', async () => {

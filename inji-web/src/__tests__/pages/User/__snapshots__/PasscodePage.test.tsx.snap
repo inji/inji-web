@@ -291,12 +291,12 @@ exports[`Passcode check if layout is matching with snapshot when Wallet doesn't 
                   class="w-full"
                 >
                   <button
-                    class="w-full text-center items-center text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg false bg-gray-400 cursor-not-allowed grayscale"
+                    class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg false bg-gray-400 cursor-not-allowed grayscale"
                     data-testid="btn-submit-passcode"
                     disabled=""
                   >
                     <div
-                      class="flex items-center justify-center gap-1.5"
+                      class="flex items-center justify-center gap-1.5 md:gap-1"
                     >
                       <span>
                         submit

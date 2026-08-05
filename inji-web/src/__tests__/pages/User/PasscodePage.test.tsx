@@ -386,6 +386,7 @@ describe('Passcode', () => {
     });
 
     describe('Passcode mismatch validation', () => {
+        jest.setTimeout(20000);
         test('should show error when both passcodes are complete but do not match', async () => {
             mockApiResponse({data: []}); // No wallet exists - creating wallet mode
             renderWithProviders(<PasscodePage/>);

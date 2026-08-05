@@ -80,12 +80,13 @@ const LoginSessionStatusChecker = () => {
         try {
             setIsLoading(true)
             await fetchUserProfile();
-            setIsLoading(false)
         } catch (error) {
             console.error('Error fetching user profile:', error);
             if (isLoginProtectedRoute(location.pathname)) {
                 redirectToLogin();
             }
+        } finally {
+            setIsLoading(false)
         }
     }, [redirectToLogin, fetchUserProfile, location.pathname]);
 

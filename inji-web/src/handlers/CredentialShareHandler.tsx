@@ -4,30 +4,50 @@ import { useApi } from "../hooks/useApi";
 import { api } from "../utils/api";
 import { LoaderModal } from "../modals/LoaderModal";
 import { ErrorCard } from "../modals/ErrorCard";
-import { CredentialShareSuccessModal } from "../modals/CredentialShareSuccessModal";
-import { PresentationCredential, CredentialShareSuccessModalProps } from "../types/components";
+import { PresentationCredential } from "../types/components";
 import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
+import { DcqlSelectionEntry, SelectedSdClaimsMap, SubmitPresentationBody } from "../types/data";
+import { DcqlSelectionState } from "../types/dcql";
+
+export interface CredentialShareSuccessPayload {
+    verifierName: string;
+    verifierLogo?: string | null;
+    verifierTrusted?: boolean;
+    credentials: PresentationCredential[];
+    returnUrl: string;
+}
 
 interface CredentialShareHandlerProps {
     verifierName: string;
+    verifierLogo?: string | null;
+    verifierTrusted?: boolean;
     returnUrl: string;
     selectedCredentials: PresentationCredential[];
+    selectedSdClaims?: SelectedSdClaimsMap;
     presentationId: string;
+    isDcqlPresentation?: boolean;
+    dcqlSelection?: DcqlSelectionState;
     onClose?: () => void;
+    onShareSuccess?: (payload: CredentialShareSuccessPayload) => void;
 }
 
 export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
                                                                                   verifierName,
+                                                                                  verifierLogo,
+                                                                                  verifierTrusted,
                                                                                   returnUrl,
                                                                                   selectedCredentials,
+                                                                                  selectedSdClaims,
                                                                                   presentationId,
-                                                                                  onClose
+                                                                                  isDcqlPresentation,
+                                                                                  dcqlSelection,
+                                                                                  onClose,
+                                                                                  onShareSuccess
                                                                               }) => {
     const { fetchData } = useApi();
     const {t} = useTranslation("ShareHandlerLoadingModal");
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
-    const [redirectUri, setRedirectUri] = useState<string | null>(null);
     const hasSubmittedRef = useRef<boolean>(false);
 
     const {
@@ -41,23 +61,51 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
     } = useApiErrorHandler({ onClose });
 
     const submitPresentationCallback = useCallback(async () => {
+        const body: SubmitPresentationBody = {};
+
+        if (isDcqlPresentation && dcqlSelection) {
+            // DCQL: selectedCredentials is an array of objects — Mimoto detects DCQL
+            // by inspecting whether the first element has a queryId field.
+            const dcqlEntries: DcqlSelectionEntry[] = Object.entries(dcqlSelection)
+                .filter(([, ids]) => ids.length > 0)
+                .map(([queryId, selectedCredentialIds]) => ({ queryId, selectedCredentialIds }));
+            body.selectedCredentials = dcqlEntries;
+        } else {
+            // Draft-23: selectedCredentials is an array of plain credential ID strings.
+            body.selectedCredentials = selectedCredentials.map((c) => c.credentialId);
+        }
+
+        if (selectedSdClaims && Object.keys(selectedSdClaims).length > 0) {
+            body.selectedSdClaims = selectedSdClaims;
+        }
+
         const response = await fetchData({
             apiConfig: api.submitPresentation,
             url: api.submitPresentation.url(presentationId),
-            body: {
-                selectedCredentials: selectedCredentials.map(c => c.credentialId)
-            }
+            body,
         });
         return response;
-    }, [fetchData, presentationId, selectedCredentials]);
+    }, [fetchData, presentationId, selectedCredentials, selectedSdClaims, isDcqlPresentation, dcqlSelection]);
 
     const handleRetrySuccess = useCallback((response: any) => {
         const responseRedirectUri = response.data?.redirectUri;
-        if (responseRedirectUri) {
-            setRedirectUri(responseRedirectUri);
-        }
+        const finalReturnUrl = responseRedirectUri || returnUrl;
+        onShareSuccess?.({
+            verifierName,
+            verifierLogo,
+            verifierTrusted,
+            credentials: selectedCredentials,
+            returnUrl: finalReturnUrl,
+        });
         setIsSuccess(true);
-    }, []);
+    }, [
+        onShareSuccess,
+        returnUrl,
+        selectedCredentials,
+        verifierLogo,
+        verifierName,
+        verifierTrusted,
+    ]);
 
     const submitPresentation = useCallback(async () => {
         setIsLoading(true);
@@ -67,9 +115,14 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
 
             if (response.ok()) {
                 const responseRedirectUri = response.data?.redirectUri;
-                if (responseRedirectUri) {
-                    setRedirectUri(responseRedirectUri);
-                }
+                const finalReturnUrl = responseRedirectUri || returnUrl;
+                onShareSuccess?.({
+                    verifierName,
+                    verifierLogo,
+                    verifierTrusted,
+                    credentials: selectedCredentials,
+                    returnUrl: finalReturnUrl,
+                });
                 setIsSuccess(true);
             } else {
                 const errorMessage = response.error?.message || 'Failed to submit presentation';
@@ -85,7 +138,7 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
         } finally {
             setIsLoading(false);
         }
-    }, [submitPresentationCallback, handleApiError, handleRetrySuccess]);
+    }, [submitPresentationCallback, handleApiError, handleRetrySuccess, onShareSuccess, returnUrl, selectedCredentials, verifierLogo, verifierName, verifierTrusted]);
 
     useEffect(() => {
         if (hasSubmittedRef.current) return;
@@ -95,21 +148,8 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
         void submitPresentation();
     }, [submitPresentation, selectedCredentials, presentationId]);
 
-    const handleSuccessClose = () => {
-        const finalRedirectUri = redirectUri || returnUrl;
-        if (finalRedirectUri) window.location.href = finalRedirectUri;
-        else if (onClose) onClose();
-    };
-
     if (isSuccess) {
-        const successModalProps: CredentialShareSuccessModalProps = {
-            isOpen: true,
-            verifierName,
-            credentials: selectedCredentials,
-            returnUrl: redirectUri || returnUrl,
-            onClose: handleSuccessClose
-        };
-        return <CredentialShareSuccessModal {...successModalProps} />;
+        return null;
     }
 
     if (showError) {

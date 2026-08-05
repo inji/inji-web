@@ -9,7 +9,6 @@ import {Provider} from "react-redux";
 
 describe("Test the Layout of the Modal Wrapper", () => {
 
-    const customMockFn = jest.fn();
     beforeEach(() => {
         render(
             <Provider store={reduxStore}>
@@ -35,26 +34,12 @@ describe("Test the Layout of the Modal Wrapper", () => {
         expect(document).toBeInTheDocument();
     })
     test("Snapshot test for ModalWrapper styling", () => {
-        const { asFragment } = render(
-            <Provider store={reduxStore}>
-                <ModalWrapper 
-                    header={<DataShareHeader title={"title"} subTitle={"subTitle"}/>}
-                    content={<DataShareContent 
-                        credentialName={"credentialName"} 
-                        credentialLogo={"credentialLogo"} 
-                        setIsCustomExpiryInTimesModalOpen={jest.fn()}
-                    />}
-                    footer={<DataShareFooter 
-                        cancelText={"cancel"} 
-                        successText={"success"} 
-                        onSuccess={jest.fn()} 
-                        onCancel={jest.fn()}
-                    />}
-                    size={"3xl"}
-                    zIndex={40} 
-                />
-            </Provider>
-        );
-        expect(asFragment()).toMatchSnapshot();
+        // Uses the already-rendered modal from beforeEach.
+        const backdrops = screen.getAllByTestId("ModalWrapper-BackDrop");
+        const outers = screen.getAllByTestId("ModalWrapper-Outer-Container");
+        expect({
+            backdrop: backdrops[0]?.outerHTML,
+            outer: outers[0]?.outerHTML
+        }).toMatchSnapshot();
     });
 })

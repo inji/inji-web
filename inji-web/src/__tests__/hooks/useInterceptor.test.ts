@@ -178,6 +178,28 @@ describe("useInterceptor", () => {
         expect(navigateMock).not.toHaveBeenCalled();
     });
 
+    test("should not overwrite redirectTo when 401 happens on login home page", async () => {
+        (useLocation as jest.Mock).mockReturnValue({
+            pathname: ROUTES.ROOT,
+            search: "",
+            hash: ""
+        });
+        isUserLoggedInMock.mockReturnValue(false);
+        (AppStorage.getItem as jest.Mock).mockReturnValue(null);
+
+        const errorCallback = getErrorCallback();
+        const mockError = {
+            response: {
+                status: 401,
+                config: {url: "/users/me"}
+            }
+        };
+
+        await expect(errorCallback(mockError)).rejects.toBe(mockError);
+        expect(AppStorage.setItem).not.toHaveBeenCalled();
+        expect(navigateMock).not.toHaveBeenCalled();
+    });
+
     function assertStoringOfCurrentLocation() {
         expect(AppStorage.setItem).toHaveBeenCalledTimes(1);
         expect(AppStorage.setItem).toHaveBeenCalledWith("redirectTo", "/test-path?test=true#test", true);

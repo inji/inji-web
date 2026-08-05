@@ -41,6 +41,7 @@
     "start": "cross-env PORT=3004 react-scripts start",
     "build": "CI=false react-scripts build",
     "test": "react-scripts test --silent --testPathPattern=__tests__",
+    "test:ci": "react-scripts test --silent --coverage --watchAll=false --testPathPattern=__tests__",
     "eject": "react-scripts eject",
     "sonar": "sonar-scanner"
   },

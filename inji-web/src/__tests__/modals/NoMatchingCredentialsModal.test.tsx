@@ -65,6 +65,26 @@ jest.mock('../../components/Common/Buttons/SolidButton', () => ({
     ),
 }));
 
+jest.mock('../../assets/RedShield.svg', () => 'red-shield-mock.svg');
+jest.mock('../../assets/FullRedShield.svg', () => 'red-shield-mock.svg');
+jest.mock('../../assets/TrustedIcon.svg', () => 'trusted-icon-mock.svg');
+jest.mock('../../assets/unknown_verifier_logo.png', () => 'unknown-verifier-logo-mock.png');
+jest.mock('../../components/Common/Buttons/CloseIconButton', () => ({
+    CloseIconButton: ({ onClick, btnTestId }: { onClick: () => void; btnTestId?: string }) => (
+        <button type="button" data-testid={btnTestId} onClick={onClick}>
+            Close
+        </button>
+    ),
+}));
+
+jest.mock('../../components/Common/Buttons/BackArrowButton', () => ({
+    BackArrowButton: ({ onClick, btnTestId }: { onClick: () => void; btnTestId?: string }) => (
+        <button type="button" data-testid={btnTestId} onClick={onClick}>
+            Back
+        </button>
+    ),
+}));
+
 jest.mock('../../assets/error_message.svg', () => 'error-message-icon-mock.svg');
 
 describe('NoMatchingCredentialsModal', () => {
@@ -98,21 +118,42 @@ describe('NoMatchingCredentialsModal', () => {
 
         originalLocation = window.location;
 
-        mockUseTranslation.mockReturnValue({
-            t: (key: string) => {
+        mockUseTranslation.mockImplementation((namespace?: string) => ({
+            t: (key: string, vars?: Record<string, unknown>) => {
+                if (namespace === "MissingClaimsListModal") {
+                    if (key === "requiredCount" && vars?.count !== undefined) {
+                        return `${vars.count} required`;
+                    }
+                    if (key === "title") {
+                        return "Missing Information";
+                    }
+                }
+
                 const translations: Record<string, string> = {
-                    'title': 'No Matching Credentials',
-                    'description': 'You do not have the required credentials to proceed.',
-                    'goToHomeButton': 'Go to Home',
-                    'ErrorCard.defaultTitle': 'Default Error Title',
-                    'ErrorCard.defaultDescription': 'Default Error Description',
-                    'ErrorCard.closeButton': 'Close',
-                    'RetryCard.defaultDescription': 'Default Retry Description',
-                    'RetryCard.retryButton': 'Retry',
+                    title: "No Matching Cards Found",
+                    claimsIntro:
+                        "The verifier has requested cards based on the following claims:",
+                    showMore: "Show more (+ {{count}})",
+                    whatYouCanDo: "WHAT YOU CAN DO",
+                    verifierHelp:
+                        "Reach out to this verifier for more information on which Cards are required to proceed.",
+                    matchingCards: "MATCHING CARDS",
+                    goToHomeButton: "Go to Home",
+                    continueWithAvailableButton: "Continue with available cards",
+                    trustedLabel: "Trusted",
+                    unknownVerifier: "Unknown Verifier",
+                    "ErrorCard.defaultTitle": "Default Error Title",
+                    "ErrorCard.defaultDescription": "Default Error Description",
+                    "ErrorCard.closeButton": "Close",
+                    "RetryCard.defaultDescription": "Default Retry Description",
+                    "RetryCard.retryButton": "Retry",
                 };
+                if (key === "showMore" && vars?.count !== undefined) {
+                    return `Show more (+ ${vars.count})`;
+                }
                 return translations[key] || key;
             },
-        } as any);
+        }));
 
         mockUseApi.mockReturnValue({
             fetchData: mockFetchData,
@@ -186,14 +227,14 @@ describe('NoMatchingCredentialsModal', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             const errorIcon = screen.getByTestId('img-no-matching-credentials-icon');
             expect(errorIcon).toBeInTheDocument();
-            expect(errorIcon).toHaveAttribute('src', 'error-message-icon-mock.svg');
-            expect(errorIcon).toHaveAttribute('alt', 'Error Icon');
+            expect(errorIcon).toHaveAttribute('src', 'red-shield-mock.svg');
+            expect(errorIcon).toHaveAttribute('alt', '');
         });
 
-        it('renders title and description from translations', () => {
+        it('renders title and claims intro from translations', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
-            expect(screen.getByText('No Matching Credentials')).toBeInTheDocument();
-            expect(screen.getByText('You do not have the required credentials to proceed.')).toBeInTheDocument();
+            expect(screen.getByText('No Matching Cards Found')).toBeInTheDocument();
+            expect(screen.getByText('The verifier has requested cards based on the following claims:')).toBeInTheDocument();
         });
 
         it('renders go to home button', () => {
@@ -201,6 +242,37 @@ describe('NoMatchingCredentialsModal', () => {
             const goToHomeButton = screen.getByTestId('btn-go-to-home');
             expect(goToHomeButton).toBeInTheDocument();
             expect(goToHomeButton).toHaveTextContent('Go to Home');
+        });
+
+        it('opens full missing claims modal when show more is clicked', () => {
+            const manyClaims = Array.from({ length: 5 }, (_, i) => `claim-${i + 1}`);
+            render(
+                <NoMatchingCredentialsModal
+                    {...defaultProps}
+                    missingClaims={manyClaims}
+                />
+            );
+
+            fireEvent.click(screen.getByTestId('btn-show-more-claims'));
+
+            expect(
+                screen.getByTestId('card-missing-claims-list-modal')
+            ).toBeInTheDocument();
+            expect(screen.getByText('Missing Information')).toBeInTheDocument();
+            expect(screen.getByText('5 required')).toBeInTheDocument();
+            expect(screen.getByTestId('missing-claims-list')).toHaveTextContent(
+                'Claim 4'
+            );
+            expect(screen.getByTestId('missing-claims-list')).toHaveTextContent(
+                'Claim 5'
+            );
+
+            fireEvent.click(screen.getByTestId('button-missing-claims-list-back'));
+
+            expect(
+                screen.queryByTestId('card-missing-claims-list-modal')
+            ).not.toBeInTheDocument();
+            expect(screen.getByText('No Matching Cards Found')).toBeInTheDocument();
         });
     });
 
@@ -248,6 +320,38 @@ describe('NoMatchingCredentialsModal', () => {
                 });
             });
             expect(window.location.href).toBe('https://example.com/redirect');
+        });
+
+        it('does not reject verifier when matching credentials are available', async () => {
+            const onClose = jest.fn();
+            const matchingCredentials = [
+                {
+                    credentialId: 'cred-1',
+                    credentialTypeDisplayName: 'Govt Id',
+                    credentialTypeLogo: 'https://example.com/logo.png',
+                    format: 'dc+sd-jwt',
+                },
+            ];
+
+            render(
+                <NoMatchingCredentialsModal
+                    {...defaultProps}
+                    matchingCredentials={matchingCredentials}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.getByTestId('btn-go-to-home')).toHaveTextContent(
+                'Continue with available cards'
+            );
+
+            fireEvent.click(screen.getByTestId('btn-go-to-home'));
+
+            await waitFor(() => {
+                expect(onClose).toHaveBeenCalledTimes(1);
+            });
+            expect(mockFetchData).not.toHaveBeenCalled();
+            expect(defaultProps.onGoToHome).not.toHaveBeenCalled();
         });
 
         it('calls onGoToHome when no redirectUri is provided after successful API call', async () => {
@@ -439,14 +543,14 @@ describe('NoMatchingCredentialsModal', () => {
         it('has correct CSS classes for responsive design', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             const modalContainer = screen.getByTestId('card-no-matching-credentials-modal');
-            expect(modalContainer).toHaveClass('w-full', 'max-w-[400px]', 'min-h-[350px]');
+            expect(modalContainer).toHaveClass('w-full');
         });
 
         it('passes correct props to ModalWrapper', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             const modalWrapper = screen.getByTestId('ModalWrapper-Mock');
             expect(modalWrapper).toHaveAttribute('data-z-index', '50');
-            expect(modalWrapper).toHaveAttribute('data-size', 'md');
+            expect(modalWrapper).toHaveAttribute('data-size', '3xl');
         });
     });
 
@@ -486,7 +590,7 @@ describe('NoMatchingCredentialsModal', () => {
     describe('Accessibility', () => {
         it('has proper ARIA attributes', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
-            const title = screen.getByText('No Matching Credentials');
+            const title = screen.getByText('No Matching Cards Found');
             expect(title).toHaveAttribute('id', 'title-no-matching-credentials');
             const description = screen.getByTestId('text-no-matching-credentials-description');
             expect(description).toBeInTheDocument();
@@ -512,8 +616,10 @@ describe('NoMatchingCredentialsModal', () => {
         it('handles special characters in missing claims', () => {
             const propsWithSpecialClaims = { ...defaultProps, missingClaims: ['claim@#$%', 'claim with spaces', 'claim-with-dashes'] };
             render(<NoMatchingCredentialsModal {...propsWithSpecialClaims} />);
-            const description = screen.getByTestId('text-no-matching-credentials-description');
-            expect(description).toHaveTextContent(/Missing: claim@#\$%, claim with spaces, claim-with-dashes/);
+            const claimsList = screen.getByTestId('no-matching-claims-list');
+            expect(claimsList).toHaveTextContent('Claim@#$%');
+            expect(claimsList).toHaveTextContent('Claim With Spaces');
+            expect(claimsList).toHaveTextContent('Claim With Dashes');
         });
     });
 
@@ -527,7 +633,7 @@ describe('NoMatchingCredentialsModal', () => {
             mockUseTranslation.mockReturnValue({ t: (key: string) => key } as any);
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             expect(screen.getByText('title')).toBeInTheDocument();
-            expect(screen.getByText('description')).toBeInTheDocument();
+            expect(screen.getByText('claimsIntro')).toBeInTheDocument();
             expect(screen.getByText('goToHomeButton')).toBeInTheDocument();
         });
     });
@@ -562,13 +668,13 @@ describe('NoMatchingCredentialsModal', () => {
         it('applies mobile-first responsive classes', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             const modalContainer = screen.getByTestId('card-no-matching-credentials-modal');
-            expect(modalContainer).toHaveClass('w-full', 'max-w-[400px]', 'min-h-[350px]');
+            expect(modalContainer).toHaveClass('w-full');
         });
 
         it('applies mobile breakpoint classes', () => {
             render(<NoMatchingCredentialsModal {...defaultProps} />);
             const modalContainer = screen.getByTestId('card-no-matching-credentials-modal');
-            expect(modalContainer).toHaveClass('max-[533px]:w-screen', 'max-[533px]:fixed', 'max-[533px]:inset-x-0', 'max-[533px]:z-[60]');
+            expect(modalContainer).toHaveClass('transition-all', 'duration-300', 'ease-in-out');
         });
     });
 });

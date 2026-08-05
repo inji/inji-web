@@ -122,3 +122,13 @@ export const convertStringIntoPascalCase = (text: string | undefined) => {
             .join(' ')
     );
 };
+
+/** Aligned with mobile wallet `formatKeyLabel` for consistent claim/key display names. */
+export const formatKeyLabel = (key: string): string => {
+    return key
+        .replace(/\[\d+\]/g, '')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .split(/[_\s]+/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+};

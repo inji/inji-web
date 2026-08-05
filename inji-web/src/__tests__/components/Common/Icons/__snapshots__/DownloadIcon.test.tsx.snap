@@ -7,7 +7,6 @@ exports[`DownloadIcon Component matches snapshot with default props (non-gradien
     data-testid="icon-download"
     fill="currentColor"
     height="24"
-    testid="icon-download"
     viewBox="0 0 24 24"
     width="24"
     xmlns="http://www.w3.org/2000/svg"

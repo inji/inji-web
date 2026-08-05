@@ -169,6 +169,19 @@ describe('LoginSessionStatusChecker', () => {
         });
     })
 
+    test("should clear loading and validate status after profile fetch fails on root", async () => {
+        (useLocation as jest.Mock).mockReturnValue({pathname: ROUTES.ROOT});
+        (AppStorage.getItem as jest.Mock).mockReturnValue(null);
+        mockFetchUserProfile.mockRejectedValue(new Error("Fetch failed"));
+
+        render(<LoginSessionStatusChecker/>);
+
+        await waitFor(() => {
+            expect(mockRemoveUser).toHaveBeenCalled();
+        });
+        expect(mockNavigate).not.toHaveBeenCalled();
+    })
+
     test.each([KEYS.USER, KEYS.WALLET_ID])("should recheck on storage change of %s key", async (storageKey) => {
         (useLocation as jest.Mock).mockReturnValue({pathname: ROUTES.USER_CREDENTIALS});
         const mockStorageEvent = new StorageEvent('storage', {

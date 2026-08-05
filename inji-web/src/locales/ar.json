@@ -402,9 +402,12 @@
     "message": "جارٍ إعداد عرض بيانات اعتمادك الآمن..."
   },
   "CredentialShareSuccessModal": {
-    "sharedWith": "تمت المشاركة مع {{verifierName}}",
-    "credentialsPresented": "تم تقديم بيانات اعتمادك بنجاح إلى {{verifierName}}",
-    "redirectMessage": "إعادة التوجيه إلى المحقق خلال {{count}} ثانية..."
+    "title": "تمت مشاركة بيانات الاعتماد",
+    "subtitle": "تمت المشاركة بنجاح مع {{verifierName}}",
+    "cardsShared": "البطاقات التي تمت مشاركتها ({{count}})",
+    "sharedTodayAt": "اليوم في {{time}}",
+    "trustedLabel": "موثوق",
+    "redirectMessage": "العودة إلى جهة التحقق خلال {{count}} ثانية..."
   },
   "User": {
     "Home": {
@@ -491,6 +494,15 @@
     }
   },
   "VerifierTrustPage": {
+    "mainPage": {
+      "unknownVerifier": "اسم الموثّق",
+      "description": "طلب الوصول إلى بطاقتك (بطاقاتك)",
+      "descriptionSubtext": "راجع المعلومات المطلوبة واختر البطاقة (البطاقات) التي ترغب في مشاركتها. لن تتم مشاركة سوى المعلومات المحددة من البطاقة التي اخترتها مع المُتحقق.",
+      "trustedLabel": "موثوق",
+      "footerInfo": "حدد بيانات الاعتماد أدناه للموافقة على هذا الطلب",
+      "addCards": "إضافة بطاقات",
+      "searchPlaceholder": "ابحث في مستنداتك حسب الاسم"
+    },
     "modal": {
       "title": "موثّق غير معروف",
       "description": "تأكد من أنك تتعرّف على هذا الموثّق أو تثق به. \nبمجرد أن تثق بهذا الموثّق:",
@@ -499,6 +511,7 @@
       "benefitSkipReviewFuture": "طلبات التحقق المستقبلية من هذا الموثّق سيتم الوثوق بها تلقائيًا.",
       "trustButton": "نعم، أنا أثق بهذا الموثّق",
       "notTrustButton": "لا، أنا لا أثق بهذا الموثّق",
+      "cancelButton": "يلغي",
       "infoTooltipButton": "ماذا تعني الثقة؟",
       "infoTooltipText": "إن الثقة في الموثّق تسمح له بطلب بيانات الاعتماد الخاصة بك. ستظل تختار بيانات الاعتماد التي تريد مشاركتها في الخطوة التالية."
     },
@@ -528,6 +541,64 @@
     "loadingCard": {
       "title": "جلب معلومات المدقق...",
       "subtitle": "يرجى الانتظار بينما نتحقق من صحة الطلب ونجهز بيانات الاعتماد الخاصة بك."
+    },
+    "credentialTile": {
+      "unselectedTitle": "حدد بيانات الاعتماد للمشاركة",
+      "selectedTitle": "تم اختيار بيانات الاعتماد",
+      "shareCredentialsButton": "تأكيد ومشاركة",
+      "shareCredentialsDeclineButton": "رفض"
+    },
+    "consentRequiredModal": {
+      "title": "الموافقة مطلوبة",
+      "description": "يرجى مراجعة اختيارك قبل المتابعة.",
+      "credentialsTitle": "البطاقات التي ستتم مشاركتها ({{count}})",
+      "credentialsDescription": "ستتم مشاركة المعلومات المحددة فقط من البطاقة أو البطاقات التي اخترتها مع جهة التحقق. لن تتم مشاركة أي معلومات إضافية.",
+      "consentButtonTitle": "تأكيد ومشاركة",
+      "backButtonTitle": "لا، أعدني"
+    },
+    "leaveConfirmation": {
+      "title": "هل أنت متأكد أنك تريد المغادرة؟",
+      "description": "إذا غادرت هذه الصفحة، فستخرج من عملية إرسال بيانات الاعتماد القابلة للتحقق وقد تفقد تقدمك.",
+      "confirmButton": "نعم، غادر",
+      "cancelButton": "لا، العودة"
+    },
+    "dcql": {
+      "mandatorySection": "إلزامي",
+      "optionalSection": "اختياري",
+      "mandatoryCards": "البطاقات الإلزامية",
+      "optionalCards": "البطاقات الاختيارية",
+      "optionalAddOns": "الإضافات الاختيارية",
+      "required": "مطلوب",
+      "multipleCards": "بطاقات متعددة",
+      "allRequired": "جميع البطاقات في هذا الخيار مطلوبة",
+      "credentialsCount": "{{count}} بيانات اعتماد",
+      "or": "أو",
+      "instruction": "اختر بطاقة اعتماد واحدة من القائمة لمشاركتها بأمان مع جهة التحقق.",
+      "instructionSelectOne": "اختر بطاقة واحدة من الخيارات المتاحة.",
+      "instructionSelectAll": "اختر جميع البطاقات المطلوبة للمتابعة.",
+      "instructionSelectCount": "اختر {{count}} بطاقة من الخيارات المتاحة.",
+      "instructionOnePerSet": "اختر بطاقة واحدة من كل مجموعة.",
+      "instructionComplex": "اتبع تعليمات الاختيار لتلبية طلب المُتحقق.",
+      "selectShareableFields": "المعلومات المطلوبة",
+      "selectRequiredClaims": "اختر المعلومات المطلوبة",
+      "viewCard": "عرض البطاقة",
+      "showAllCards": "عرض جميع البطاقات ({{count}})",
+      "clearAll": "مسح الكل",
+      "unknownCredential": "بيانات الاعتماد",
+      "noSatisfiableOptions": "لا توجد بيانات اعتماد مطابقة لهذا الطلب.",
+      "requirementInfo": {
+        "title": "طلب بيانات الاعتماد",
+        "description": "يطلب {{verifierName}} الوصول إلى بيانات اعتماد هويتك للتحقق من هويتك وفتح حسابك بأمان.",
+        "requiredTitle": "البطاقات المطلوبة",
+        "requiredDescription": "تُدرج هذه البطاقات ضمن الطلب (أو الطلبات) المطلوب من المُتحقِّق. يُرجى اتباع تعليمات الاختيار الموضحة لكل طلب للمتابعة.",
+        "optionalTitle": "بطاقات اختيارية",
+        "optionalDescription": "هذه البطاقات مُدرجة ضمن الطلبات الاختيارية الخاصة بالمُتحقق. يمكنك اختيار ما إذا كنت ترغب في مشاركتها.",
+        "footerNote": "لن تتم مشاركة سوى المعلومات المطلوبة من البطاقات التي اخترتها مع المُتحقق. يُرجى مراجعة اختيارك قبل التأكيد.",
+        "close": "إغلاق",
+        "securityFooter": "تشفير من طرف إلى طرف · تم التحقق بواسطة {{verifierName}}",
+        "requiredAriaLabel": "معرفة المزيد حول بيانات الاعتماد المطلوبة",
+        "optionalAriaLabel": "معرفة المزيد حول الإضافات الاختيارية"
+      }
     }
   },
   "CredentialRequestModal": {
@@ -551,10 +622,39 @@
       "consentShare": "أوافق وأشارك"
     }
   },
+  "SDClaimsSelectionModal": {
+    "subtitle": "معاينة بيانات الاعتماد · حدد الحقول للمشاركة",
+    "subtitleReadOnly": "معاينة بيانات الاعتماد · سيتم مشاركة جميع الحقول",
+    "confirmProceed": "تأكيد والمتابعة",
+    "done": "تم",
+    "disclosableFields": "الحقول القابلة للإفصاح",
+    "defaultShareable": "الحقول القابلة للمشاركة افتراضيًا",
+    "defaultShareableNote": "مضمنة · لا يمكن إلغاء تحديدها.",
+    "checkAll": "تحديد الكل",
+    "clearAll": "إلغاء تحديد الكل",
+    "credentialPreview": "معاينة بيانات الاعتماد",
+    "shareableFields": "الحقول القابلة للمشاركة",
+    "previewUnavailable": "المعاينة غير متوفرة لهذه البطاقة.",
+    "fieldsCount": "{{count}} حقول",
+    "expand": "توسيع",
+    "collapse": "طي"
+  },
   "NoMatchingCredentialsModal": {
-    "title": "لم يتم العثور على بيانات اعتماد مطابقة",
-    "description": "يرجى تحميل بيانات الاعتماد المقابلة وإعادة محاولة عملية المشاركة",
-    "goToHomeButton": "عُد"
+    "title": "لم يتم العثور على بطاقات مطابقة",
+    "claimsIntro": "لا تحتوي محفظتك على جميع البطاقات أو المعلومات المطلوبة لإتمام طلب جهة التحقق.",
+    "missingInfoLabel": "معلومات مفقودة:",
+    "showMore": "عرض المزيد (+{{count}}) >",
+    "whatYouCanDo": "ما الذي يمكنك فعله",
+    "verifierHelp": "تواصل مع جهة التحقق للحصول على مزيد من المعلومات حول البطاقات المطلوبة للمتابعة.",
+    "matchingCards": "بطاقات مطابقة جزئيًا",
+    "goToHomeButton": "الانتقال إلى الصفحة الرئيسية",
+    "continueWithAvailableButton": "المتابعة باستخدام البطاقات المتاحة",
+    "trustedLabel": "موثوق",
+    "unknownVerifier": "جهة تحقق غير معروفة"
+  },
+  "MissingClaimsListModal": {
+    "title": "المعلومات المفقودة",
+    "requiredCount": "{{count}} مطلوب"
   },
   "LogoutConfirmation": {
     "title": "هل أنت متأكد أنك تريد الخروج؟",

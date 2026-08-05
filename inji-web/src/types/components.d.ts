@@ -124,18 +124,22 @@ export interface PresentationCredential {
 }
 
 export interface CredentialsResponse {
-    availableCredentials: PresentationCredential[];
-    missingClaims: any[];
+    availableCredentials?: PresentationCredential[];
+    missingClaims?: any[];
+    queryGroups?: import("./dcql").DcqlQueryGroup[];
+    credentialSets?: import("./dcql").DcqlCredentialSet[];
 }
 
-export type CredentialShareSuccessModalProps = {
-    isOpen: boolean;
+export type CredentialShareSuccessViewProps = {
     verifierName: string;
+    verifierLogo?: string | null;
+    verifierTrusted?: boolean;
     credentials: PresentationCredential[];
     returnUrl: string;
     countdownStart?: number;
     onClose?: () => void;
 }
+
 
 export type PresentationCredentialListProps = {
     credentials?: PresentationCredential[];

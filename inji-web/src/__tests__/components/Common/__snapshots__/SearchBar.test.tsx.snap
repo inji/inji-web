@@ -23,7 +23,7 @@ exports[`SearchBar Component Testing the Layout of HeaderTile Check if the layou
       />
     </svg>
     <input
-      class="py-6 w-11/12 flex text-iw-searchTitle focus:outline-none overflow-ellipsis mr-10 text-[14px] leading-[20px] font-medium"
+      class="py-6 w-11/12 flex text-iw-searchTitle focus:outline-none overflow-ellipsis me-10 text-[14px] leading-[20px] font-medium text-start"
       data-testid="input-search"
       placeholder="Search test"
       type="text"

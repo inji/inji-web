@@ -15,6 +15,8 @@ import {RiDeleteBin6Line} from "react-icons/ri";
 import {BsBoxArrowRight} from "react-icons/bs";
 import {showToast} from "../Common/toast/ToastWrapper";
 import {useApi} from "../../hooks/useApi";
+import { useLocation } from "react-router-dom";
+import { Pages } from "../../utils/constants";
 
 export function VCCardView(props: Readonly<{
     credential: WalletCredential,
@@ -30,7 +32,9 @@ export function VCCardView(props: Readonly<{
     const previewApi = useApi()
     const downloadApi = useApi()
     const deleteApi = useApi()
-
+    const location = useLocation();
+    const isOvpFlow = location.pathname.includes(Pages.AUTHORIZE);
+    
     useEffect(() => {
         if (error) {
             showToast({
@@ -144,15 +148,19 @@ export function VCCardView(props: Readonly<{
             id: "download",
             icon: <DownloadIcon testId={"icon-download"}/>
         },
-        {
+        ...(!isOvpFlow ? [{
             label: t('menu.delete'),
             onClick: handleDelete,
             id: "delete",
-            icon: <RiDeleteBin6Line data-testid={"icon-delete"} size={18}
-                                    className={VCStyles.cardView.menuIcon}
-                                    color={"var(--iw-color-red)"}/>,
+            icon: (
+            <RiDeleteBin6Line
+                size={18}
+                className={VCStyles.cardView.menuIcon}
+                color="var(--iw-color-red)"
+            />
+            ),
             color: "var(--iw-color-red)"
-        },
+        }] : [])
     ];
 
     return (
