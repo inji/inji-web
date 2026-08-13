@@ -41,7 +41,7 @@ services:
 
   mimoto-service:
     container_name: 'mimoto-service'
-    image: 'injistackdev/mimoto:develop'
+    image: 'injistack/mimoto:1.0.0-alpha.1'
     user: root
     ports:
       - "8099:8099"
@@ -67,7 +67,7 @@ services:
 
   inji-web:
     container_name: 'inji-web'
-    image: 'injistackdev/inji-web:develop'
+    image: 'injistack/inji-web:1.0.0-alpha.1'
     ports:
       - '3004:3004'
     environment:
