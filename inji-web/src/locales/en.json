@@ -645,7 +645,6 @@
     "verifierHelp": "Reach out to this verifier for more information on which card(s) are required to proceed.",
     "matchingCards": "PARTIALLY MATCHING CARDS",
     "goToHomeButton": "Go to Home",
-    "continueWithAvailableButton": "Continue with available cards",
     "trustedLabel": "Trusted",
     "unknownVerifier": "Unknown Verifier"
   },

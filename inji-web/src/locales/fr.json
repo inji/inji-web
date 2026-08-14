@@ -648,7 +648,6 @@
     "verifierHelp": "Contactez ce vérificateur pour obtenir plus d'informations sur les cartes requises pour continuer.",
     "matchingCards": "CARTES PARTIELLEMENT CORRESPONDANTES",
     "goToHomeButton": "Aller à l'accueil",
-    "continueWithAvailableButton": "Continuer avec les cartes disponibles",
     "trustedLabel": "Fiable",
     "unknownVerifier": "Vérificateur inconnu"
   },

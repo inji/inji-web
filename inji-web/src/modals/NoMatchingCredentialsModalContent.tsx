@@ -18,7 +18,6 @@ export interface NoMatchingCredentialsModalContentProps {
     matchingCredentials: PresentationCredential[];
     verifier?: RequirementInfoVerifier | null;
     verifierName: string;
-    hasMatchingCredentials: boolean;
     isSubmitting: boolean;
     isRetrying: boolean;
     onClose: () => void;
@@ -35,7 +34,6 @@ export const NoMatchingCredentialsModalContent: React.FC<
     matchingCredentials,
     verifier,
     verifierName,
-    hasMatchingCredentials,
     isSubmitting,
     isRetrying,
     onClose,
@@ -209,11 +207,7 @@ export const NoMatchingCredentialsModalContent: React.FC<
             <SolidButton
                 testId="btn-go-to-home"
                 onClick={onGoToHome}
-                title={
-                    hasMatchingCredentials
-                        ? t("continueWithAvailableButton")
-                        : t("goToHomeButton")
-                }
+                title={t("goToHomeButton")}
                 fullWidth
                 disabled={isSubmitting || isRetrying}
                 className={styles.footerButton}

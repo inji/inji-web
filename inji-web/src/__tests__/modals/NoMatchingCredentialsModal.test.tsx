@@ -139,7 +139,6 @@ describe('NoMatchingCredentialsModal', () => {
                         "Reach out to this verifier for more information on which Cards are required to proceed.",
                     matchingCards: "MATCHING CARDS",
                     goToHomeButton: "Go to Home",
-                    continueWithAvailableButton: "Continue with available cards",
                     trustedLabel: "Trusted",
                     unknownVerifier: "Unknown Verifier",
                     "ErrorCard.defaultTitle": "Default Error Title",
@@ -322,35 +321,69 @@ describe('NoMatchingCredentialsModal', () => {
             expect(window.location.href).toBe('https://example.com/redirect');
         });
 
-        it('does not reject verifier when matching credentials are available', async () => {
-            const onClose = jest.fn();
+        it('rejects verifier when the close icon is selected', async () => {
+            mockFetchData.mockResolvedValue(mockApiRejectSuccessWithRedirect);
+            setupWindowLocationMock();
+            render(<NoMatchingCredentialsModal {...defaultProps} />);
+
+            fireEvent.click(
+                screen.getByTestId('btn-close-no-matching-credentials')
+            );
+
+            await waitFor(() => {
+                expect(mockFetchData).toHaveBeenCalledWith({
+                    url: expect.stringContaining('/presentations/test-presentation-id'),
+                    apiConfig: expect.any(Object),
+                    body: {
+                        errorCode: 'invalid_transaction_data',
+                        errorMessage: 'No matching credentials found to fulfill the request',
+                    },
+                });
+                expect(window.location.href).toBe('https://example.com/redirect');
+            });
+        });
+
+        it('rejects verifier and redirects when partial cards are shown', async () => {
             const matchingCredentials = [
                 {
                     credentialId: 'cred-1',
-                    credentialTypeDisplayName: 'Govt Id',
+                    credentialTypeDisplayName: 'Insurance Credential',
                     credentialTypeLogo: 'https://example.com/logo.png',
+                    format: 'ldp_vc',
+                },
+                {
+                    credentialId: 'cred-2',
+                    credentialTypeDisplayName: 'Mock Verifiable Credential (SD-JWT)',
+                    credentialTypeLogo: 'https://example.com/logo2.png',
                     format: 'dc+sd-jwt',
                 },
             ];
 
+            mockFetchData.mockResolvedValue(mockApiRejectSuccessWithRedirect);
+            setupWindowLocationMock();
             render(
                 <NoMatchingCredentialsModal
                     {...defaultProps}
                     matchingCredentials={matchingCredentials}
-                    onClose={onClose}
                 />
             );
 
-            expect(screen.getByTestId('btn-go-to-home')).toHaveTextContent(
-                'Continue with available cards'
-            );
+            expect(screen.getByTestId('no-matching-cards-list')).toBeInTheDocument();
+            expect(screen.getByTestId('btn-go-to-home')).toHaveTextContent('Go to Home');
 
             fireEvent.click(screen.getByTestId('btn-go-to-home'));
 
             await waitFor(() => {
-                expect(onClose).toHaveBeenCalledTimes(1);
+                expect(mockFetchData).toHaveBeenCalledWith({
+                    url: expect.stringContaining('/presentations/test-presentation-id'),
+                    apiConfig: expect.any(Object),
+                    body: {
+                        errorCode: 'invalid_transaction_data',
+                        errorMessage: 'No matching credentials found to fulfill the request',
+                    },
+                });
             });
-            expect(mockFetchData).not.toHaveBeenCalled();
+            expect(window.location.href).toBe('https://example.com/redirect');
             expect(defaultProps.onGoToHome).not.toHaveBeenCalled();
         });
 

@@ -28,8 +28,8 @@ modules:
     enabled: true
     image:
       registry: docker.io
-      repository: injistackdev/uitest-web
-      tag: develop
+      repository: injistack/uitest-web
+      tag: 1.0.0-alpha.1
       pullPolicy: Always
 
 crontime: "0 3 * * *"    ## run cronjob every day at 3 AM (time hr: 0-23 )

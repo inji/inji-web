@@ -112,7 +112,7 @@ export function VerifierRequestActionPanel({
     const [declineDisabled, setDeclineDisabled] = useState(false);
     const [showConsentRequiredModal, setConsentRequiredModal] = useState(false);
     const credentialCount = selectedCredentialIds.length;
-    const shareEnabled = isShareEnabled ?? selectedCredentialIds.length > 0;
+    const shareEnabled = isShareEnabled ?? credentialCount > 0;
 
     const handleDecline = async () => {
         if (!presentationId || declineDisabled) return;

@@ -29,7 +29,6 @@ import {
     DcqlSelectionState,
 } from "../types/dcql";
 import {
-    areRequiredQueryGroupsSatisfied,
     buildInitialDcqlSelection,
     filterQueryGroupsBySearch,
     flattenQueryGroupCredentials,
@@ -38,7 +37,6 @@ import {
     updateDcqlCredentialSelection,
 } from "../utils/dcqlSelectionUtils";
 import {
-    areRequiredCredentialSetsSatisfied,
     buildInitialCredentialSetSelection,
     flattenCredentialSetSelectionToDcqlState,
     getDcqlNoMatchState,
@@ -69,8 +67,6 @@ export const VPAuthorizationPage: React.FC = () => {
         useState<SelectedSdClaimsMap>({});
     const [credentialsData, setCredentialsData] = useState<any[] | null>(null);
     const [missingClaimsData, setMissingClaimsData] = useState<string[]>([]);
-    const [isPartialNoMatchDismissed, setIsPartialNoMatchDismissed] =
-        useState(false);
     const [isDcqlPresentation, setIsDcqlPresentation] = useState<boolean>(false);
     const [queryGroupsData, setQueryGroupsData] = useState<DcqlQueryGroup[]>([]);
     const [filteredQueryGroups, setFilteredQueryGroups] = useState<DcqlQueryGroup[]>([]);
@@ -271,7 +267,6 @@ export const VPAuthorizationPage: React.FC = () => {
                                     : []
                             )
                         );
-                        setIsPartialNoMatchDismissed(false);
                     } else {
                         setIsDcqlPresentation(false);
                         setHasDcqlCredentialSets(false);
@@ -354,28 +349,6 @@ export const VPAuthorizationPage: React.FC = () => {
         selectedCredentialIds,
     ]);
 
-    const isDcqlShareEnabled = useMemo(() => {
-        if (!isDcqlPresentation) {
-            return selectedCredentialIds.length > 0;
-        }
-        if (hasDcqlCredentialSets) {
-            return areRequiredCredentialSetsSatisfied(
-                credentialSetsData,
-                dcqlCredentialSetSelection,
-                queryGroupsData
-            );
-        }
-        return areRequiredQueryGroupsSatisfied(queryGroupsData, dcqlSelection);
-    }, [
-        credentialSetsData,
-        dcqlCredentialSetSelection,
-        dcqlSelection,
-        hasDcqlCredentialSets,
-        isDcqlPresentation,
-        queryGroupsData,
-        selectedCredentialIds.length,
-    ]);
-
     const displayedSelectedCredentialIds = useMemo(() => {
         if (!isDcqlPresentation) {
             return selectedCredentialIds;
@@ -437,13 +410,7 @@ export const VPAuthorizationPage: React.FC = () => {
         if (queryGroupsData.length === 0) {
             return credentialsData.length === 0;
         }
-        if (!dcqlNoMatchState.showModal) {
-            return false;
-        }
-        return (
-            dcqlNoMatchState.blockCredentialSelection ||
-            !isPartialNoMatchDismissed
-        );
+        return dcqlNoMatchState.showModal;
     }, [
         showCredentialRequest,
         isLoading,
@@ -451,8 +418,7 @@ export const VPAuthorizationPage: React.FC = () => {
         credentialsData,
         isDcqlPresentation,
         queryGroupsData,
-        dcqlNoMatchState,
-        isPartialNoMatchDismissed,
+        dcqlNoMatchState.showModal,
     ]);
 
     const noMatchModalCredentials = useMemo(
@@ -668,11 +634,6 @@ export const VPAuthorizationPage: React.FC = () => {
                 matchingCredentials={noMatchModalCredentials}
                 verifier={verifierData}
                 onGoToHome={() => navigate(ROUTES.ROOT)}
-                onClose={
-                    dcqlNoMatchState.blockCredentialSelection
-                        ? undefined
-                        : () => setIsPartialNoMatchDismissed(true)
-                }
                 redirectUri={verifierData?.redirectUri ?? null}
                 presentationId={presentationIdData}
             />
@@ -755,7 +716,6 @@ export const VPAuthorizationPage: React.FC = () => {
                         verifier={verifierData}
                         presentationId={presentationIdData}
                         selectedCredentialIds={displayedSelectedCredentialIds}
-                        isShareEnabled={isDcqlShareEnabled}
                         onShareCredentials={handleShareCredentialsFromCard}
                         stickyBelowHeader
                     />

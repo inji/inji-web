@@ -19,7 +19,6 @@ export interface NoMatchingCredentialsModalProps {
     matchingCredentials?: PresentationCredential[];
     verifier?: RequirementInfoVerifier | null;
     onGoToHome?: () => void;
-    onClose?: () => void;
     redirectUri?: string | null;
     presentationId?: string;
 }
@@ -32,7 +31,6 @@ export const NoMatchingCredentialsModal: React.FC<
     matchingCredentials = [],
     verifier,
     onGoToHome,
-    onClose,
     redirectUri,
     presentationId,
 }) => {
@@ -74,8 +72,6 @@ export const NoMatchingCredentialsModal: React.FC<
         0
     );
 
-    const hasMatchingCredentials = matchingCredentials.length > 0;
-
     const handleExit = useCallback(
         (nextRedirectUri = "") => {
             if (nextRedirectUri) {
@@ -102,21 +98,8 @@ export const NoMatchingCredentialsModal: React.FC<
         return response;
     }, [rejectVerifier, presentationId]);
 
-    const handleContinueWithAvailableCredentials = useCallback(() => {
-        if (onClose) {
-            onClose();
-            return;
-        }
-        onGoToHome?.();
-    }, [onClose, onGoToHome]);
-
     const handleGoToHome = useCallback(async () => {
         if (isSubmitting || isRetrying) {
-            return;
-        }
-
-        if (hasMatchingCredentials) {
-            handleContinueWithAvailableCredentials();
             return;
         }
 
@@ -144,22 +127,12 @@ export const NoMatchingCredentialsModal: React.FC<
     }, [
         isSubmitting,
         isRetrying,
-        hasMatchingCredentials,
-        handleContinueWithAvailableCredentials,
         presentationId,
         rejectVerifierCallback,
         handleExit,
         handleApiError,
         redirectUri,
     ]);
-
-    const handleClose = useCallback(() => {
-        if (onClose) {
-            onClose();
-            return;
-        }
-        void handleGoToHome();
-    }, [onClose, handleGoToHome]);
 
     if (!isVisible) return null;
 
@@ -205,10 +178,9 @@ export const NoMatchingCredentialsModal: React.FC<
                         matchingCredentials={matchingCredentials}
                         verifier={verifier}
                         verifierName={verifierName}
-                        hasMatchingCredentials={hasMatchingCredentials}
                         isSubmitting={isSubmitting}
                         isRetrying={isRetrying}
-                        onClose={handleClose}
+                        onClose={() => void handleGoToHome()}
                         onShowFullClaimsList={() => setShowFullClaimsList(true)}
                         onGoToHome={() => void handleGoToHome()}
                     />

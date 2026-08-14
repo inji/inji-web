@@ -25,7 +25,7 @@ jobs:
             SERVICE_NAME: "inji-web"
       fail-fast: false
     name: ${{ matrix.SERVICE_NAME }}
-    uses: mosip/kattu/.github/workflows/docker-build.yml@gpgupdate-master
+    uses: mosip/kattu/.github/workflows/docker-build.yml@v0.0.1
     with:
       SERVICE_LOCATION: ${{ matrix.SERVICE_LOCATION }}
       SERVICE_NAME: ${{ matrix.SERVICE_NAME }}
@@ -68,7 +68,7 @@ jobs:
   sonar-analysis-inji-web:
     if: "${{ github.event_name != 'pull_request' }}"
     needs: build-dockers-inji-web
-    uses: mosip/kattu/.github/workflows/npm-sonar-analysis.yml@dsd9685
+    uses: mosip/kattu/.github/workflows/npm-sonar-analysis.yml@v0.0.1
     with:
       SERVICE_LOCATION: ./inji-web
     secrets:
@@ -77,7 +77,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
   build-maven-ui-test:
-    uses: mosip/kattu/.github/workflows/maven-build.yml@gpgupdate-masterj21
+    uses: mosip/kattu/.github/workflows/maven-build.yml@v0.0.1
     with:
       SERVICE_LOCATION: ./ui-test
       BUILD_ARTIFACT: ui-test
@@ -154,7 +154,7 @@ jobs:
             BUILD_ARTIFACT: 'ui-test-local'
       fail-fast: false
     name: ${{ matrix.SERVICE_NAME }}
-    uses: mosip/kattu/.github/workflows/docker-build.yml@master-java21
+    uses: mosip/kattu/.github/workflows/docker-build.yml@v0.0.1
     with:
       SERVICE_LOCATION: ${{ matrix.SERVICE_LOCATION }}
       SERVICE_NAME: ${{ matrix.SERVICE_NAME }}
