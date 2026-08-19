@@ -73,7 +73,7 @@ services:
     environment:
       - DEFAULT_LANG=en
       - MIMOTO_URL=http://localhost:3004/v1/mimoto
-      - IGNORED_ISSUER_IDS=MockMdl
+      - IGNORED_ISSUER_IDS=null
     volumes:
       - ./config/mimoto-issuers-config.json:/home/mosip/mimoto-issuers-config.json
       - ./config/mimoto-trusted-verifiers.json:/home/mosip/mimoto-trusted-verifiers.json
