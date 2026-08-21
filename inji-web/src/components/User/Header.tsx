@@ -42,6 +42,7 @@ export const Header: React.FC<UserHeaderProps> = ({
     const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const hamburgerMenuRef = useRef<HTMLImageElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
     const {user, removeUser,isLoading} = useUser();
     const displayNameFromLocalStorage = user?.displayName;
     const hasProfilePictureUrl = user?.profilePictureUrl;
@@ -60,10 +61,17 @@ export const Header: React.FC<UserHeaderProps> = ({
                 setIsProfileDropdownOpen(false);
             }
 
-            if (
-                hamburgerMenuRef.current &&
-                !hamburgerMenuRef.current.contains(target)
-            ) {
+            // The icon, the menu it opens, and any dialog that menu renders
+            // through a portal are one interaction region. hamburgerMenuRef is
+            // the <img> alone, so without the other two checks a click on a
+            // menu item - or anywhere in the portaled AboutPlatform modal -
+            // counted as outside and unmounted the modal.
+            const insideIcon = hamburgerMenuRef.current?.contains(target);
+            const insideMenu = mobileMenuRef.current?.contains(target);
+            const insideDialog =
+                target instanceof Element && target.closest('[role="dialog"]') !== null;
+
+            if (!insideIcon && !insideMenu && !insideDialog) {
                 setIsHamburgerMenuOpen(false);
             }
         };
@@ -289,6 +297,7 @@ export const Header: React.FC<UserHeaderProps> = ({
             >
                 {isHamburgerMenuOpen && (isLoading || user) && (
                     <div
+                        ref={mobileMenuRef}
                         style={{marginTop: headerHeight}}
                         className="absolute top-1 bg-white shadow-iw-hamburger-dropdown p-2 w-full"
                     >

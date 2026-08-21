@@ -33,7 +33,8 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
         <div className="inline-block ms-1 ml-3">
             <button
                 type="button"
-                className="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none"
+                className="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2"
                 data-testid={"Language-Selector-Button"}
                 onClick={() => setIsOpen(true)}>
 

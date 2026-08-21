@@ -73,8 +73,10 @@ export const useWalletCredentials = () => {
 
     useEffect(() => {
         void fetchWalletCredentials();
+        // fetchWalletCredentials is redefined every render; `language` is the
+        // only input that should refetch, since it sets Accept-Language.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [language]);
 
     const filterCredentials = (searchText: string) => {
         if (searchText === "") {

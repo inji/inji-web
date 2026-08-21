@@ -36,9 +36,12 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         }
     };
 
+    // The text label below is only rendered when expanded, so without an
+    // explicit name the collapsed icon-only button has none at all.
     return (
         <button
             type="button"
+            aria-label={text}
             disabled={disabled}
             aria-current={isActive ? "page" : undefined}
             className={`relative flex items-center w-full h-12 transition-all duration-200 rounded-lg ${

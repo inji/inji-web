@@ -40,7 +40,8 @@ export const AboutPlatform: React.FC<{ "data-testid"?: string }> = ({ "data-test
                 data-testid={testId ?? "About-Platform-Button"}
                 onClick={() => setIsOpen(true)}
                 className="flex flex-row items-center gap-2 h-[3rem] px-5 rounded-xl text-white font-semibold shadow-sm
-                           bg-gradient-to-r from-iw-primary to-iw-secondary focus:outline-none whitespace-nowrap">
+                           bg-gradient-to-r from-iw-primary to-iw-secondary whitespace-nowrap
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2">
                 <FiInfo size={18} />
                 {t("button")}
             </button>

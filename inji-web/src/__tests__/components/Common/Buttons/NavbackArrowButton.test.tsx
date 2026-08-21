@@ -15,15 +15,32 @@ describe('NavBackArrowButton', () => {
     const handleBackClick = jest.fn();
     render(<NavBackArrowButton onBackClick={handleBackClick} />);
 
-    const svgElement = screen.getByTestId('back-arrow-icon');
-    fireEvent.click(svgElement);
+    fireEvent.click(screen.getByTestId('back-arrow-button'));
 
     expect(handleBackClick).toHaveBeenCalledTimes(1);
   });
 
-  it('applies the expected classes', () => {
-    render(<NavBackArrowButton onBackClick={() => {}} />);
-    const svgElement = screen.getByTestId('back-arrow-icon');
-    expect(svgElement).toHaveClass('mr-2 cursor-pointer');
+  it('renders a native button so the control is keyboard operable', () => {
+    const handleBackClick = jest.fn();
+    render(<NavBackArrowButton onBackClick={handleBackClick} label="Back" />);
+
+    const button = screen.getByRole('button', { name: 'Back' });
+    expect(button.tagName.toLowerCase()).toBe('button');
+    expect(button).toHaveAttribute('type', 'button');
+
+    // The icon must stay decorative so it does not double up the button's name.
+    expect(screen.getByTestId('back-arrow-icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('uses the supplied label as the accessible name', () => {
+    render(<NavBackArrowButton onBackClick={() => {}} label="Retour" />);
+    expect(screen.getByRole('button', { name: 'Retour' })).toBeInTheDocument();
+  });
+
+  it('renders only the decorative icon when no handler is supplied', () => {
+    render(<NavBackArrowButton />);
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getByTestId('back-arrow-icon')).toHaveAttribute('aria-hidden', 'true');
   });
 });

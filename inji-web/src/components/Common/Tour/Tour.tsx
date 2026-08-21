@@ -181,10 +181,19 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
         }
     }, [currentIndex, rect]);
 
-    // Move focus into the popover once per step, and hand it back to whatever
-    // held it when the tour closes. rect is a dependency only so this retries
-    // until the popover has rendered; focusedStepRef keeps it to one move per
-    // step, since rect itself is refreshed on a timer.
+    // Hand focus back to whatever held it when the tour closes. This has to be
+    // declared before the effect that moves focus: effects run in declaration
+    // order, so capturing the opener first is what keeps this from recording
+    // the popover itself and restoring focus to a detached node.
+    useEffect(() => {
+        if (!isOpen) return;
+        const previouslyFocused = document.activeElement as HTMLElement | null;
+        return () => previouslyFocused?.focus();
+    }, [isOpen]);
+
+    // Move focus into the popover once per step. rect is a dependency only so
+    // this retries until the popover has rendered; focusedStepRef keeps it to
+    // one move per step, since rect itself is refreshed on a timer.
     useEffect(() => {
         if (!isOpen) {
             focusedStepRef.current = null;
@@ -194,12 +203,6 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
         focusedStepRef.current = currentIndex;
         popoverRef.current.focus();
     }, [isOpen, currentIndex, rect]);
-
-    useEffect(() => {
-        if (!isOpen) return;
-        const previouslyFocused = document.activeElement as HTMLElement | null;
-        return () => previouslyFocused?.focus();
-    }, [isOpen]);
 
     // Allow Escape to dismiss the tour, and keep Tab inside it.
     useEffect(() => {

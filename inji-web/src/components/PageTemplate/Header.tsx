@@ -19,6 +19,18 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
     const language = useSelector((state: RootState) => state.common.language);
     const {t} = useTranslation('PageTemplate');
     const [isOpen, setIsOpen] = useState(false);
+
+    // AboutPlatform lives inside this menu but renders its modal through a
+    // portal, so the modal is outside the menu in the DOM. Both the blur and
+    // the outside-click dismissals would therefore fire the moment the modal
+    // takes focus or is clicked, unmounting AboutPlatform and the modal with
+    // it - which is why the About Platform dialog could not be opened on
+    // mobile at all. While a dialog is open, the menu stays put and closes
+    // only through an explicit path.
+    const dismissMenu = () => {
+        if (document.querySelector('[role="dialog"]')) return;
+        setIsOpen(false);
+    };
     const navigate = useNavigate();
 
     return (
@@ -83,13 +95,13 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                 </div>
             </div>
             {isOpen && (
-                <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
+                <OutsideClickHandler onOutsideClick={dismissMenu}>
                     <div
                         className="w-full sm:hidden px-4 flex flex-col justify-start items-start font-semibold"
                         role="button"
                         tabIndex={0}
                         onMouseDown={() => setIsOpen(false)}
-                        onBlur={() => setIsOpen(false)}
+                        onBlur={dismissMenu}
                     >
                         <div
                             className="py-5 w-full"

@@ -29,6 +29,9 @@ export const ProfilePage: React.FC = () => {
         keyPrefix: "ProfilePage"
     });
     const {t: commonTranslation} = useTranslation('common');
+    // `t` above is prefixed to User:ProfilePage, so the shared back label needs
+    // its own accessor.
+    const {t: issuersTranslation} = useTranslation('IssuersPage');
     const location = useLocation();
     const previousPagePath = location.state?.from;
     const {state, data, fetchData, error} = useApi<User>()
@@ -118,7 +121,10 @@ export const ProfilePage: React.FC = () => {
         <div className={ProfilePageStyles.container}>
             <div className={ProfilePageStyles.headerContainer}>
                 <div className={ProfilePageStyles.headerLeftSection}>
-                    <NavBackArrowButton onBackClick={handleBackClick}/>
+                    <NavBackArrowButton
+                        onBackClick={handleBackClick}
+                        label={issuersTranslation('back')}
+                    />
                     <div className={ProfilePageStyles.headerTitleContainer}>
             <span data-testid="profile-page" className={ProfilePageStyles.pageTitle}>
               {t('title')}

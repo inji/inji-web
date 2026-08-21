@@ -53,7 +53,7 @@ exports[`Header Container Layout Test Check if the layout is matching with the s
           class="hidden sm:block"
         >
           <button
-            class="flex flex-row items-center gap-2 h-[3rem] px-5 rounded-xl text-white font-semibold shadow-sm bg-gradient-to-r from-iw-primary to-iw-secondary focus:outline-none whitespace-nowrap"
+            class="flex flex-row items-center gap-2 h-[3rem] px-5 rounded-xl text-white font-semibold shadow-sm bg-gradient-to-r from-iw-primary to-iw-secondary whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2"
             data-testid="Header-Menu-AboutPlatform"
             type="button"
           >
@@ -120,7 +120,7 @@ exports[`Header Container Layout Test Check if the layout is matching with the s
             class="inline-block ms-1 ml-3"
           >
             <button
-              class="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none"
+              class="flex flex-row items-center w-full h-[3rem] px-2 rounded-xl border border-gray-200 bg-white shadow-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2"
               data-testid="Language-Selector-Button"
               type="button"
             >
