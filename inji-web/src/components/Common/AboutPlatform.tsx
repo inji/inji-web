@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 import {useTranslation} from "react-i18next";
 import {FiInfo, FiDownload, FiLock, FiShare2, FiCheck, FiX} from "react-icons/fi";
@@ -17,10 +17,39 @@ const steps: Step[] = [
     {key: "share", icon: <FiShare2 size={20} className="text-white" />, iconBg: "bg-iw-secondary"}
 ];
 
-export const AboutPlatform: React.FC<{ "data-testid"?: string }> = ({ "data-testid": testId }) => {
+type AboutPlatformProps = {
+    "data-testid"?: string;
+    /**
+     * Notifies the owner when the modal opens or closes. A parent that can
+     * dismiss itself while this component is mounted - a menu, for instance -
+     * needs to know, because unmounting takes the portaled modal with it.
+     */
+    onOpenChange?: (isOpen: boolean) => void;
+};
+
+export const AboutPlatform: React.FC<AboutPlatformProps> = ({
+    "data-testid": testId,
+    onOpenChange
+}) => {
     const {t} = useTranslation("AboutPlatform");
     const [isOpen, setIsOpen] = useState(false);
-    const closeModal = useCallback(() => setIsOpen(false), []);
+
+    // Held in a ref so an inline callback does not re-run the unmount effect.
+    const onOpenChangeRef = useRef(onOpenChange);
+    useEffect(() => {
+        onOpenChangeRef.current = onOpenChange;
+    });
+
+    const setOpen = useCallback((open: boolean) => {
+        setIsOpen(open);
+        onOpenChangeRef.current?.(open);
+    }, []);
+
+    // Report closed on unmount, so an owner that dismissed this component while
+    // the modal was open is not left latched open forever.
+    useEffect(() => () => onOpenChangeRef.current?.(false), []);
+
+    const closeModal = useCallback(() => setOpen(false), [setOpen]);
     const dialogRef = useModalDialog<HTMLDivElement>(isOpen, closeModal);
 
     const highlights = ["encryption", "offline", "ownership"];
@@ -38,7 +67,7 @@ export const AboutPlatform: React.FC<{ "data-testid"?: string }> = ({ "data-test
             <button
                 type="button"
                 data-testid={testId ?? "About-Platform-Button"}
-                onClick={() => setIsOpen(true)}
+                onClick={() => setOpen(true)}
                 className="flex flex-row items-center gap-2 h-[3rem] px-5 rounded-xl text-white font-semibold shadow-sm
                            bg-gradient-to-r from-iw-primary to-iw-secondary whitespace-nowrap
                            focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2">

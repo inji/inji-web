@@ -19,16 +19,17 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
     const language = useSelector((state: RootState) => state.common.language);
     const {t} = useTranslation('PageTemplate');
     const [isOpen, setIsOpen] = useState(false);
+    const [isAboutOpen, setIsAboutOpen] = useState(false);
 
     // AboutPlatform lives inside this menu but renders its modal through a
     // portal, so the modal is outside the menu in the DOM. Both the blur and
     // the outside-click dismissals would therefore fire the moment the modal
     // takes focus or is clicked, unmounting AboutPlatform and the modal with
     // it - which is why the About Platform dialog could not be opened on
-    // mobile at all. While a dialog is open, the menu stays put and closes
-    // only through an explicit path.
+    // mobile at all. Keyed to this menu's own dialog rather than to any open
+    // dialog, so an unrelated modal still lets the menu dismiss.
     const dismissMenu = () => {
-        if (document.querySelector('[role="dialog"]')) return;
+        if (isAboutOpen) return;
         setIsOpen(false);
     };
     const navigate = useNavigate();
@@ -107,7 +108,10 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                             className="py-5 w-full"
                             onMouseDown={(event) => event.stopPropagation()}
                         >
-                            <AboutPlatform data-testid="Header-Menu-Mobile-AboutPlatform" />
+                            <AboutPlatform
+                                data-testid="Header-Menu-Mobile-AboutPlatform"
+                                onOpenChange={setIsAboutOpen}
+                            />
                         </div>
                         <div
                             data-testid="Header-Menu-Faq"

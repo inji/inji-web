@@ -43,6 +43,9 @@ export const Header: React.FC<UserHeaderProps> = ({
     const dropdownRef = useRef<HTMLDivElement>(null);
     const hamburgerMenuRef = useRef<HTMLImageElement>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+    // A ref rather than state: the document listener below is registered once,
+    // so it would close over a stale value.
+    const isMobileAboutOpenRef = useRef(false);
     const {user, removeUser,isLoading} = useUser();
     const displayNameFromLocalStorage = user?.displayName;
     const hasProfilePictureUrl = user?.profilePictureUrl;
@@ -61,17 +64,17 @@ export const Header: React.FC<UserHeaderProps> = ({
                 setIsProfileDropdownOpen(false);
             }
 
-            // The icon, the menu it opens, and any dialog that menu renders
-            // through a portal are one interaction region. hamburgerMenuRef is
-            // the <img> alone, so without the other two checks a click on a
-            // menu item - or anywhere in the portaled AboutPlatform modal -
-            // counted as outside and unmounted the modal.
+            // The icon, the menu it opens, and the About Platform modal that
+            // menu renders through a portal are one interaction region.
+            // hamburgerMenuRef is the <img> alone, so without the other two
+            // checks a click on a menu item - or anywhere in the portaled
+            // modal - counted as outside and unmounted the modal. Keyed to
+            // this menu's own dialog, so an unrelated modal such as the logout
+            // confirmation still lets the menu dismiss.
             const insideIcon = hamburgerMenuRef.current?.contains(target);
             const insideMenu = mobileMenuRef.current?.contains(target);
-            const insideDialog =
-                target instanceof Element && target.closest('[role="dialog"]') !== null;
 
-            if (!insideIcon && !insideMenu && !insideDialog) {
+            if (!insideIcon && !insideMenu && !isMobileAboutOpenRef.current) {
                 setIsHamburgerMenuOpen(false);
             }
         };
@@ -306,7 +309,12 @@ export const Header: React.FC<UserHeaderProps> = ({
                                 {getUserProfileIconWithName()}
                             </div>
                             <div className="px-4 py-2">
-                                <AboutPlatform data-testid="header-mobile-about-platform" />
+                                <AboutPlatform
+                                    data-testid="header-mobile-about-platform"
+                                    onOpenChange={(open) => {
+                                        isMobileAboutOpenRef.current = open;
+                                    }}
+                                />
                             </div>
                             {!disableProfileDropdown && user && dropdownItems.map((item, index) => (
                                 <React.Fragment key={item.key}>

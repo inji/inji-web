@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {ApiError, ErrorType, WalletCredential} from '../../types/data';
 import {RootState} from '../../types/redux';
@@ -18,7 +18,14 @@ export const useWalletCredentials = () => {
     const language = useSelector((state: RootState) => state.common.language);
     const [error, setError] = useState<string>();
 
+    // A language change refetches, so two requests can be in flight at once. The
+    // slower earlier one must not overwrite the newer one's data.
+    const requestIdRef = useRef(0);
+
     const fetchWalletCredentials = async () => {
+        const requestId = ++requestIdRef.current;
+        const isCurrent = () => requestIdRef.current === requestId;
+
         setLoading(true);
         setError(undefined);
         try {
@@ -28,6 +35,9 @@ export const useWalletCredentials = () => {
                 headers: fetchWalletCredentials.headers(language),
                 apiConfig: fetchWalletCredentials
             });
+
+            // Superseded by a newer request, which now owns the state.
+            if (!isCurrent()) return;
 
             if (response.ok()) {
                 const responseData = response.data!;
@@ -65,14 +75,20 @@ export const useWalletCredentials = () => {
                 }
             }
         } catch {
-            setError("unknownError");
+            if (isCurrent()) setError("unknownError");
         } finally {
-            setLoading(false);
+            // Left to the newer request when this one has been superseded.
+            if (isCurrent()) setLoading(false);
         }
     };
 
     useEffect(() => {
         void fetchWalletCredentials();
+        // Invalidates whatever is in flight, so a late response cannot write
+        // state for a language that is no longer selected, or after unmount.
+        return () => {
+            requestIdRef.current++;
+        };
         // fetchWalletCredentials is redefined every render; `language` is the
         // only input that should refetch, since it sets Accept-Language.
         // eslint-disable-next-line react-hooks/exhaustive-deps
