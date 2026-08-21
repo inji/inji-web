@@ -9,9 +9,7 @@ jest.mock('../../../../components/Credentials/SearchCredential', () => ({
 
 jest.mock('../../../../components/Common/Buttons/NavBackArrowButton', () => ({
     NavBackArrowButton: (props: { onBackClick?: () => void }) => (
-        <button data-testid="back-button" onClick={props.onBackClick}>
-        Back
-        </button>
+        <svg data-testid="back-arrow-icon" onClick={props.onBackClick} />
     ),
 }));
 
@@ -31,19 +29,26 @@ it('renders the page title and description', () => {
   expect(description).not.toBeEmptyDOMElement();
 });
 
-it('renders and calls back button', () => {
+it('calls the back handler exactly once when the arrow icon is clicked', () => {
   render(<Header onBackClick={mockBackClick} />);
 
-  const backButton = screen.getByTestId('back-button');
-  fireEvent.click(backButton);
-  expect(mockBackClick).toHaveBeenCalled();
+  fireEvent.click(screen.getByTestId('back-arrow-icon'));
+  expect(mockBackClick).toHaveBeenCalledTimes(1);
 });
 
-it('calls back handler when the back row is clicked', () => {
+it('calls the back handler exactly once when the back row is clicked', () => {
   render(<Header onBackClick={mockBackClick} />);
 
   fireEvent.click(screen.getByTestId('CredentialTypes-Back-Button'));
-  expect(mockBackClick).toHaveBeenCalled();
+  expect(mockBackClick).toHaveBeenCalledTimes(1);
+});
+
+it('renders the back row as a semantic button', () => {
+  render(<Header onBackClick={mockBackClick} />);
+
+  const backButton = screen.getByTestId('CredentialTypes-Back-Button');
+  expect(backButton.tagName.toLowerCase()).toBe('button');
+  expect(backButton).toHaveAttribute('type', 'button');
 });
 
 it('renders the SearchCredential component', () => {

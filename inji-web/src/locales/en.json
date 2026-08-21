@@ -80,7 +80,8 @@
     "ThirdPartyRedirectModal": {
       "title": "Important Alert !",
       "description": "Any language changes you made here will not be carried over to the third-party Google platform during authentication and log in process.",
-      "continue": "Continue"
+      "continue": "Continue",
+      "cancel": "Cancel"
     },
     "Tour":{
       "counter":"{{current}} of {{total}}",
@@ -712,12 +713,13 @@
   },
   "AboutPlatform": {
     "button": "About Platform",
+    "close": "Close",
     "hero": {
       "title": "Your Digital Identity, Simplified",
       "subTitle": "Store, manage, and share your verified credentials securely—all in one place.",
       "highlights": {
         "encryption": "Bank-level encryption",
-        "offline": "Works offline",
+        "offline": "Offline PDF sharing",
         "ownership": "You control your data"
       },
       "compatibility": {
@@ -742,11 +744,11 @@
         },
         "store": {
           "title": "Store Securely",
-          "description": "All credentials are end-to-end encrypted and stored locally. Only you hold the keys! No third party can access or modify your cards."
+          "description": "Your credentials are encrypted and unlocked with your wallet passcode. You decide which credentials to share, and when."
         },
         "share": {
           "title": "Share & Verify",
-          "description": "Present credentials via QR code or direct share. Verifiers confirm authenticity cryptographically and no issuer contact required, works offline."
+          "description": "Present credentials via QR code or direct share. Verifiers confirm authenticity cryptographically, with no issuer contact required."
         }
       }
     }

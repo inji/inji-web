@@ -91,7 +91,10 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                         onMouseDown={() => setIsOpen(false)}
                         onBlur={() => setIsOpen(false)}
                     >
-                        <div className="py-5 w-full">
+                        <div
+                            className="py-5 w-full"
+                            onMouseDown={(event) => event.stopPropagation()}
+                        >
                             <AboutPlatform data-testid="Header-Menu-Mobile-AboutPlatform" />
                         </div>
                         <div

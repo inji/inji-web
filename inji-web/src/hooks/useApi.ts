@@ -136,8 +136,8 @@ export function useApi<T = any>(): UseApiReturn<T> {
                         },
                     } as AxiosError;
                 }
-            } catch (parseErr) {
-                console.warn('Error parsing error response:', parseErr);
+            } catch {
+                // The body is not the expected JSON; the unparsed error stands.
             }
 
             setError(parsedError);

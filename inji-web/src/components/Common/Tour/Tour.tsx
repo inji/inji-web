@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 import {useTranslation} from "react-i18next";
+import {FOCUSABLE_SELECTOR} from "../../../hooks/useModalDialog";
 
 export type TourPlacement = "top" | "bottom" | "left" | "right";
 
@@ -122,6 +123,7 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
     const [rect, setRect] = useState<DOMRect | null>(null);
     const [popoverSize, setPopoverSize] = useState({width: 400, height: 220});
     const popoverRef = useRef<HTMLDivElement>(null);
+    const focusedStepRef = useRef<number | null>(null);
 
     const step = steps[currentIndex];
     const isFirst = currentIndex === 0;
@@ -179,15 +181,83 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
         }
     }, [currentIndex, rect]);
 
-    // Allow Escape to dismiss the tour.
+    // Move focus into the popover once per step, and hand it back to whatever
+    // held it when the tour closes. rect is a dependency only so this retries
+    // until the popover has rendered; focusedStepRef keeps it to one move per
+    // step, since rect itself is refreshed on a timer.
+    useEffect(() => {
+        if (!isOpen) {
+            focusedStepRef.current = null;
+            return;
+        }
+        if (!popoverRef.current || focusedStepRef.current === currentIndex) return;
+        focusedStepRef.current = currentIndex;
+        popoverRef.current.focus();
+    }, [isOpen, currentIndex, rect]);
+
     useEffect(() => {
         if (!isOpen) return;
+        const previouslyFocused = document.activeElement as HTMLElement | null;
+        return () => previouslyFocused?.focus();
+    }, [isOpen]);
+
+    // Allow Escape to dismiss the tour, and keep Tab inside it.
+    useEffect(() => {
+        if (!isOpen) return;
+
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") close();
+            if (event.key === "Escape") {
+                close();
+                return;
+            }
+            if (event.key !== "Tab") return;
+
+            const popover = popoverRef.current;
+            if (!popover) return;
+
+            const elements = Array.from(
+                popover.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+            );
+
+            // An interactive step leaves the highlighted control operable, so it
+            // joins the popover's own controls in the allowed focus sequence.
+            if (step?.interactive) {
+                const target = document.querySelector<HTMLElement>(step.targetSelector);
+                if (target) {
+                    elements.unshift(
+                        ...(target.matches(FOCUSABLE_SELECTOR)
+                            ? [target]
+                            : Array.from(target.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)))
+                    );
+                }
+            }
+
+            if (elements.length === 0) {
+                event.preventDefault();
+                return;
+            }
+
+            const first = elements[0];
+            const last = elements[elements.length - 1];
+            const active = document.activeElement as HTMLElement | null;
+            const isInsideTour = active === popover || (active !== null && elements.includes(active));
+
+            if (!isInsideTour) {
+                // Focus had escaped to the dimmed page behind the tour.
+                event.preventDefault();
+                first.focus();
+            } else if (event.shiftKey && (active === first || active === popover)) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && (active === last || active === popover)) {
+                event.preventDefault();
+                first.focus();
+            }
         };
+
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-    }, [isOpen, close]);
+    }, [isOpen, close, step]);
 
     if (!isOpen || !step || !rect) {
         return null;
@@ -245,6 +315,7 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
             <div
                 ref={popoverRef}
                 data-testid="Tour-Popover"
+                tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="Tour-Popover-Title"
@@ -308,7 +379,7 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
                             type="button"
                             data-testid="Tour-Popover-Secondary-Button"
                             onClick={isFirst ? close : goPrevious}
-                            className="px-4 py-1.5 rounded-lg border border-gray-300 text-[13px] font-semibold text-iw-title bg-white hover:bg-gray-50 focus:outline-none"
+                            className="px-4 py-1.5 rounded-lg border border-gray-300 text-[13px] font-semibold text-iw-title bg-white hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2"
                         >
                             {isFirst ? t("Tour.skip") : t("Tour.previous")}
                         </button>
@@ -316,7 +387,7 @@ export const Tour: React.FC<TourProps> = ({steps, isOpen, onClose}) => {
                             type="button"
                             data-testid="Tour-Popover-Primary-Button"
                             onClick={goNext}
-                            className="px-4 py-1.5 rounded-lg text-[13px] font-semibold text-white bg-gradient-to-br from-iw-primary to-iw-secondary hover:opacity-90 focus:outline-none"
+                            className="px-4 py-1.5 rounded-lg text-[13px] font-semibold text-white bg-gradient-to-br from-iw-primary to-iw-secondary hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2"
                         >
                             {isLast ? t("Tour.finish") : t("Tour.next")}
                         </button>

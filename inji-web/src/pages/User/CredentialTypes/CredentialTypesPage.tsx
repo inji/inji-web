@@ -81,8 +81,7 @@ export const CredentialTypesPage: React.FC<CredentialTypesPageProps> = ({
                 dispatch(storeFilteredCredentials(issuerConfigurationResponse?.response));
                 dispatch(storeCredentials(issuerConfigurationResponse?.response));
                 setState(RequestStatus.DONE);
-            } catch (error: any) {
-                console.error("Error fetching user profile or issuers info:", error);
+            } catch {
                 setState(RequestStatus.ERROR);
             }
         };

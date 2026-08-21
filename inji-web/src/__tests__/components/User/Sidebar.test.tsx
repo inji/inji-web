@@ -33,7 +33,9 @@ describe('Sidebar', () => {
 
   it('toggles collapse state when CollapseButton is clicked', () => {
     renderWithRouter(<Sidebar />);
-    const collapseBtn = screen.getByRole('button');
+    // Sidebar items are buttons too, so target the collapse control by its
+    // accessible name rather than by being the only button on screen.
+    const collapseBtn = screen.getByRole('button', {name: /collapse/i});
     const sidebarContainer = screen.getByTestId('sidebar-container');
 
     expect(sidebarContainer).toHaveClass('w-64');

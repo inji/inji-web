@@ -11,16 +11,17 @@ interface HeaderPops {
 export const Header: React.FC<HeaderPops> = (props) => {
     const {t} = useTranslation(['CredentialsPage', 'IssuersPage']);
     return <div className={HeaderStyles.headerContainer}>
-        <div
+        <button
+            type="button"
             data-testid="CredentialTypes-Back-Button"
             className={HeaderStyles.backButtonContainer}
             onClick={props.onBackClick}
         >
-            <NavBackArrowButton onBackClick={props.onBackClick}/>
+            <NavBackArrowButton/>
             <span className={HeaderStyles.backText}>
                 {t('IssuersPage:back')}
             </span>
-        </div>
+        </button>
 
         <div className={HeaderStyles.headerTitleSection}>
             <h1

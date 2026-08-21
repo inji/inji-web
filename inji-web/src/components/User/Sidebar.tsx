@@ -37,12 +37,15 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     };
 
     return (
-        <div
+        <button
+            type="button"
+            disabled={disabled}
+            aria-current={isActive ? "page" : undefined}
             className={`relative flex items-center w-full h-12 transition-all duration-200 rounded-lg ${
                 disabled 
                     ? 'cursor-not-allowed opacity-50' 
                     : 'cursor-pointer'
-            } ${isRTL(language) ? 'pl-2' : 'pr-2'}`}
+            } ${isRTL(language) ? 'pl-2' : 'pr-2'} focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2`}
             onClick={handleClick}
         >
             <div
@@ -77,7 +80,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                     {text}
                 </span>
             )}
-        </div>
+        </button>
     );
 };
 

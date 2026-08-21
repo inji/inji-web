@@ -103,7 +103,8 @@
     "ThirdPartyRedirectModal": {
       "title": "Alerta importante !",
       "description": "Quaisquer alterações de idioma feitas aqui não serão transferidas para a plataforma terceirizada do Google durante o processo de autenticação e login.",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "cancel": "Cancelar"
     }
   },
   "Layout": {
@@ -709,14 +710,19 @@
     "logoutButton": "Sim, Sair",
     "stayButton": "Fique nesta página"
   },
+  "LanguageSelector": {
+    "title": "Escolher idioma",
+    "subTitle": "Selecione suas configurações de idioma preferidas."
+  },
   "AboutPlatform": {
     "button": "Sobre a plataforma",
+    "close": "Fechar",
     "hero": {
       "title": "Sua identidade digital, simplificada",
       "subTitle": "Armazene, gerencie e compartilhe suas credenciais verificadas com segurança — tudo em um só lugar.",
       "highlights": {
         "encryption": "Criptografia de nível bancário",
-        "offline": "Funciona offline",
+        "offline": "Compartilhamento de PDF offline",
         "ownership": "Você controla seus dados"
       },
       "compatibility": {
@@ -741,11 +747,11 @@
         },
         "store": {
           "title": "Armazenar com segurança",
-          "description": "Todas as credenciais são criptografadas de ponta a ponta e armazenadas localmente. Somente você tem as chaves! Nenhum terceiro pode acessar ou modificar seus cartões."
+          "description": "Suas credenciais são criptografadas e desbloqueadas com a senha da sua carteira. Você decide quais credenciais compartilhar e quando."
         },
         "share": {
           "title": "Compartilhar e verificar",
-          "description": "Apresente credenciais por código QR ou compartilhamento direto. Os verificadores confirmam a autenticidade criptograficamente, sem necessidade de contato com o emissor, e funciona offline."
+          "description": "Apresente credenciais por código QR ou compartilhamento direto. Os verificadores confirmam a autenticidade criptograficamente, sem precisar contatar o emissor."
         }
       }
     }

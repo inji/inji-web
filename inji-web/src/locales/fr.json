@@ -103,7 +103,8 @@
     "ThirdPartyRedirectModal": {
       "title": "Alerte importante !",
       "description": "Les changements de langue effectués ici ne seront pas répercutés sur la plateforme tierce Google pendant le processus d'authentification et de connexion.",
-      "continue": "Continuer"
+      "continue": "Continuer",
+      "cancel": "Annuler"
     }
   },
   "Layout": {
@@ -709,14 +710,19 @@
     "logoutButton": "Oui, se déconnecter",
     "stayButton": "Rester sur cette page"
   },
+  "LanguageSelector": {
+    "title": "Choisir la langue",
+    "subTitle": "Sélectionnez vos paramètres de langue préférés."
+  },
   "AboutPlatform": {
     "button": "À propos de la plateforme",
+    "close": "Fermer",
     "hero": {
       "title": "Votre identité numérique, simplifiée",
       "subTitle": "Stockez, gérez et partagez vos identifiants vérifiés en toute sécurité — le tout en un seul endroit.",
       "highlights": {
         "encryption": "Chiffrement de niveau bancaire",
-        "offline": "Fonctionne hors ligne",
+        "offline": "Partage de PDF hors ligne",
         "ownership": "Vous contrôlez vos données"
       },
       "compatibility": {
@@ -741,11 +747,11 @@
         },
         "store": {
           "title": "Stocker en toute sécurité",
-          "description": "Tous les identifiants sont chiffrés de bout en bout et stockés localement. Vous seul détenez les clés ! Aucun tiers ne peut accéder à vos cartes ni les modifier."
+          "description": "Vos justificatifs sont chiffrés et déverrouillés avec le code d'accès de votre portefeuille. Vous décidez quels justificatifs partager, et quand."
         },
         "share": {
           "title": "Partager et vérifier",
-          "description": "Présentez vos identifiants via un code QR ou un partage direct. Les vérificateurs confirment l'authenticité de manière cryptographique, sans contact avec l'émetteur, et cela fonctionne hors ligne."
+          "description": "Présentez vos justificatifs via un code QR ou un partage direct. Les vérificateurs confirment l'authenticité de manière cryptographique, sans contacter l'émetteur."
         }
       }
     }

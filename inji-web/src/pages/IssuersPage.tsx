@@ -57,8 +57,7 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className, variant = "la
                 try {
                     await fetchUserProfile();
                     await fetchIssuers();
-                } catch (error: any) {
-                    console.error("Error fetching user profile:", error);
+                } catch {
                     toast.error(t("errorContent"));
                 }
             } else {
@@ -82,16 +81,17 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className, variant = "la
     if (variant === "dashboard") {
         return (
             <div data-testid="Home-Page-Container" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 my-8 flex flex-col">
-                <div
+                <button
+                    type="button"
                     data-testid="Issuers-Back-Button"
                     className="flex items-center self-start cursor-pointer"
                     onClick={handleBackClick}
                 >
-                    <NavBackArrowButton onBackClick={handleBackClick}/>
+                    <NavBackArrowButton/>
                     <span className="text-[18px] leading-[26px] font-semibold text-iw-title">
                         {t("back")}
                     </span>
-                </div>
+                </button>
 
                 <div className="text-center mt-2">
                     <h1

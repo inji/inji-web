@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import ReactDOM from "react-dom";
 import {VscGlobe} from "react-icons/vsc";
 import {useTranslation} from "react-i18next";
@@ -10,6 +10,7 @@ import {LanguageObject} from "../../types/data";
 import {GradientWrapper} from './GradientWrapper';
 import {Clickable} from './Clickable';
 import DropdownArrowIcon from './DropdownArrowIcon';
+import {useModalDialog} from '../../hooks/useModalDialog';
 
 export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-testid": testId }) => {
     const dispatch = useDispatch();
@@ -17,6 +18,8 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
     let language = useSelector((state: RootState) => state.common.language);
     language = language ?? window._env_.DEFAULT_LANG;
     const [isOpen, setIsOpen] = useState(false);
+    const closeModal = useCallback(() => setIsOpen(false), []);
+    const dialogRef = useModalDialog<HTMLDivElement>(isOpen, closeModal);
 
     const handleChange = (item: LanguageObject) => {
         setIsOpen(false);
@@ -51,12 +54,14 @@ export const LanguageSelector: React.FC<{ "data-testid"?: string }> = ({ "data-t
         {isOpen && ReactDOM.createPortal(
             <Clickable
                 className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex justify-center items-center p-4"
-                onClick={() => setIsOpen(false)}
-                testId="Language-Selector-Modal"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="Language-Selector-Modal-Title">
+                onClick={closeModal}
+                testId="Language-Selector-Modal">
                 <div
+                    ref={dialogRef}
+                    tabIndex={-1}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="Language-Selector-Modal-Title"
                     className="bg-iw-background rounded-2xl shadow-2xl w-full max-w-[640px] max-h-[90vh] overflow-y-auto p-6 sm:p-10"
                     onClick={(event) => event.stopPropagation()}>
 

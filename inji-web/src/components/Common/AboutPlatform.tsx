@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import ReactDOM from "react-dom";
 import {useTranslation} from "react-i18next";
-import {FiInfo, FiDownload, FiLock, FiShare2, FiCheck} from "react-icons/fi";
+import {FiInfo, FiDownload, FiLock, FiShare2, FiCheck, FiX} from "react-icons/fi";
 import {Clickable} from "./Clickable";
+import {useModalDialog} from "../../hooks/useModalDialog";
 
 type Step = {
     key: string;
@@ -19,6 +20,8 @@ const steps: Step[] = [
 export const AboutPlatform: React.FC<{ "data-testid"?: string }> = ({ "data-testid": testId }) => {
     const {t} = useTranslation("AboutPlatform");
     const [isOpen, setIsOpen] = useState(false);
+    const closeModal = useCallback(() => setIsOpen(false), []);
+    const dialogRef = useModalDialog<HTMLDivElement>(isOpen, closeModal);
 
     const highlights = ["encryption", "offline", "ownership"];
     const credentialTypes = [
@@ -45,15 +48,27 @@ export const AboutPlatform: React.FC<{ "data-testid"?: string }> = ({ "data-test
             {isOpen && ReactDOM.createPortal(
                 <Clickable
                     className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex justify-center items-center p-4"
-                    onClick={() => setIsOpen(false)}
-                    testId="About-Platform-Modal"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="About-Platform-Modal-Title">
+                    onClick={closeModal}
+                    testId="About-Platform-Modal">
                     <div
-                        className="bg-iw-background rounded-3xl shadow-2xl w-full max-w-[1040px] max-h-[90vh] overflow-y-auto
+                        ref={dialogRef}
+                        tabIndex={-1}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="About-Platform-Modal-Title"
+                        className="relative bg-iw-background rounded-3xl shadow-2xl w-full max-w-[1040px] max-h-[90vh] overflow-y-auto
                                    flex flex-col md:flex-row"
                         onClick={(event) => event.stopPropagation()}>
+
+                        <button
+                            type="button"
+                            data-testid="About-Platform-Modal-Close-Button"
+                            aria-label={t("close")}
+                            onClick={closeModal}
+                            className="absolute top-4 right-4 z-10 p-2 rounded-full text-white/90 bg-black/20 hover:bg-black/30
+                                       focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2">
+                            <FiX size={20} />
+                        </button>
 
                         {/* Left gradient hero panel */}
                         <div className="md:w-1/2 min-w-0 p-8 sm:p-10 text-white flex flex-col break-words bg-gradient-to-r from-iw-primary from-[65%] via-iw-tertiary via-[85%] to-iw-secondary">

@@ -28,33 +28,14 @@ export const CredentialList: React.FC<CredentialListProps> = ({state, showHeader
     const credentials = useSelector((state: RootState) => state.credentials);
 
     const filterCredentialsBySelectedOrDefaultLanguage = () => {
-        const missingLanguageSupport: CredentialConfigurationObject[] = [];
-
-        const filteredCredentialsList = (
+        return (
             credentials?.filtered_credentials?.credentials_supported ?? []
-        ).filter((credential: CredentialConfigurationObject) => {
-            const display = credential.display;
-            const hasMatchingDisplay = display?.some(
+        ).filter((credential: CredentialConfigurationObject) =>
+            credential.display?.some(
                 ({locale}) =>
                     locale === selectedLanguage || locale === defaultLanguage
-            );
-
-            if (!hasMatchingDisplay) {
-                missingLanguageSupport.push(credential);
-            }
-
-            return hasMatchingDisplay;
-        });
-
-        if (missingLanguageSupport.length) {
-            console.error(
-                `Language support missing for these credential types of issuer: ${missingLanguageSupport
-                    .map((credential) => credential.name)
-                    .join(", ")}`
-            );
-        }
-
-        return filteredCredentialsList;
+            )
+        );
     };
 
     const filteredCredentialsWithLangSupport =

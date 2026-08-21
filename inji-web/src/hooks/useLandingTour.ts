@@ -12,8 +12,7 @@ import {LANDING_TOUR_COMPLETED} from "../utils/constants";
 export const isLandingTourCompleted = (): boolean => {
     try {
         return AppStorage.getItem(LANDING_TOUR_COMPLETED) === "true";
-    } catch (e) {
-        console.warn("Unable to read landing tour state from storage", e);
+    } catch {
         return true;
     }
 };
@@ -29,8 +28,8 @@ export const useLandingTour = () => {
     const completeTour = useCallback(() => {
         try {
             AppStorage.setItem(LANDING_TOUR_COMPLETED, "true");
-        } catch (e) {
-            console.warn("Unable to persist landing tour completion", e);
+        } catch {
+            // Completion cannot be persisted; the tour still closes for this session.
         }
         setIsTourOpen(false);
     }, []);

@@ -20,6 +20,7 @@ export const useWalletCredentials = () => {
 
     const fetchWalletCredentials = async () => {
         setLoading(true);
+        setError(undefined);
         try {
             const fetchWalletCredentials = api.fetchWalletVCs;
 
@@ -33,9 +34,7 @@ export const useWalletCredentials = () => {
                 setCredentials(responseData);
                 setFilteredCredentials(responseData);
             } else {
-                console.error("Error fetching credentials:", response.status, response.error, !navigator.onLine);
                 if (response.error?.message === (NETWORK_ERROR_MESSAGE) && !navigator.onLine) {
-                    console.error('Network error: Please check your internet connection.');
                     setError("networkError");
                     return;
                 }
@@ -65,8 +64,7 @@ export const useWalletCredentials = () => {
                         setError("unknownError");
                 }
             }
-        } catch (error) {
-            console.error("An unknown error occurred. Failed to fetch credentials:", error);
+        } catch {
             setError("unknownError");
         } finally {
             setLoading(false);
