@@ -6,6 +6,7 @@ import {toast} from "react-toastify";
 import {useTranslation} from "react-i18next";
 import {useLocation} from 'react-router-dom';
 import {LoginFailedModal} from '../components/Login/LoginFailedModal';
+import {LandingTour} from "../components/Common/Tour/LandingTour";
 import {LANDING_VISITED, OPENID_VP_LOGIN} from "../utils/constants";
 
 const Status = {
@@ -78,6 +79,9 @@ export const HomePage: React.FC = () => {
             </div>
 
             {isLoginFailed && <LoginFailedModal/>}
+
+            {/* Guided walkthrough, shown only on the Landing Page and only when no blocking modal is up */}
+            {!isLoginFailed && <LandingTour isOpenIdVpLogin={isOpenIdVpLogin}/>}
         </div>
 
     );

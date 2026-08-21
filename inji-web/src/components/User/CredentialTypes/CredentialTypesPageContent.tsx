@@ -38,6 +38,7 @@ export const CredentialTypesPageContent: React.FC<CredentialTypesPageContentProp
             <CredentialListWrapper
                 state={props.state}
                 className={CredentialTypesPageStyles.credentialListContainer}
+                showHeader={false}
             />
         </div>
     );

@@ -26,21 +26,29 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                                                      disabled = false
                                                  }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const language = useSelector((state: RootState) => state.common.language);
 
     const handleClick = () => {
         if (!disabled) {
-            navigate(path);
+            // Pass the origin so destination pages (e.g. FAQ) can navigate back.
+            navigate(path, {state: {from: location.pathname}});
         }
     };
 
+    // The text label below is only rendered when expanded, so without an
+    // explicit name the collapsed icon-only button has none at all.
     return (
-        <div
+        <button
+            type="button"
+            aria-label={text}
+            disabled={disabled}
+            aria-current={isActive ? "page" : undefined}
             className={`relative flex items-center w-full h-12 transition-all duration-200 rounded-lg ${
                 disabled 
                     ? 'cursor-not-allowed opacity-50' 
                     : 'cursor-pointer'
-            } ${isRTL(language) ? 'pl-2' : 'pr-2'}`}
+            } ${isRTL(language) ? 'pl-2' : 'pr-2'} focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-offset-2`}
             onClick={handleClick}
         >
             <div
@@ -75,7 +83,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                     {text}
                 </span>
             )}
-        </div>
+        </button>
     );
 };
 
@@ -113,14 +121,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ disabled = false, forceLeftPos
         {
             icon: (
                 <SideBarSvgIcon
-                    outline="M9 12H15M9 16H15M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H12.5858C12.851 3 13.1054 3.10536 13.2929 3.29289L18.7071 8.70711C18.8946 8.89464 19 9.149 19 9.41421V19C19 20.1046 18.1046 21 17 21Z"
-                    navUrl={ROUTES.USER_CREDENTIALS}
+                    outline="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5M9 12H15M9 16H15"
+                    navUrl={ROUTES.USER_ISSUERS}
                     location={location}
                 />
             ),
-            text: t('StoredCards:title'),
-            path: ROUTES.USER_CREDENTIALS,
-            key: 'Sidebar-Item-Credentials'
+            text: t('IssuersPage:containerHeading'),
+            path: ROUTES.USER_ISSUERS,
+            key: 'Sidebar-Item-Issuers'
         }
     ];
 
@@ -163,6 +171,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ disabled = false, forceLeftPos
                         disabled={disabled}
                     />
                 ))}
+            </div>
+
+            <div
+                data-testid="sidebar-faq"
+                className={`mt-auto mb-6 w-full ${
+                    isRTL(language) ? 'pl-4' : 'pr-4'
+                }`}
+            >
+                <SidebarItem
+                    icon={
+                        <SideBarSvgIcon
+                            outline="M8.228 9C8.777 7.835 10.258 7 12 7C14.21 7 16 8.343 16 10C16 11.4 14.722 12.575 12.994 12.907C12.452 13.011 12 13.448 12 14M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                            navUrl={ROUTES.USER_FAQ}
+                            location={location}
+                        />
+                    }
+                    text={t('ProfileDropdown.faq')}
+                    path={ROUTES.USER_FAQ}
+                    isActive={location.pathname === ROUTES.USER_FAQ}
+                    isCollapsed={isCollapsed}
+                    disabled={disabled}
+                />
             </div>
         </div>
     );

@@ -15,7 +15,14 @@ describe('Sidebar', () => {
   it('renders sidebar items with correct text', () => {
     renderWithRouter(<Sidebar />, { route: '/user/home' });
     expect(screen.getByText('Home.title')).toBeInTheDocument();
-    expect(screen.getByText('StoredCards:title')).toBeInTheDocument();
+    expect(screen.getByText('IssuersPage:containerHeading')).toBeInTheDocument();
+    expect(screen.queryByText('StoredCards:title')).not.toBeInTheDocument();
+  });
+
+  it('navigates to issuers page on List of Issuers click', () => {
+    renderWithRouter(<Sidebar />, { route: '/user/home' });
+    fireEvent.click(screen.getByText('IssuersPage:containerHeading'));
+    expect(window.location.pathname).toBe('/user/issuers');
   });
 
   it('sets active class on current location path', () => {
@@ -26,7 +33,9 @@ describe('Sidebar', () => {
 
   it('toggles collapse state when CollapseButton is clicked', () => {
     renderWithRouter(<Sidebar />);
-    const collapseBtn = screen.getByRole('button');
+    // Sidebar items are buttons too, so target the collapse control by its
+    // accessible name rather than by being the only button on screen.
+    const collapseBtn = screen.getByRole('button', {name: /collapse/i});
     const sidebarContainer = screen.getByTestId('sidebar-container');
 
     expect(sidebarContainer).toHaveClass('w-64');

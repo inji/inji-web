@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {LanguageSelector} from '../Common/LanguageSelector';
+import {AboutPlatform} from '../Common/AboutPlatform';
 import {api} from '../../utils/api';
 import {toast} from 'react-toastify';
 import {useUser} from '../../hooks/User/useUser';
@@ -10,6 +11,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../types/redux';
 import {useTranslation} from 'react-i18next';
 import DropdownArrowIcon from '../Common/DropdownArrowIcon';
+import {MdLogout, MdOutlineAccountCircle} from 'react-icons/md';
 import {ROUTES} from '../../utils/constants';
 import {convertStringIntoPascalCase} from "../../utils/misc";
 import {navigateToUserHome} from "../../utils/navigationUtils";
@@ -40,6 +42,10 @@ export const Header: React.FC<UserHeaderProps> = ({
     const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const hamburgerMenuRef = useRef<HTMLImageElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    // A ref rather than state: the document listener below is registered once,
+    // so it would close over a stale value.
+    const isMobileAboutOpenRef = useRef(false);
     const {user, removeUser,isLoading} = useUser();
     const displayNameFromLocalStorage = user?.displayName;
     const hasProfilePictureUrl = user?.profilePictureUrl;
@@ -58,10 +64,17 @@ export const Header: React.FC<UserHeaderProps> = ({
                 setIsProfileDropdownOpen(false);
             }
 
-            if (
-                hamburgerMenuRef.current &&
-                !hamburgerMenuRef.current.contains(target)
-            ) {
+            // The icon, the menu it opens, and the About Platform modal that
+            // menu renders through a portal are one interaction region.
+            // hamburgerMenuRef is the <img> alone, so without the other two
+            // checks a click on a menu item - or anywhere in the portaled
+            // modal - counted as outside and unmounted the modal. Keyed to
+            // this menu's own dialog, so an unrelated modal such as the logout
+            // confirmation still lets the menu dismiss.
+            const insideIcon = hamburgerMenuRef.current?.contains(target);
+            const insideMenu = mobileMenuRef.current?.contains(target);
+
+            if (!insideIcon && !insideMenu && !isMobileAboutOpenRef.current) {
                 setIsHamburgerMenuOpen(false);
             }
         };
@@ -89,8 +102,7 @@ export const Header: React.FC<UserHeaderProps> = ({
                 }
                 throw new Error(parsedResponse?.[0]?.errorMessage);
             }
-        } catch (error) {
-            console.error('Logout failed with error:', error);
+        } catch {
             toast.error('Unable to logout. Please try again.');
         }
     };
@@ -99,26 +111,19 @@ export const Header: React.FC<UserHeaderProps> = ({
         {
             label: t('ProfileDropdown.profile'),
             onClick: () => {
-                setIsProfileDropdownOpen(false);    
+                setIsProfileDropdownOpen(false);
                 navigate(ROUTES.USER_PROFILE,{state: {from: window.location.pathname}});
             },
             textColor: 'text-gray-700',
-            key: 'Profile-Dropdown-Profile'
-        },
-        {
-            label: t('ProfileDropdown.faq'),
-            onClick: () => {
-                setIsProfileDropdownOpen(false);
-                navigate(ROUTES.USER_FAQ, {state: {from: window.location.pathname}});
-            },
-            textColor: 'text-gray-700',
-            key: 'Profile-Dropdown-FAQ'
+            key: 'Profile-Dropdown-Profile',
+            icon: <MdOutlineAccountCircle size={18}/>
         },
         {
             label: t('ProfileDropdown.logout'),
             onClick: handleLogout,
             textColor: 'text-red-700',
-            key: 'Profile-Dropdown-Logout'
+            key: 'Profile-Dropdown-Logout',
+            icon: <MdLogout size={18}/>
         }
     ];
 
@@ -241,6 +246,9 @@ export const Header: React.FC<UserHeaderProps> = ({
                 </div>
 
                 <div className="flex items-center space-x-6">
+                    <div className="hidden sm:block">
+                        <AboutPlatform data-testid="header-about-platform" />
+                    </div>
                     <LanguageSelector />
 
                     {(isLoading || user) && (
@@ -269,13 +277,15 @@ export const Header: React.FC<UserHeaderProps> = ({
                                 <div className="absolute top-[-0.3rem] right-8 w-3 h-3 bg-white transform rotate-45" />
                                 <div className="py-2">
                                     {dropdownItems.map((item) => (
-                                        <div
+                                        <button
                                             key={item.key}
-                                            className={`px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary`}
+                                            type="button"
+                                            className={`w-full text-left px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-inset`}
                                             onClick={item.onClick}
                                         >
+                                            {item.icon}
                                             {item.label}
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             </div>
@@ -290,6 +300,7 @@ export const Header: React.FC<UserHeaderProps> = ({
             >
                 {isHamburgerMenuOpen && (isLoading || user) && (
                     <div
+                        ref={mobileMenuRef}
                         style={{marginTop: headerHeight}}
                         className="absolute top-1 bg-white shadow-iw-hamburger-dropdown p-2 w-full"
                     >
@@ -297,14 +308,24 @@ export const Header: React.FC<UserHeaderProps> = ({
                             <div className="flex items-center px-4 py-2">
                                 {getUserProfileIconWithName()}
                             </div>
+                            <div className="px-4 py-2">
+                                <AboutPlatform
+                                    data-testid="header-mobile-about-platform"
+                                    onOpenChange={(open) => {
+                                        isMobileAboutOpenRef.current = open;
+                                    }}
+                                />
+                            </div>
                             {!disableProfileDropdown && user && dropdownItems.map((item, index) => (
                                 <React.Fragment key={item.key}>
-                                    <div
-                                        className={`px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium`}
+                                    <button
+                                        type="button"
+                                        className={`w-full text-left px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-primary focus-visible:ring-inset`}
                                         onClick={item.onClick}
                                     >
+                                        {item.icon}
                                         {item.label}
-                                    </div>
+                                    </button>
                                     {index !== dropdownItems.length - 1 && (
                                         <hr className="border-gray-200 my-1 mx-2" />
                                     )}

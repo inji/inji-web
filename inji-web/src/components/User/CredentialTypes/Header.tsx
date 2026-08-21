@@ -1,38 +1,47 @@
 import React from "react";
 import {SearchCredential} from "../../Credentials/SearchCredential";
 import {NavBackArrowButton} from "../../Common/Buttons/NavBackArrowButton";
-import {IssuerWellknownDisplayArrayObject} from "../../../types/data";
 import {useTranslation} from "react-i18next";
-import {TertiaryButton} from "../../Common/Buttons/TertiaryButton";
 import {HeaderStyles} from "./HeaderStyles";
 
 interface HeaderPops {
     onBackClick: () => void,
-    displayObject: IssuerWellknownDisplayArrayObject | undefined,
-    onClick: () => void,
 }
 
 export const Header: React.FC<HeaderPops> = (props) => {
-    const {t} = useTranslation('User');
+    const {t} = useTranslation(['CredentialsPage', 'IssuersPage']);
     return <div className={HeaderStyles.headerContainer}>
-        <div className={HeaderStyles.headerLeftSection}>
-            <div className={HeaderStyles.headerLeftSection}>
-                <NavBackArrowButton onBackClick={props.onBackClick}/>
-            </div>
-            <div className={HeaderStyles.headerTitleSection}>
-                <span
-                    data-testid={"Stored-Credentials"}
-                    className={HeaderStyles.pageTitle}
-                >
-                    {props.displayObject?.name}
-                </span>
+        <button
+            type="button"
+            data-testid="CredentialTypes-Back-Button"
+            className={HeaderStyles.backButtonContainer}
+            onClick={props.onBackClick}
+        >
+            <NavBackArrowButton/>
+            <span className={HeaderStyles.backText}>
+                {t('IssuersPage:back')}
+            </span>
+        </button>
 
-                <TertiaryButton onClick={props.onClick} title={t('Common:home')} testId={"home"}/>
-            </div>
+        <div className={HeaderStyles.headerTitleSection}>
+            <h1
+                data-testid="CredentialTypes-Page-Title"
+                className={HeaderStyles.pageTitle}
+            >
+                {t('CredentialsPage:containerHeading')}
+            </h1>
+            <p
+                data-testid="CredentialTypes-Page-Description"
+                className={HeaderStyles.pageDescription}
+            >
+                {t('CredentialsPage:containerSubHeading')}
+            </p>
         </div>
-        <div>
+
+        <div className={HeaderStyles.searchBarContainer}>
             <SearchCredential
-                issuerContainerBorderRadius={"rounded-md"}
+                fullWidth
+                issuerContainerBorderRadius={"rounded-lg"}
             />
         </div>
     </div>;

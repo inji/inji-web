@@ -80,10 +80,6 @@ jest.mock("../pages/FAQPage.tsx", () => ({
     FAQPage: () => <div>FaqPage</div>
 }));
 
-jest.mock("../pages/User/StoredCards/StoredCardsPage.tsx", () => ({
-    StoredCardsPage: () => <div>User/credentialsPage</div>
-}))
-
 describe("AppRouter", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -171,9 +167,15 @@ describe("AppRouter", () => {
         renderMemoryRouterWithProvider(<AppRouter/>, [`${route}`]);
 
         let expectedText;
-        if (route === ROUTES.USER_ISSUERS || route === ROUTES.ROOT) {
+        if (route === ROUTES.ROOT) {
             expectedText = "User/homePage";
-        } else if (route === ROUTES.USER_FAQ || route === ROUTES.USER_ISSUERS) { // common pages
+        } else if (route === ROUTES.USER_CREDENTIALS) {
+            // Stored Cards was merged into Home; the old route redirects there
+            expectedText = "User/homePage";
+        } else if (route === ROUTES.USER_ISSUERS) {
+            // "Add Card" destination: issuer selection page
+            expectedText = "IssuersPage";
+        } else if (route === ROUTES.USER_FAQ) { // common pages
             expectedText = `${route.charAt(6).toUpperCase() + route.slice(7)}Page`;
         } else {
             expectedText = getPageLabelFromRoute(route);

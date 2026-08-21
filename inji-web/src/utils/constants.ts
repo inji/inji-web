@@ -65,6 +65,8 @@ export const passcodeLength = 6;
 
 export const LANDING_VISITED = "landingVisited";
 
+export const LANDING_TOUR_COMPLETED = "landingTourCompleted";
+
 export const OPENID_VP_LOGIN = "openIdVpLogin";
 
 export const OPENID4VP_AUTHORIZE_PREFIX = "openid4vp://authorize";

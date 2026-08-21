@@ -47,6 +47,7 @@ export type IssuerProps = {
 
 export type EmptyListContainerProps = {
     content: string;
+    subContent?: string;
 }
 
 export type HeaderTileProps = {
@@ -56,6 +57,7 @@ export type HeaderTileProps = {
 
 export type IssuersListProps = {
     state: RequestStatus;
+    showHeader?: boolean;
 }
 export type CTContentProps = {
     expiryTime: number;

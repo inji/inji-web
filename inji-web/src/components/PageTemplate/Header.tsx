@@ -8,6 +8,7 @@ import {RootState} from '../../types/redux';
 import {useSelector} from 'react-redux';
 import {isRTL} from '../../utils/i18n';
 import { PlainButton } from '../Common/Buttons/PlainButton';
+import {AboutPlatform} from '../Common/AboutPlatform';
 import {ROUTES} from "../../utils/constants";
 
 type HeaderProps = {
@@ -18,6 +19,19 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
     const language = useSelector((state: RootState) => state.common.language);
     const {t} = useTranslation('PageTemplate');
     const [isOpen, setIsOpen] = useState(false);
+    const [isAboutOpen, setIsAboutOpen] = useState(false);
+
+    // AboutPlatform lives inside this menu but renders its modal through a
+    // portal, so the modal is outside the menu in the DOM. Both the blur and
+    // the outside-click dismissals would therefore fire the moment the modal
+    // takes focus or is clicked, unmounting AboutPlatform and the modal with
+    // it - which is why the About Platform dialog could not be opened on
+    // mobile at all. Keyed to this menu's own dialog rather than to any open
+    // dialog, so an unrelated modal still lets the menu dismiss.
+    const dismissMenu = () => {
+        if (isAboutOpen) return;
+        setIsOpen(false);
+    };
     const navigate = useNavigate();
 
     return (
@@ -67,6 +81,9 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                     data-testid="Header-FAQ-LanguageSelector-Container"
                 >
                     <div className="hidden sm:block">
+                        <AboutPlatform data-testid="Header-Menu-AboutPlatform" />
+                    </div>
+                    <div className="hidden sm:block">
                         <PlainButton
                             fullWidth={true}
                             onClick={() => navigate(ROUTES.FAQ)}
@@ -79,14 +96,23 @@ export const Header: React.FC<HeaderProps> = ({headerRef}) => {
                 </div>
             </div>
             {isOpen && (
-                <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
+                <OutsideClickHandler onOutsideClick={dismissMenu}>
                     <div
                         className="w-full sm:hidden px-4 flex flex-col justify-start items-start font-semibold"
                         role="button"
                         tabIndex={0}
                         onMouseDown={() => setIsOpen(false)}
-                        onBlur={() => setIsOpen(false)}
+                        onBlur={dismissMenu}
                     >
+                        <div
+                            className="py-5 w-full"
+                            onMouseDown={(event) => event.stopPropagation()}
+                        >
+                            <AboutPlatform
+                                data-testid="Header-Menu-Mobile-AboutPlatform"
+                                onOpenChange={setIsAboutOpen}
+                            />
+                        </div>
                         <div
                             data-testid="Header-Menu-Faq"
                             role="button"
