@@ -1,5 +1,5 @@
 import React from 'react';
-import {ItemBoxProps} from '../../types/components';
+import { ItemBoxProps } from '../../types/components';
 
 export const ItemBox: React.FC<ItemBoxProps> = (props) => {
     return (
@@ -25,6 +25,14 @@ export const ItemBox: React.FC<ItemBoxProps> = (props) => {
                 >
                     {props.title}
                 </h3>
+                {props.description && (
+                    <p
+                        className="text-xs text-gray-600 text-center w-[150px] mt-2 break-words"
+                        data-testid="ItemBox-Description"
+                    >
+                        {props.description}
+                    </p>
+                )}
             </div>
         </div>
     );
