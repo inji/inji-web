@@ -14,6 +14,7 @@ export enum ContentTypes {
     JSON = "application/json",
     PDF = "application/pdf",
     FORM_URL_ENCODED = "application/x-www-form-urlencoded",
+    SVG = "image/svg+xml",
 }
 
 
@@ -56,7 +57,8 @@ export class api {
         methodType: MethodType.POST,
         headers: () => {
             return {
-                "accept": ContentTypes.PDF,
+                "accept": `${ContentTypes.SVG}, ${ContentTypes.PDF}`,
+                "accept": `${ContentTypes.SVG}, ${ContentTypes.PDF}`,
                 "Content-Type": ContentTypes.FORM_URL_ENCODED,
                 "Cache-Control": "no-cache, no-store, must-revalidate"
             };
