@@ -192,7 +192,13 @@ export const PasscodePage: React.FC = () => {
             redirectPath = storedRedirectPath!;
             AppStorage.removeItem(KEYS.REDIRECT_TO, true);
         }
-        navigate(redirectPath);
+        // Set sessionStorage flag as backup in case navigation state is lost
+        try {
+            sessionStorage.setItem('showLoginSuccessToast', 'true');
+        } catch (e) {
+            console.warn('Unable to access sessionStorage', e);
+        }
+        navigate(redirectPath, { state: { loginSuccess: true } });
     }
 
     const handleSubmit = async () => {

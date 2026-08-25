@@ -412,7 +412,8 @@
   "User": {
     "Home": {
       "title": "بيت",
-      "welcome": "مرحباً"
+      "welcome": "مرحباً",
+      "loginSuccess": "تم تسجيل الدخول بنجاح!"
     },
     "ProfileDropdown": {
       "profile": "حساب تعريفي",

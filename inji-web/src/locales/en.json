@@ -412,7 +412,8 @@
   "User": {
     "Home": {
       "title": "Home",
-      "welcome": "Welcome"
+      "welcome": "Welcome",
+      "loginSuccess": "Login successful!"
     },
     "ProfileDropdown": {
       "profile": "Profile",
