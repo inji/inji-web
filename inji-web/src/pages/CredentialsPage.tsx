@@ -12,7 +12,7 @@ import {
     ApiRequest,
     IssuerObject,
     IssuerWellknownDisplayArrayObject,
-    ResponseTypeObject
+  ResponseTypeObject,
 } from "../types/data";
 import {getIssuerDisplayObjectForCurrentLanguage} from "../utils/i18n";
 import {RootState} from "../types/redux";
@@ -24,12 +24,12 @@ import {RequestStatus} from "../utils/constants";
 // This page is hit on guest mode
 export const CredentialsPage: React.FC = () => {
     const {state, fetchData} = useApi<ResponseTypeObject>();
-    const params = useParams<CredentialParamProps>();
+  const params = useParams<{issuerId: string}>();
     const dispatch = useDispatch();
     const {t} = useTranslation("CredentialsPage");
     const language = useSelector((state: RootState) => state.common.language);
     let displayObject = {} as IssuerWellknownDisplayArrayObject;
-    let [selectedIssuer, setSelectedIssuer] = useState({} as IssuerObject);
+  const [selectedIssuer, setSelectedIssuer] = useState({} as IssuerObject);
     if (!isObjectEmpty(selectedIssuer)) {
         displayObject = getIssuerDisplayObjectForCurrentLanguage(
             selectedIssuer.display,
@@ -43,7 +43,7 @@ export const CredentialsPage: React.FC = () => {
             let response = await fetchData(
                 {
                     url: apiRequest.url(params.issuerId ?? ""),
-                    apiConfig: apiRequest
+        apiConfig: apiRequest,
                 }
             );
             if(response.state === RequestStatus.ERROR) {
@@ -58,7 +58,7 @@ export const CredentialsPage: React.FC = () => {
             response = await fetchData(
                 {
                     url: apiRequest.url(params.issuerId ?? ""),
-                    apiConfig: apiRequest
+        apiConfig: apiRequest,
                 }
             );
 
@@ -79,10 +79,11 @@ export const CredentialsPage: React.FC = () => {
                 search={true}
                 link={"/issuers"}
             />
+      <div className="container mx-auto mt-8 px-4 sm:px-6 md:px-10 lg:px-20">
             <CredentialListWrapper
                 state={state}
-                className="container mx-auto mt-8 px-10 sm:px-0"
             />
         </div>
+    </div>
     );
 };
