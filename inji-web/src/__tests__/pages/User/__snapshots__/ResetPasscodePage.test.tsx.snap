@@ -3,11 +3,11 @@
 exports[`ResetPasscodePage Component should match snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex flex-col items-center justify-center z-50 h-screen"
+    class="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex flex-col items-center justify-center z-50 h-screen overflow-y-auto py-4"
     data-testid="reset-passcode-page"
   >
     <div
-      class="rounded-2xl bg-white flex flex-col items-center justify-start relative w-[90%] sm:w-[85%] md:w-[90%] h-fit max-h-[99vh] sm:max-h-[98vh] overflow-y-hidden shadow-iw-pin-page-container"
+      class="rounded-2xl bg-white flex flex-col items-center justify-start relative w-[90%] sm:w-[85%] md:w-[90%] h-fit max-h-[95vh] sm:max-h-[95vh] overflow-y-auto shadow-iw-pin-page-container my-auto"
     >
       <div
         class="overflow-hidden absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
@@ -60,7 +60,7 @@ exports[`ResetPasscodePage Component should match snapshot 1`] = `
         </div>
       </div>
       <div
-        class="flex flex-col items-center justify-start w-full mt-44 sm:mt-48 relative z-10 pb-0 sm:pb-8"
+        class="flex flex-col items-center justify-start w-full mt-44 sm:mt-48 relative z-10 pb-8 sm:pb-8"
       >
         <div
           class="text-center space-y-5 relative w-full max-w-lg px-4 sm:px-0"

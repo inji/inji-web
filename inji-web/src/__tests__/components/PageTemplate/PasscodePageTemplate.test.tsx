@@ -140,4 +140,51 @@ describe('PasscodePageTemplate Component', () => {
 
         expect(asFragment()).toMatchSnapshot();
     });
+
+    test('renders profile image with accessible alt text when user has profilePictureUrl', () => {
+        const userWithPhoto = {
+            displayName: 'Jane Doe',
+            profilePictureUrl: 'https://example.com/photo.jpg',
+            email: 'jane@example.com'
+        };
+
+        render(
+            <PasscodePageTemplate
+                title={mockTitle}
+                subtitle={mockSubtitle}
+                content={mockContent}
+                contentTestId={"content-test"}
+                testId={mockTestId}
+                user={userWithPhoto}
+            />
+        );
+
+        const img = screen.getByRole('img', { name: /profile picture for jane doe/i });
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('alt', 'Profile picture for Jane Doe');
+    });
+
+    test('renders profile initials with role img and aria-label when user has no profile picture', () => {
+        const userWithInitials = {
+            displayName: 'John Smith',
+            profilePictureUrl: '',
+            email: 'john@example.com'
+        };
+
+        render(
+            <PasscodePageTemplate
+                title={mockTitle}
+                subtitle={mockSubtitle}
+                content={mockContent}
+                contentTestId={"content-test"}
+                testId={mockTestId}
+                user={userWithInitials}
+            />
+        );
+
+        const initials = screen.getByRole('img', { name: /profile initials for john smith/i });
+        expect(initials).toBeInTheDocument();
+        expect(initials).toHaveAttribute('aria-label', 'Profile initials for John Smith');
+        expect(initials).toHaveTextContent('J');
+    });
 });
