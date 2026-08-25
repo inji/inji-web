@@ -67,9 +67,10 @@ exports[`Testing  the Layout of the Expiry Content Check if the layout is matchi
             Number of times
           </span>
         </label>
-        <label
+        <button
           class="w-1/2 flex items-center"
           data-testid="DataShareContent-Validity-Date"
+          type="button"
         >
           <div
             class="relative inline-block"
@@ -78,11 +79,9 @@ exports[`Testing  the Layout of the Expiry Content Check if the layout is matchi
               class="accent-iw-primary scale-150 mx-2"
               disabled=""
               name="consentValidity"
+              tabindex="-1"
               type="radio"
               value="date"
-            />
-            <div
-              class="absolute inset-0"
             />
           </div>
           <span
@@ -91,25 +90,26 @@ exports[`Testing  the Layout of the Expiry Content Check if the layout is matchi
           >
             Date
           </span>
-        </label>
+        </button>
       </div>
     </div>
     <div
       class="relative flex mb-4"
-      data-testid="times-dropdown"
     >
       <div
         class="w-1/3"
       />
-      <div
+      <button
         class="w-2/3 py-4 px-4 rounded-lg border-2 border-iw-borderLight flex flex-row items-center"
+        data-testid="times-dropdown"
+        type="button"
       >
-        <label
+        <span
           class="w-full h-full"
           data-testid="DataShareContent-Selected-Validity-Times"
         >
           Once
-        </label>
+        </span>
         <svg
           color="var(--iw-color-arrowDown)"
           fill="currentColor"
@@ -128,7 +128,7 @@ exports[`Testing  the Layout of the Expiry Content Check if the layout is matchi
             d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
           />
         </svg>
-      </div>
+      </button>
     </div>
     <div
       class="flex w-full p-2 rounded-lg border-2 border-iw-shieldLoadingShadow bg-iw-disclaimerBackGround my-8"

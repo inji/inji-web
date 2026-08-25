@@ -81,8 +81,8 @@ const sortClaimNodes = (nodes: ClaimNode[]): ClaimNode[] =>
             if (orderDiff !== 0) {
                 return orderDiff;
             }
-            const labelA = a.kind === "group" ? a.label : a.label;
-            const labelB = b.kind === "group" ? b.label : b.label;
+            const labelA = a.label;
+            const labelB = b.label;
             return labelA.localeCompare(labelB);
         })
         .map((node) =>

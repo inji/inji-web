@@ -4,6 +4,7 @@ import {SolidButtonStyles} from "./SolidButtonStyles";
 export const SolidButton: React.FC<SolidButtonProps> = ({iconTwo, ...props}) => {
     return <div className={props.fullWidth ? "w-full" : ""}>
         <button
+            type="button"
             data-testid={props.testId}
             className={`${SolidButtonStyles.baseStyles} ${!props.disabled && 'hover:shadow-lg cursor-pointer'} ${props.disabled ? 'bg-gray-400 cursor-not-allowed' : ' bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white'} ${props.className || ''}`}
             disabled={props.disabled}

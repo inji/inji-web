@@ -114,6 +114,7 @@ export const NoMatchingCredentialsModalContent: React.FC<
                                 </span>
                                 <img
                                     src={emptyLeftArrow}
+                                    alt=""
                                     className="h-2.5 w-2.5 mt-1"
                                 />
                             </button>

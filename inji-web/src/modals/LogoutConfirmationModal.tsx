@@ -49,9 +49,11 @@ export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = (
             aria-labelledby={`title-${testId}`}
             aria-describedby={`text-${testId}`}
         >
-            <div 
+            <div
+                role="presentation"
                 className={LogoutConfirmationModalStyles.modalContainer}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
             >
                 <div className={LogoutConfirmationModalStyles.container}>
                     <InfoIcon testId={testId} />
@@ -80,6 +82,7 @@ export const LogoutConfirmationModal: React.FC<LogoutConfirmationModalProps> = (
                             className={LogoutConfirmationModalStyles.logoutButton}
                         />
                         <button
+                            type="button"
                             data-testid={`btn-${testId}-stay`}
                             onClick={(event: React.MouseEvent) => {
                                 event.stopPropagation();

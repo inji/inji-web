@@ -27,7 +27,7 @@ export const MissingClaimsListModalContent: React.FC<
                 />
             </div>
             <div className={styles.header}>
-                <button className={styles.backButton} onClick={onBack}>
+                <button type="button" className={styles.backButton} onClick={onBack}>
                     <img
                         src={ArrowOpenLeft}
                         alt="Back arrow"

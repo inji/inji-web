@@ -6,6 +6,7 @@ exports[`MenuItem Component renders correctly and matches snapshot 1`] = `
     class="w-full text-left px-4 py-2 text-sm text-gray-700 border-[#EBF0FB] hover:bg-[#F7F3F0] last:border-b-0 hover:text-[#F2680C] transition-colors"
     data-testid="menu-item-test-menu"
     role="menuitem"
+    type="button"
   >
     <div
       class="flex flex-row items-center gap-2"

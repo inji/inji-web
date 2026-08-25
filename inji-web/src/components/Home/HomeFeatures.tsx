@@ -45,14 +45,14 @@ export const HomeFeatures: React.FC = () => {
       </div>
       <div data-testid="HomeFeatures-Navigation" className="flex justify-between w-full px-5 md:hidden items-center">
         <div data-testid="HomeFeatures-NavButtons" className="flex">
-          <button onClick={handlePrev} className="bg-grey-300 p-1" aria-label="Previous feature">
+          <button type="button" onClick={handlePrev} className="bg-grey-300 p-1" aria-label="Previous feature">
             {rtl ? (
               <IoArrowForwardCircleOutline size={50} className="text-gray-500" color={"var(--iw-color-searchIcon)"} />
             ) : (
               <IoArrowBackCircleOutline size={50} className="text-gray-500" color={"var(--iw-color-searchIcon)"} />
             )}
           </button>
-          <button onClick={handleNext} className="bg-grey-300 rounded mr-1" aria-label="Next feature">
+          <button type="button" onClick={handleNext} className="bg-grey-300 rounded mr-1" aria-label="Next feature">
             {rtl ? (
               <IoArrowBackCircleOutline size={50} className="text-gray-500" color={"var(--iw-color-searchIcon)"} />
             ) : (

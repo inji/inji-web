@@ -58,42 +58,39 @@ export const DataShareContent:React.FC<DSContentProps> = (props) => {
                     <span className="font-base text-iw-subTitle" data-testid={"DataShareContent-Consent-Option"}>{t("content.validityTimesHeader")}</span>
                 </label>
 
-                <label onClick={()=>toast.warning(t("toastText"))} className="w-1/2 flex items-center" data-testid={"DataShareContent-Validity-Date"}>  
+                <button type="button" onClick={()=>toast.warning(t("toastText"))} className="w-1/2 flex items-center" data-testid={"DataShareContent-Validity-Date"}>
                     <div className="relative inline-block">
-                        <input 
-                            type="radio" 
-                            name="consentValidity" 
-                            value="date" 
-                            disabled={true} 
-                            className="accent-iw-primary scale-150 mx-2" 
-                        />
-                        <div 
-                            className="absolute inset-0"
-                            onClick={(e) => {e.stopPropagation(); toast.warning(t("toastText")); }}
+                        <input
+                            type="radio"
+                            name="consentValidity"
+                            value="date"
+                            disabled={true}
+                            className="accent-iw-primary scale-150 mx-2"
+                            tabIndex={-1}
                         />
                     </div>
-                        <span className="font-light text-iw-subTitle" data-testid={"DataShareContent-Validity-Date-Title"}>
+                    <span className="font-light text-iw-subTitle" data-testid={"DataShareContent-Validity-Date-Title"}>
                         {t("content.validityDate")}</span>
-                </label>
+                </button>
             </div>
         </div>
-        <div className="relative flex mb-4" data-testid={"times-dropdown"} onClick={()=>setTimesDropDown(times => !times)}>
+        <div className="relative flex mb-4">
                     <div className={"w-1/3"}></div>
-                    <div className={"w-2/3 py-4 px-4 rounded-lg border-2 border-iw-borderLight flex flex-row items-center"}>
-                        <label className={"w-full h-full"} data-testid={"DataShareContent-Selected-Validity-Times"}>{getExpiryDisplayName(vcStorageExpiryLimitInTimes)}</label>
+                    <button type="button" data-testid={"times-dropdown"} className={"w-2/3 py-4 px-4 rounded-lg border-2 border-iw-borderLight flex flex-row items-center"} onClick={()=>setTimesDropDown(times => !times)}>
+                        <span className={"w-full h-full"} data-testid={"DataShareContent-Selected-Validity-Times"}>{getExpiryDisplayName(vcStorageExpiryLimitInTimes)}</span>
                         <MdOutlineKeyboardArrowDown size={30} color={'var(--iw-color-arrowDown)'} />
-                    </div>
+                    </button>
                 </div>
 
                 {timesDropDown && <div className="relative flex mb-4">
                     <div className={"w-1/3"}></div>
                     <div
                         className={"w-2/3 py-4 px-2 border-2 border-iw-borderLight rounded-lg shadow-lg shadow-iw-shadow flex flex-col justify-center items-center"} data-testid={"DataShareContent-Validity-Times-DropDown"}>
-                        <label data-testid={"DataShareContent-Validity-Times-DropDown-Once"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(1)); setTimesDropDown(false)} } className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.once")}</label>
-                        <label data-testid={"DataShareContent-Validity-Times-DropDown-Thrice"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(3)); setTimesDropDown(false)} } className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.thrice")}</label>
-                        <label data-testid={"DataShareContent-Validity-Times-DropDown-NoLimit"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(-1)); setTimesDropDown(false)} } className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.noLimit")}</label>
-                        <label data-testid={"DataShareContent-Validity-Times-DropDown-Custom"} onClick={()=>{setTimesDropDown(false); props.setIsCustomExpiryInTimesModalOpen(true)} }
-                               className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.custom")}</label>
+                        <button type="button" data-testid={"DataShareContent-Validity-Times-DropDown-Once"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(1)); setTimesDropDown(false)}} className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.once")}</button>
+                        <button type="button" data-testid={"DataShareContent-Validity-Times-DropDown-Thrice"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(3)); setTimesDropDown(false)}} className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.thrice")}</button>
+                        <button type="button" data-testid={"DataShareContent-Validity-Times-DropDown-NoLimit"} onClick={()=>{dispatch(storevcStorageExpiryLimitInTimes(-1)); setTimesDropDown(false)}} className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.noLimit")}</button>
+                        <button type="button" data-testid={"DataShareContent-Validity-Times-DropDown-Custom"} onClick={()=>{setTimesDropDown(false); props.setIsCustomExpiryInTimesModalOpen(true)}}
+                               className={"w-full h-full py-3 px-4 hover:bg-iw-borderLight hover:rounded-lg"}>{t("content.validityTimesOptions.custom")}</button>
                     </div>
                 </div>}
         <DataShareDisclaimer content={t("disclaimer")}/>

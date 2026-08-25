@@ -45,7 +45,7 @@ export const Credential: React.FC<CredentialProps> = (props) => {
             selectedIssuer: selectedIssuer,
             selectedCredentialType: {type: filteredCredentialConfig.name, displayObj: filteredCredentialConfig.display},
             codeVerifier: state,
-            vcStorageExpiryLimitInTimes: isNaN(defaultVCStorageExpiryLimit)
+            vcStorageExpiryLimitInTimes: Number.isNaN(defaultVCStorageExpiryLimit)
                 ? vcStorageExpiryLimitInTimes
                 : defaultVCStorageExpiryLimit,
             state: state

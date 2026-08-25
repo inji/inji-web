@@ -15,6 +15,7 @@ exports[`Testing the Layout of the Custom Expiry Content Check if the layout is 
       >
         <button
           data-testid="CustomExpiryTimesContent-Times-Range-Increase"
+          type="button"
         >
           <svg
             color="var(--iw-color-arrowDown)"
@@ -33,6 +34,7 @@ exports[`Testing the Layout of the Custom Expiry Content Check if the layout is 
         </button>
         <button
           data-testid="CustomExpiryTimesContent-Times-Range-Decrease"
+          type="button"
         >
           <svg
             color="var(--iw-color-arrowDown)"

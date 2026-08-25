@@ -48,6 +48,7 @@ exports[`VCCardView Component should match snapshot 1`] = `
         <button
           class="p-2 hover:bg-gray-100"
           data-testid="icon-mini-view-card-menu"
+          type="button"
         >
           <svg
             color="#707070"

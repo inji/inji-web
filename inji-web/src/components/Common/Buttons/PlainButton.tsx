@@ -45,7 +45,6 @@ export const PlainButton: React.FC<PlainButtonProps> = (props) => {
         <div className={props.fullWidth ? PlainButtonStyles.wrapperFull : PlainButtonStyles.wrapper}>
             <div
                 className={PlainButtonStyles.clickable}
-                onClick={isDisabled ? undefined : props.onClick}
             >
                 <div className={innerClass}>
                     <button
@@ -53,6 +52,7 @@ export const PlainButton: React.FC<PlainButtonProps> = (props) => {
                         data-testid={props.testId}
                         className={PlainButtonStyles.button}
                         disabled={isDisabled}
+                        onClick={isDisabled ? undefined : props.onClick}
                     >
                         {props.disableGradient
                             ? props.title

@@ -9,6 +9,7 @@ exports[`Testing the Layout of Faq Accordion Check if the layout is matching wit
     <button
       class="w-full px-4 sm:px-6 py-6 sm:py-8 text-left font-semibold text-base sm:text-lg text-iw-title flex justify-between items-center hover:bg-iw-faqAccordionHover hover:rounded-t-md focus:outline-none transition-colors"
       data-testid="Faq-Item-Title-Button"
+      type="button"
     >
       <span
         class="text-[16px] leading-[32px] font-bold"

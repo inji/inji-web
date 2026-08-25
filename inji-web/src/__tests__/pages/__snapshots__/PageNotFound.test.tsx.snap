@@ -22,6 +22,7 @@ exports[`Testing the Layout of PageNotFound Check the presence of the PageNotFou
       <button
         class="text-iw-primary font-bold py-2 px-4 rounded-lg border-2 border-iw-primary"
         data-testid="PageNotFound-Home-Button"
+        type="button"
       >
         Go To Home
       </button>

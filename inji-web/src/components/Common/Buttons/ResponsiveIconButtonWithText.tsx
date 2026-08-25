@@ -52,6 +52,7 @@ export const ResponsiveIconButtonWithText: React.FC<ResponsiveIconButtonWithText
 
                 <div className={ButtonStyles.responsiveButtonWithText.gradientContainer}>
                     <button
+                        type="button"
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
                         className={`${ButtonStyles.responsiveButtonWithText.iconButton} ${isHovered ? ButtonStyles.responsiveButtonWithText.hoveredIconButton : ""}`}

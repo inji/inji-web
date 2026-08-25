@@ -32,7 +32,7 @@ export const PasscodePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [wallets, setWallets] = useState<any[] | null>(null);
 
-    const initialPasscodeArray = Array(passcodeLength).fill('');
+    const initialPasscodeArray = new Array(passcodeLength).fill('');
     const [passcode, setPasscode] = useState<string[]>(initialPasscodeArray);
     const [confirmPasscode, setConfirmPasscode] = useState<string[]>(initialPasscodeArray);
 

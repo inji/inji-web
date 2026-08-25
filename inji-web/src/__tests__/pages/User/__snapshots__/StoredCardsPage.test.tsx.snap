@@ -42,6 +42,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the "N
           <button
             class="text-xs sm:text-sm text-iw-secondary cursor-pointer hover:underline "
             data-testid="btn-home"
+            type="button"
           >
             Home
           </button>
@@ -56,6 +57,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the "N
           <button
             class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
+            type="button"
           >
             <div
               class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -115,6 +117,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the "N
             <button
               class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
               data-testid="btn-add-cards"
+              type="button"
             >
               <div
                 class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -174,6 +177,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the lo
           <button
             class="text-xs sm:text-sm text-iw-secondary cursor-pointer hover:underline "
             data-testid="btn-home"
+            type="button"
           >
             Home
           </button>
@@ -188,6 +192,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage check if the lo
           <button
             class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
+            type="button"
           >
             <div
               class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -309,6 +314,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           <button
             class="text-xs sm:text-sm text-iw-secondary cursor-pointer hover:underline "
             data-testid="btn-home"
+            type="button"
           >
             Home
           </button>
@@ -323,6 +329,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           <button
             class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
+            type="button"
           >
             <div
               class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -396,6 +403,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                   class="text-iw-tertiary font-bold text-[16px] leading-[24px] "
                   data-testid="btn-go-home"
                   id="btn-go-home"
+                  type="button"
                 >
                   <span
                     class="inline-block bg-gradient-to-r from-iw-primary to-iw-secondary bg-clip-text text-md font-bold text-transparent"
@@ -455,6 +463,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           <button
             class="text-xs sm:text-sm text-iw-secondary cursor-pointer hover:underline "
             data-testid="btn-home"
+            type="button"
           >
             Home
           </button>
@@ -469,6 +478,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           <button
             class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
+            type="button"
           >
             <div
               class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -570,6 +580,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 <button
                   class="p-2 hover:bg-gray-100"
                   data-testid="icon-mini-view-card-menu"
+                  type="button"
                 >
                   <svg
                     color="#707070"
@@ -640,6 +651,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 <button
                   class="p-2 hover:bg-gray-100"
                   data-testid="icon-mini-view-card-menu"
+                  type="button"
                 >
                   <svg
                     color="#707070"
@@ -675,6 +687,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
           <button
             class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white "
             data-testid="btn-add-cards"
+            type="button"
           >
             <div
               class="flex items-center justify-center gap-1.5 md:gap-1"

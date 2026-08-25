@@ -45,6 +45,7 @@ exports[`Testing the Layout of LandingPageWrapper ->  matches snapshot when user
             class="text-iw-tertiary font-bold text-[16px] leading-[24px] "
             data-testid="btn-home-download-result"
             id="btn-home-download-result"
+            type="button"
           >
             <span
               class="inline-block bg-gradient-to-r from-iw-primary to-iw-secondary bg-clip-text text-md font-bold text-transparent"
@@ -104,6 +105,7 @@ exports[`Testing the Layout of LandingPageWrapper ->  matches snapshot when user
             class="text-iw-tertiary font-bold text-[16px] leading-[24px] "
             data-testid="btn-home-download-result"
             id="btn-home-download-result"
+            type="button"
           >
             <span
               class="inline-block bg-gradient-to-r from-iw-primary to-iw-secondary bg-clip-text text-md font-bold text-transparent"
