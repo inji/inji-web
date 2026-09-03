@@ -19,7 +19,7 @@ export const DataShareFooter: React.FC<DSFooterProps> = (props) => {
             />
             <SolidButton
                 testId={"DataShareFooter-Success-Button"}
-                onClick={props.onSuccess}
+                onClick={() => props.onSuccess()}
                 title={props.successText}
                 fullWidth={true}
             />
