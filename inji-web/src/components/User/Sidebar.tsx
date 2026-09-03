@@ -71,7 +71,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                 <span
                     className={`font-medium text-md ${
                         isActive ? 'text-[#2B011C]' : 'text-[#6F6F6F]'
-                    } flex-1 truncate ${isRTL(language) ? 'text-right' : ''}`}
+                    } flex-1 truncate ${isRTL(language) ? 'text-right' : 'text-left'}`}
                 >
                     {text}
                 </span>

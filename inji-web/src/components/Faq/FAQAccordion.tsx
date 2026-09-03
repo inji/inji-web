@@ -30,13 +30,13 @@ export const FAQAccordion: React.FC = () =>{
         { n: 18, descCount: 3 },
         { n: 19, descCount: 1 },
         { n: 20, descCount: 1 },
-        { n: 21, descCount: 1, bullet: true },
-        { n: 22, descCount: 1, bullet: true },
+        { n: 21, descCount: 1, applyHtml: true },
+        { n: 22, descCount: 1, applyHtml: true },
         { n: 23, descCount: 3 },
     ];
 
     const accordionItems: FAQAccordionItemType[] = itemConfig.map(
-        ({ n, descCount, bullet = false }) => {
+        ({ n, descCount, applyHtml = false }) => {
             const key = `item${n}`;
             const descriptions = Array.from({ length: descCount }, (_, i) =>
                 t(`${key}.description${i + 1}`)
@@ -44,7 +44,7 @@ export const FAQAccordion: React.FC = () =>{
             return {
                 key,
                 title: t(`${key}.title`),
-                content: constructContent(descriptions, bullet)
+                content: constructContent(descriptions, applyHtml)
             };
         }
     );
