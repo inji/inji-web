@@ -400,7 +400,7 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 class="py-1 px-2 bg-white justify-center center rounded-lg hover:bg-none hover:bg-[#FFF2F2] hover:text-[#E64E4E] undefined"
               >
                 <button
-                  class="text-iw-tertiary font-bold text-[16px] leading-[24px] "
+                  class="w-full text-iw-tertiary font-bold text-[16px] leading-[24px] "
                   data-testid="btn-go-home"
                   id="btn-go-home"
                   type="button"

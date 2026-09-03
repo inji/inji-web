@@ -12,7 +12,7 @@ export const BorderedButton:React.FC<BorderedButtonProps> = (props) => {
                     type="button"
                     id={props.testId}
                     data-testid={props.testId}
-                    className={`${BorderedButtonStyles.baseStyles } ${props.disabled ? BorderedButtonStyles.disabledClasses : ""}`}
+                    className={`w-full ${BorderedButtonStyles.baseStyles} ${props.disabled ? BorderedButtonStyles.disabledClasses : ""}`}
                     disabled={props.disabled}
                     onClick={isDisabled ? undefined : props.onClick}>
                     {renderGradientText(props.title)}
