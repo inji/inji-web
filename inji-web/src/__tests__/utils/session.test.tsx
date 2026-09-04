@@ -13,7 +13,6 @@ describe('Test Session Management Functions', () => {
   const mockSession: SessionObject = {
       selectedIssuer: undefined,
       selectedCredentialType: {type: 'cert123', displayObj: [{ name: 'Certificate', logo: 'logo.png', locale:'en' }]},
-      codeVerifier: 'verifier123',
       vcStorageExpiryLimitInTimes: 3600,
       state: 'state123'
   };

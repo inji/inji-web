@@ -30,7 +30,9 @@ const mockState = {
     credentials: {
         credentials: {
             authorization_endpoint: "https://test-auth-server/authorize",
-        grant_types_supported: ["authorization_code"],
+            grant_types_supported: ["authorization_code"],
+            token_endpoint: "https://test-auth-server/token",
+            credential_endpoint: "https://test-issuer/credential"
         },
     },
 };

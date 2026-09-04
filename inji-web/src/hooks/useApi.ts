@@ -94,7 +94,7 @@ export function useApi<T = any>(): UseApiReturn<T> {
 
             const res = err?.response;
 
-            const contentType: string  = res?.headers?.["Content-Type"] || res?.data?.type || ContentTypes.JSON;
+            const contentType: string  = res?.headers?.["content-type"] || res?.data?.type || ContentTypes.JSON;
 
             try {
                 if (res?.data) {
@@ -112,9 +112,13 @@ export function useApi<T = any>(): UseApiReturn<T> {
                     // Case : String
                     else if (typeof res.data === 'string') {
                         if (contentType.includes(ContentTypes.JSON)) {
-                            errorData = JSON.parse(res.data);
+                            try {
+                                errorData = JSON.parse(res.data);
+                            } catch {
+                                errorData = res.data;
+                            }
                         } else {
-                            errorData = {message: res.data};
+                            errorData = res.data;
                         }
                     }
 

@@ -2,11 +2,13 @@ import {
     generateCodeChallenge,
     generateRandomString,
     isObjectEmpty,
-    getTokenRequestBody,
+    getCredentialRequestBody,
     downloadCredentialPDF,
     getErrorObject,
-    convertStringIntoPascalCase
+    convertStringIntoPascalCase,
+    createAuthorizationUrl
 } from '../../utils/misc';
+import { apiInstance } from '../../hooks/useApi';
 import { mockCrypto } from '../../test-utils/mockUtils';
 import sha256 from 'crypto-js/sha256';
 import Base64 from 'crypto-js/enc-base64';
@@ -44,28 +46,64 @@ describe('Test misc.ts utility functions', () => {
         expect(isObjectEmpty({ key: 'value' })).toBe(false);
     });
 
-   test('Check if getTokenRequestBody returns correct request body', () => {
-    const requestBody = getTokenRequestBody('code', 'verifier', 'issuer', 'credential', 'expiry');
-    expect(requestBody).toEqual({
-        'grant_type': 'authorization_code',
-        'code': 'code',
-        'redirect_uri': window.location.origin + "/redirect", 
-        'code_verifier': 'verifier',
-        'issuer': 'issuer',
-        'credential': 'credential',
-        'vcStorageExpiryLimitInTimes': 'expiry'
+    test('createAuthorizationUrl posts issuance params and returns the Mimoto authorization URL and state', async () => {
+        const requestSpy = jest.spyOn(apiInstance, 'request').mockResolvedValue({
+            data: {
+                authorizationUrl: 'https://as.example.com/authorize?dpop_jkt=thumbprint',
+                state: 'mimoto-state'
+            }
+        } as any);
+
+        const result = await createAuthorizationUrl('issuer1', {
+            redirectUri: window.location.origin + '/redirect',
+            scope: 'mosip_vc_ldp',
+            responseType: 'code',
+            uiLocales: 'en'
+        });
+
+        expect(result).toEqual({
+            authorizationUrl: 'https://as.example.com/authorize?dpop_jkt=thumbprint',
+            state: 'mimoto-state'
+        });
+        expect(requestSpy).toHaveBeenCalledWith(expect.objectContaining({
+            method: 'POST',
+            withCredentials: true,
+            data: expect.objectContaining({
+                scope: 'mosip_vc_ldp',
+                responseType: 'code',
+                uiLocales: 'en'
+            })
+        }));
+        expect(requestSpy).toHaveBeenCalledWith(expect.objectContaining({
+            headers: expect.not.objectContaining({
+                state: expect.anything()
+            }),
+            data: expect.not.objectContaining({
+                state: expect.anything(),
+                codeChallenge: expect.anything(),
+                codeChallengeMethod: expect.anything()
+            })
+        }));
+        requestSpy.mockRestore();
     });
 
-    const requestBodyForLoggedIn = getTokenRequestBody('code', 'verifier', 'issuer', 'credential', 'expiry', true);
-    expect(requestBodyForLoggedIn).toEqual({
-        'grantType': 'authorization_code',
-        'code': 'code',
-        'redirectUri': window.location.origin + "/redirect",
-        'codeVerifier': 'verifier',
-        'issuer': 'issuer',
-        'credentialConfigurationId': 'credential',
+    test('builds guest and logged-in credential requests with authorization code only', () => {
+      const grant = {
+        code: 'auth-code'
+      };
+
+      expect(getCredentialRequestBody('issuer', 'credential', '3', false, grant)).toEqual({
+        issuer: 'issuer',
+        credential: 'credential',
+        vcStorageExpiryLimitInTimes: '3',
+        code: 'auth-code'
+      });
+      expect(getCredentialRequestBody('issuer', 'credential', '3', true, grant)).toEqual({
+        issuer: 'issuer',
+        credentialConfigurationId: 'credential',
+        code: 'auth-code'
+      });
     });
-});
 
     test('Check if downloadCredentialPDF creates and clicks a download link', async () => {
         const response = new Blob(['test'], { type: 'application/pdf' });

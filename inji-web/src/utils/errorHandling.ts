@@ -3,6 +3,8 @@
  * Provides consistent error handling patterns across the application
  */
 
+import {reportApplicationError} from "./logger";
+
 export interface StandardError {
     code: string;
     originalError?: any;
@@ -71,25 +73,32 @@ export const standardizeError = (
 };
 
 /**
- * Logs error with consistent format
+ * Logs error with consistent format and sanitized metadata only.
+ * Does not write raw error objects (may contain tokens/proofs) to the console.
  */
 export const logError = (error: StandardError, options: ErrorOptions = {}): void => {
     if (options.logError === false) return;
-    
-    const message = options.fallbackMessage || 
-                    error.originalError?.response?.data?.message || 
-                    error.originalError?.message || 
-                    'An unexpected error occurred';
-    
-    const logData = {
+
+    const originalMessage = typeof error.originalError?.message === "string"
+        ? error.originalError.message
+        : undefined;
+    const responseMessage = typeof error.originalError?.response?.data?.message === "string"
+        ? error.originalError.response.data.message
+        : typeof error.originalError?.response?.data?.error === "string"
+            ? error.originalError.response.data.error
+            : undefined;
+
+    const message = options.fallbackMessage ||
+        responseMessage ||
+        originalMessage ||
+        "An unexpected error occurred";
+
+    reportApplicationError({
         code: error.code,
         message,
         context: options.context,
-        timestamp: new Date().toISOString(),
-        originalError: error.originalError
-    };
-    
-    console.error(`[${error.code}] ${message}`, logData);
+        timestamp: new Date().toISOString()
+    });
 };
 
 /**

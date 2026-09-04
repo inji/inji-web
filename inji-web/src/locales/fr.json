@@ -166,6 +166,10 @@
       "authorizationGrantTypeNotSupportedByWallet": {
         "code": "Erreur d'autorisation du type d'octroi non pris en charge!",
         "message": "Merci pour votre patience ! Nous rencontrons actuellement des difficultés techniques. Veuillez réessayer plus tard ou contacter l'administrateur pour obtenir de l'aide!"
+      },
+      "dpopInitializationFailed": {
+        "code": "L'autorisation sécurisée n'a pas pu être lancée.",
+        "message": "La session de téléchargement sécurisé des identifiants n'a pas pu être démarrée. Veuillez réessayer."
       }
     }
   },

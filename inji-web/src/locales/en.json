@@ -166,6 +166,10 @@
       "authorizationGrantTypeNotSupportedByWallet": {
         "code": "Grant type not supported authorization error!",
         "message": "Thanks for your patience! We're experiencing technical difficulties right now. Please try again later or contact the admin for further assistance!"
+      },
+      "dpopInitializationFailed": {
+        "code": "Secure authorization could not be started",
+        "message": "The secure credential download session could not be started. Please try again."
       }
     }
   },

@@ -28,6 +28,8 @@ export type IssuerConfigurationObject = {
     credentials_supported: CredentialConfigurationObject[];
     authorization_endpoint: string;
     grant_types_supported: string[];
+    token_endpoint: string;
+    credential_endpoint: string;
 };
 
 export type CredentialConfigurationObject = {
@@ -64,10 +66,6 @@ export type ResponseTypeObject = {
     metadata?: string;
     response?: any;
     errors?: ErrorType[];
-
-    access_token?: string;
-    expires_in?: number;
-    token_type?: string;
 };
 
 export type ErrorType = {
@@ -83,7 +81,6 @@ type DownloadSessionCredentialTypeObj = {
 export type SessionObject = {
     selectedIssuer?: IssuerObject;
     selectedCredentialType: DownloadSessionCredentialTypeObj;
-    codeVerifier: string;
     vcStorageExpiryLimitInTimes: number;
     state: string;
 };
@@ -160,26 +157,20 @@ export type DropdownItem = {
 
 export type RouteValue = (typeof ROUTES)[keyof typeof ROUTES];
 
-type LoggedInRequestBody = {
-    grantType: 'authorization_code';
-    code: string;
-    redirectUri: string;
-    codeVerifier: string;
+export type LoggedInCredentialRequestBody = {
     issuer: string;
     credentialConfigurationId: string;
-}
+    code?: string;
+};
 
-type GuestRequestBody = {
-    grant_type: 'authorization_code';
-    code: string;
-    redirect_uri: string;
-    code_verifier: string;
+export type GuestCredentialRequestBody = {
     issuer: string;
     credential: string;
     vcStorageExpiryLimitInTimes: string;
-}
+    code?: string;
+};
 
-export type TokenRequestBody = LoggedInRequestBody | GuestRequestBody;
+export type CredentialRequestBody = LoggedInCredentialRequestBody | GuestCredentialRequestBody;
 
 export interface MenuItemType {
     label: string;

@@ -166,6 +166,10 @@
       "authorizationGrantTypeNotSupportedByWallet": {
         "code": "Erro de autorização de tipo de concessão não suportado!",
         "message": "Obrigado pela sua paciência! Estamos enfrentando dificuldades técnicas no momento. Tente novamente mais tarde ou entre em contato com o administrador para obter mais assistência!"
+      },
+      "dpopInitializationFailed": {
+        "code": "Não foi possível iniciar a autorização segura.",
+        "message": "Não foi possível iniciar a sessão segura de download de credenciais. Por favor, tente novamente."
       }
     }
   },

@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 import {getCredentialTypeDisplayObjectForCurrentLanguage,} from "../../utils/i18n";
 import {ItemBox} from "../Common/ItemBox";
-import {buildAuthorizationUrl, generateCodeChallenge, generateRandomString} from "../../utils/misc";
+import {createAuthorizationUrl} from "../../utils/misc";
+import {api} from "../../utils/api";
 import {addNewSession} from "../../utils/sessions";
 import {useSelector} from "react-redux";
 import {CredentialProps} from "../../types/components";
-import {CodeChallengeObject, CredentialConfigurationObject} from "../../types/data";
+import {CredentialConfigurationObject} from "../../types/data";
 
 import {RootState} from "../../types/redux";
 import {DataShareExpiryModal} from "../../modals/DataShareExpiryModal";
@@ -16,7 +17,6 @@ export const Credential: React.FC<CredentialProps> = (props) => {
         (state: RootState) => state.credentials.credentials
     );
 
-    const authorizationEndpoint = credentials?.authorization_endpoint;
     const grantTypesSupported = credentials?.grant_types_supported;
 
     const selectedIssuer = useSelector(
@@ -38,35 +38,42 @@ export const Credential: React.FC<CredentialProps> = (props) => {
     const onSuccess = async (
         defaultVCStorageExpiryLimit: number = vcStorageExpiryLimitInTimes
     ) => {
-        const state = generateRandomString();
-        const code_challenge: CodeChallengeObject =
-            generateCodeChallenge(state);
-        addNewSession({
-            selectedIssuer: selectedIssuer,
-            selectedCredentialType: {type: filteredCredentialConfig.name, displayObj: filteredCredentialConfig.display},
-            codeVerifier: state,
-            vcStorageExpiryLimitInTimes: Number.isNaN(defaultVCStorageExpiryLimit)
-                ? vcStorageExpiryLimitInTimes
-                : defaultVCStorageExpiryLimit,
-            state: state
-        });
-
-        if (
-            validateIfAuthServerSupportRequiredGrantTypes(grantTypesSupported)
-        ) {
-            const url = buildAuthorizationUrl(
-                selectedIssuer,
-                filteredCredentialConfig,
-                state,
-                code_challenge,
-                authorizationEndpoint!
-              );
-              window.open(url, "_self", "noopener");
-        } else {
+        if (!validateIfAuthServerSupportRequiredGrantTypes(grantTypesSupported)) {
             props.setErrorObj({
                 code: "errors.authorizationGrantTypeNotSupportedByWallet.code",
                 message:
                     "errors.authorizationGrantTypeNotSupportedByWallet.message"
+            });
+            return;
+        }
+        if (!selectedIssuer?.issuer_id || !filteredCredentialConfig.scope) {
+            props.setErrorObj({
+                code: "errors.dpopInitializationFailed.code",
+                message: "errors.dpopInitializationFailed.message"
+            });
+            return;
+        }
+
+        try {
+            const {authorizationUrl, state} = await createAuthorizationUrl(selectedIssuer.issuer_id, {
+                redirectUri: api.authorizationRedirectionUrl,
+                scope: filteredCredentialConfig.scope,
+                responseType: "code",
+                uiLocales: language
+            });
+            addNewSession({
+                selectedIssuer: selectedIssuer,
+                selectedCredentialType: {type: filteredCredentialConfig.name, displayObj: filteredCredentialConfig.display},
+                vcStorageExpiryLimitInTimes: isNaN(defaultVCStorageExpiryLimit)
+                    ? vcStorageExpiryLimitInTimes
+                    : defaultVCStorageExpiryLimit,
+                state
+            });
+            window.open(authorizationUrl, "_self", "noopener");
+        } catch (error) {
+            props.setErrorObj({
+                code: "errors.dpopInitializationFailed.code",
+                message: "errors.dpopInitializationFailed.message"
             });
         }
     };

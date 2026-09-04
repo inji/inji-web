@@ -1,5 +1,4 @@
-import { ApiRequest, CodeChallengeObject, CredentialConfigurationObject, IssuerObject } from "../types/data";
-import i18n from "i18next";
+import { ApiRequest } from "../types/data";
 import { KEYS, ROUTES } from "./constants";
 import { AppStorage } from "./AppStorage";
 
@@ -61,26 +60,16 @@ export class api {
                 "Cache-Control": "no-cache, no-store, must-revalidate"
             };
         },
+        credentials: "include",
         responseType: "blob"
     };
-    static authorization = (
-        currentIssuer: IssuerObject,
-        filterCredentialWellknown: CredentialConfigurationObject,
-        state: string,
-        code_challenge: CodeChallengeObject,
-        authorizationEndPoint: String
-    ) => {
-        return (
-            `${authorizationEndPoint}` +
-            `?response_type=code&` +
-            `client_id=${currentIssuer.client_id}&` +
-            `scope=${filterCredentialWellknown.scope}&` +
-            `redirect_uri=${api.authorizationRedirectionUrl}&` +
-            `state=${state}&` +
-            `code_challenge=${code_challenge.codeChallenge}&` +
-            `code_challenge_method=S256&` +
-            `ui_locales=${i18n.language}`
-        );
+    static authorizeIssuance: ApiRequest = {
+        url: (issuerId: string) => api.mimotoHost + `/issuers/${issuerId}/authorize`,
+        methodType: MethodType.POST,
+        headers: () => ({
+            "Content-Type": ContentTypes.JSON
+        }),
+        credentials: "include"
     };
     // method to fetch user profile
     static fetchUserProfile: ApiRequest = {

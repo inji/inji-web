@@ -1,7 +1,8 @@
 import sha256 from 'crypto-js/sha256';
 import Base64 from 'crypto-js/enc-base64';
 import {api} from "./api";
-import { IssuerObject,CredentialConfigurationObject,CodeChallengeObject, TokenRequestBody } from '../types/data';
+import {apiInstance} from "../hooks/useApi";
+import { CredentialRequestBody } from '../types/data';
 
 export const generateCodeChallenge = (verifier = generateRandomString()) => {
     const hashedVerifier = sha256(verifier);
@@ -38,43 +39,52 @@ export const isObjectEmpty = (object: any) => {
     return object === null || object === undefined || Object.keys(object).length === 0;
 }
 
-export const buildAuthorizationUrl = (
-    selectedIssuer: IssuerObject,
-    filteredCredentialConfig: CredentialConfigurationObject,
-    state: string,
-    codeChallenge: CodeChallengeObject,
-    authorizationEndpoint: string
-  ): string => {
-    return api.authorization(
-      selectedIssuer,
-      filteredCredentialConfig,
-      state,
-      codeChallenge,
-      authorizationEndpoint
-    );
-  };
-  
-export const getTokenRequestBody = (code: string, codeVerifier: string, issuerId: string, credentialConfigurationId: string, vcStorageExpiryLimitInTimes: string, isLoggedIn = false) : TokenRequestBody => {
-    // naming convention is handled separately for logged in and non logged in users as they use camelcase and snake case respectively
+export type IssuerAuthorizeRequest = {
+    redirectUri: string;
+    scope: string;
+    responseType: string;
+    uiLocales: string;
+};
+
+export const createAuthorizationUrl = async (
+    issuerId: string,
+    request: IssuerAuthorizeRequest
+): Promise<{authorizationUrl: string; state: string}> => {
+    const response = await apiInstance.request({
+        url: api.authorizeIssuance.url(issuerId),
+        method: "POST",
+        headers: api.authorizeIssuance.headers(),
+        data: request,
+        withCredentials: true
+    });
+    const authorizationUrl = response.data?.authorizationUrl;
+    const state = response.data?.state;
+    if (typeof authorizationUrl !== "string" || !authorizationUrl || typeof state !== "string" || !state) {
+        throw new Error(response.data?.errorMessage ?? "Authorize did not return an authorization URL and state");
+    }
+    return {authorizationUrl, state};
+};
+
+export const getCredentialRequestBody = (
+    issuerId: string,
+    credentialConfigurationId: string,
+    vcStorageExpiryLimitInTimes: string,
+    isLoggedIn: boolean,
+    grant: {code: string}
+): CredentialRequestBody => {
     if (isLoggedIn) {
         return {
-            'grantType': 'authorization_code',
-            'code': code,
-            'redirectUri': api.authorizationRedirectionUrl,
-            'codeVerifier': codeVerifier,
-            'issuer': issuerId,
-            'credentialConfigurationId': credentialConfigurationId,
-        }
+            issuer: issuerId,
+            credentialConfigurationId,
+            code: grant.code
+        };
     }
     return {
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': api.authorizationRedirectionUrl,
-        'code_verifier': codeVerifier,
-        'issuer': issuerId,
-        'credential': credentialConfigurationId,
-        'vcStorageExpiryLimitInTimes': vcStorageExpiryLimitInTimes
-    }
+        issuer: issuerId,
+        credential: credentialConfigurationId,
+        vcStorageExpiryLimitInTimes,
+        code: grant.code
+    };
 }
 
 export const downloadCredentialPDF = async (
