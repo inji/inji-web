@@ -1,8 +1,13 @@
 export const PasscodePageTemplateStyles = {
-    overlay: "fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex flex-col items-center justify-center z-50 h-screen",
-    container: "rounded-2xl bg-white flex flex-col items-center justify-start relative w-[90%] sm:w-[85%] md:w-[90%] h-fit max-h-[99vh] sm:max-h-[98vh] overflow-y-hidden shadow-iw-pin-page-container",
-    contentWrapper: "flex flex-col items-center justify-start w-full mt-44 sm:mt-48 relative z-10 pb-0 sm:pb-8",
+    overlay: "fixed inset-0 backdrop-blur-sm bg-black bg-opacity-40 flex flex-col items-center justify-center z-50 h-screen overflow-y-auto py-4",
+    container: "rounded-2xl bg-white flex flex-col items-center justify-start relative w-[90%] sm:w-[85%] md:w-[90%] h-fit max-h-[95vh] sm:max-h-[95vh] overflow-y-auto shadow-iw-pin-page-container my-auto",
+    contentWrapper: "flex flex-col items-center justify-start w-full mt-44 sm:mt-48 relative z-10 pb-8 sm:pb-8",
     titleContainer: "text-center space-y-5 relative w-full max-w-lg px-4 sm:px-0",
+    userProfileContainer: "flex flex-col items-center justify-center gap-3 mb-2",
+    userProfilePictureContainer: "flex items-center justify-center",
+    userProfilePicture: "w-16 h-16 rounded-full object-cover border-2 border-iw-grayishBlue",
+    userProfileInitials: "w-16 h-16 rounded-full bg-iw-avatarPlaceholder text-iw-avatarText font-medium text-2xl flex items-center justify-center border-2 border-iw-grayishBlue",
+    userProfileName: "text-iw-darkGrayishBlue text-lg font-semibold",
     title: "text-[36px] leading-[44px] tracking-[-0.02em] font-bold text-iw-darkGrayishBlue",
     description: "text-iw-textTertiary text-[16px] leading-[24px] font-semibold mx-8",
     subTitle: {
