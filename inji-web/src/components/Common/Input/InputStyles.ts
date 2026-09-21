@@ -10,6 +10,7 @@ export const InputStyles = {
         inputBlur: "pin-input-box-border",
         toggleGroup: "flex items-center gap-4 py-2 rounded-lg",
         toggleButton: "pin-input-box-border pin-input-box-style flex items-center justify-center focus:outline-none",
-        eyeIcon: "text-iw-grayLight"
+        eyeIcon: "text-iw-grayLight",
+        eyeIconActive: "text-iw-textPrimary"
     }
 }

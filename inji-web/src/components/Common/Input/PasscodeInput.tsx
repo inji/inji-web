@@ -91,7 +91,7 @@ export const PasscodeInput: React.FC<PasscodeInputProps> = ({
                             data-testid={`btn-toggle-visibility-${testId}`}
                         >
                             {showPasscode ? (
-                                <FaEye className={InputStyles.passcode.eyeIcon} data-testid={"eye-view"}/>
+                                <FaEye className={InputStyles.passcode.eyeIconActive} data-testid={"eye-view"}/>
                             ) : (
                                 <FaEyeSlash className={InputStyles.passcode.eyeIcon} data-testid={"eye-view-slash"}/>
                             )}
