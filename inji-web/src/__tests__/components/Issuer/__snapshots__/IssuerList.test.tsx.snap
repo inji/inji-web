@@ -19,7 +19,8 @@ exports[`Testing the Layout of IssuersList Check whether it renders empty issuer
       Search for your trusted issuer and choose a credential type in the next step.
     </div>
     <div
-      class="flex justify-center items-center w-full mx-auto bg-iw-background my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
+      class="flex justify-center items-center w-full mx-auto bg-iw-background
+ my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
       data-testid="EmptyList-Outer-Container"
     >
       <p
@@ -52,7 +53,8 @@ exports[`Testing the Layout of IssuersList Check whether it renders error state 
       Search for your trusted issuer and choose a credential type in the next step.
     </div>
     <div
-      class="flex justify-center items-center w-full mx-auto bg-iw-background my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
+      class="flex justify-center items-center w-full mx-auto bg-iw-background
+ my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
       data-testid="EmptyList-Outer-Container"
     >
       <p
@@ -85,7 +87,8 @@ exports[`Testing the Layout of IssuersList Check whether it renders issuers list
       Search for your trusted issuer and choose a credential type in the next step.
     </div>
     <div
-      class="flex justify-center items-center w-full mx-auto bg-iw-background my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
+      class="flex justify-center items-center w-full mx-auto bg-iw-background
+ my-auto flex-col h-72 shadow-md shadow-iw-shadow border-t-iw-shadow px-10"
       data-testid="EmptyList-Outer-Container"
     >
       <p
