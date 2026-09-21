@@ -67,8 +67,8 @@ export const IssuersPage: React.FC<IssuerPageProps> = ({className}) => {
 
     return (
         <div data-testid="Home-Page-Container">
-            <div className="container mx-auto mt-8 flex flex-col px-4 sm:px-6 md:px-10 lg:px-20">
-                <div className={className}>
+            <div className={`container mx-auto mt-8 px-4 sm:px-6 md:px-10 lg:px-20 ${className ?? ""}`}>
+                <div className="flex flex-col gap-6">
                     <IntroBox/>
                     <SearchIssuer/>
                 </div>
