@@ -1,13 +1,13 @@
 import React from 'react';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 type FooterProps = {
     footerRef: React.RefObject<HTMLDivElement>;
 };
 
-export const Footer: React.FC<FooterProps> = ({footerRef}) => {
-    const {t} = useTranslation('PageTemplate');
-    
+export const Footer: React.FC<FooterProps> = ({ footerRef }) => {
+    const { t } = useTranslation('PageTemplate');
+
     return (
         <footer
             ref={footerRef}
@@ -17,7 +17,7 @@ export const Footer: React.FC<FooterProps> = ({footerRef}) => {
             <div className="w-full px-0 flex flex-col sm:flex-row justify-between items-end sm:items-center">
                 <p
                     data-testid="Footer-Text"
-                    className="ps-7 text-[#9E9E9E] transform rotate-180 text-[16px] leading-[24px] font-medium mr-4 ml-4"
+                    className="ps-7 text-[#9E9E9E] transform rotate-180 text-[16px] leading-[24px] font-medium mr-4 md:text-right md:pr-7 min-w-0 w-full sm:w-auto sm:flex-1"
                 >
                     {t("Footer.copyRight")}
                 </p>
