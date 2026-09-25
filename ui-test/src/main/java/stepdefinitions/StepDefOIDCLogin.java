@@ -502,8 +502,11 @@ public class StepDefOIDCLogin {
 
 		BasePage.waitForSeconds(driver, Math.max(lockSeconds - 10, 1));
 		driver.navigate().refresh();
+		loginpage.waituntilpagecompletelyloaded();
 		assertTrue(!loginpage.isSubmitButtonEnabledFast(), "Before temporaty lock Expire Submit button is enabled");
+		BasePage.waitForSeconds(driver, 10);
 		driver.navigate().refresh();
+		loginpage.waituntilpagecompletelyloaded();
 		loginpage.waitUntilPasscodeEnabled(BasePage.getConfiguredWaitTimeInSeconds());
 		assertTrue(!loginpage.isPasscodeInputDisabled(), "Passocde button is not enabled after temporaty lock Expire");
 	}
@@ -515,7 +518,7 @@ public class StepDefOIDCLogin {
 
 	@Then("user verify the wallet permanently locked")
 	public void user_verify_the_wallet_permanently_locked() throws InterruptedException {
-		assertTrue(!loginpage.isPermLockMsgDisplayed(), "Permanent lock message is not displayed");
+		assertTrue(loginpage.isPermLockMsgDisplayed(), "Permanent lock message is not displayed");
 	}
 
 }

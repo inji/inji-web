@@ -50,7 +50,7 @@ public class Loginpage extends BasePage {
 
 	public void enterPasscode(String string) {
 		By passcodeContainer = By.xpath(
-				"//div[@data-testid='passcode-container']//input[@type='password' and @maxlength='1']");
+				"//div[@data-testid='passcode-container']//input[@data-testid='input-passcode' and @maxlength='1']");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(passcodeContainer));
 
@@ -70,7 +70,7 @@ public class Loginpage extends BasePage {
 
 	public void enterConfirmPasscode(String string) {
 		By confirmLocator = By.xpath(
-				"//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']");
+				"//div[@data-testid='confirm-passcode-container']//input[@data-testid='input-confirm-passcode' and @maxlength='1']");
 		// Scroll the container into view first — the element exists in the DOM but is
 		// below the visible viewport, so visibilityOfElementLocated would time out
 		// without this step.
@@ -94,7 +94,7 @@ public class Loginpage extends BasePage {
 
 	public void clickonToggleButton() {
 		clickOnElement(driver,
-				By.xpath("(//button[@type='button'])[2]"),
+				By.xpath("//button[@data-testid='btn-toggle-visibility-passcode']"),
 				"Click passcode visibility toggle button");
 	}
 
@@ -124,7 +124,7 @@ public class Loginpage extends BasePage {
 
 	public void clickonToggleButtonConfimration() {
 		clickOnElement(driver,
-				By.xpath("(//button[@type='button'])[3]"),
+				By.xpath("//button[@data-testid='btn-toggle-visibility-confirm-passcode']"),
 				"Click confirm passcode visibility toggle button");
 	}
 
@@ -175,13 +175,13 @@ public class Loginpage extends BasePage {
 
 	public void clickonLogout() {
 		clickOnElement(driver,
-				By.xpath("//div[@data-testid='profile-dropdown']//div[contains(text(),'Logout')]"),
+				By.xpath("//div[@data-testid='profile-dropdown']//button[contains(text(),'Logout')]"),
 				"Click 'Logout' option in profile dropdown");
 	}
 
 	public Boolean confirmPasscodeSecondTimeLogin() {
 		return isElementNotVisible(driver,
-				By.xpath("//div[@data-testid='confirm-passcode-container']//input[@type='password' and @maxlength='1']"),
+				By.xpath("//div[@data-testid='confirm-passcode-container']//input[@data-testid='input-confirm-passcode' and @maxlength='1']"),
 				"Verify confirm passcode container is not displayed (second login)");
 	}
 
@@ -205,7 +205,7 @@ public class Loginpage extends BasePage {
 
 	public Boolean isProfileDropDownDisplayed() {
 		return isElementIsVisible(driver,
-				By.xpath("(//div[@data-testid='profile-details']//div)[4]"),
+				By.xpath("//div[@data-testid='profile-details']//button[@class='relative inline-block cursor-pointer']"),
 				"Verify profile dropdown trigger is displayed");
 	}
 
@@ -222,7 +222,7 @@ public class Loginpage extends BasePage {
 				.until(ExpectedConditions.visibilityOfElementLocated(
 						By.xpath("//div[@data-testid='profile-details']")));
 		clickOnElement(driver,
-				By.xpath("//div[@class='relative inline-block cursor-pointer']"),
+				By.xpath("//button[@class='relative inline-block cursor-pointer']"),
 				getConfiguredWaitTimeInSeconds());
 	}
 
@@ -235,7 +235,7 @@ public class Loginpage extends BasePage {
 	public void clickOnProfileDropDownDisplayedAgain() {
 		waituntilpagecompletelyloaded();
 		clickOnElement(driver,
-				By.xpath("(//div[@data-testid='profile-details']//div)[4]"),
+				By.xpath("//button[@class='relative inline-block cursor-pointer']"),
 				getConfiguredWaitTimeInSeconds());
 	}
 
@@ -334,7 +334,7 @@ public class Loginpage extends BasePage {
 
 	public void clickOnProfileOption() {
 		clickOnElement(driver,
-				By.xpath("//div[@data-testid='profile-dropdown']//div[text()='Profile']"),
+				By.xpath("//div[@data-testid='profile-dropdown']//button[text()='Profile']"),
 				"Click 'Profile' option in profile dropdown");
 	}
 
@@ -566,7 +566,7 @@ public class Loginpage extends BasePage {
 
 	public boolean isProfileDrownOptionsPresent(String optionText) {
 		try {
-			String xpath = String.format("//div[@data-testid='profile-dropdown']//div[text()='%s']", optionText);
+			String xpath = String.format("//div[@data-testid='profile-dropdown']//button[text()='%s']", optionText);
 			return isElementIsVisible(driver, By.xpath(xpath),
 					"Verify '" + optionText + "' option is present in profile dropdown");
 		} catch (NoSuchElementException e) {
@@ -576,7 +576,7 @@ public class Loginpage extends BasePage {
 
 	public void clickonFAQLink() {
 		clickOnElement(driver,
-				By.xpath("//div[@data-testid='profile-dropdown']//div[text()='FAQ']"),
+				By.xpath("//div[@data-testid='profile-dropdown']//button[text()='FAQ']"),
 				"Click 'FAQ' option in profile dropdown");
 	}
 

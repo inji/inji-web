@@ -243,6 +243,7 @@ Feature: OIDC Login for InjiWeb
     Then user enters the wrong passcode "<wrongConfirmation1>" to lessthan max failed attempts before perm lock
     Then user verify the warning message before to permanent lock
     And user enters the passcode "<wrongConfirmation1>"
+    And user click on submit button
     And user verify the wallet permanently locked
     Then user click on forget passcode option
     Then user click on forget passcode button

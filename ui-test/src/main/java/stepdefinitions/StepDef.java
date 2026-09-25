@@ -151,6 +151,7 @@ public class StepDef {
 			issuerText = string[0];
 		}
 		homePage.clearIssuersSearchBox();
+		homePage.isIssuersDisplayed();
 		homePage.enterIssuersInSearchBox(issuerText);
 	}
 
@@ -397,6 +398,8 @@ public class StepDef {
 
 	@Then("user verify the page after Refresh")
 	public void user_verify_the_page_after_refresh() {
+		homePage.waitForPageLoad();
+		assertTrue(homePage.isOnHomePage(), "User was not redirected to Home Page after refresh");
 	}
 
 	@When("User verify the FAQ header and its description")
