@@ -43,7 +43,7 @@ export function VerifierRequestInfoPanel({
             data-testid="verifier-request-info-panel"
         >
             <div className={VerifierCredentialsRequestCardStyles.verifierDetails}>
-                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-2 h-[56px] w-[56px]">
+                <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-1 py-1 h-[52px] w-[94px]">
                     <img
                         src={verifier?.logo || unknownVerifierLogo}
                         alt={verifier?.name || "Verifier Logo"}

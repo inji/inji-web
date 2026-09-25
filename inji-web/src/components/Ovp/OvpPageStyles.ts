@@ -44,7 +44,7 @@ export const VerifierCredentialsRequestCardStyles = {
     declineButton: "w-full",
     actionButtons: "flex w-full shrink-0 flex-col gap-3 lg:w-[260px] lg:justify-start",
     verifierLogo: "h-10 w-10 shrink-0 rounded-lg object-cover",
-    verifierName: "text-lg font-semibold leading-tight text-[#0F172A]",
+    verifierName: "text-lg font-semibold leading-tight text-[#0F172A] break-all",
     trustedBadge: "mt-1 flex items-center gap-1 text-[12px] font-medium text-[#358CFF]",
     verifierDetails: "flex items-start gap-3",
     requestPanel: "flex items-start gap-3 rounded-xl bg-[#FAFAFA] px-4 py-3 border border-[#F1F5F9]",

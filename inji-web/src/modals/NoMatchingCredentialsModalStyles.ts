@@ -26,7 +26,7 @@ export const NoMatchingCredentialsModalStyles = {
     verifierLogoWrapper:
         "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-1",
     verifierLogo: "h-full w-full object-contain",
-    verifierName: "text-sm font-semibold text-[#0F172A] break-words",
+    verifierName: "text-sm font-semibold text-[#0F172A] break-all",
     contactLink:
         "text-[12px] text-[#951F6F] font-semibold",
     verifierHelp:

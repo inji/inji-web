@@ -137,23 +137,18 @@ export const NoMatchingCredentialsModalContent: React.FC<
                             />
                         </div>
                         <div className="min-w-0 flex flex-col">
-                            <div className="flex items-center gap-1">
-                                <p
-                                    className={styles.verifierName}
-                                    data-testid="no-matching-verifier-name"
-                                >
-                                    {verifierName}
-                                </p>
+                            <p className={styles.verifierName} data-testid="no-matching-verifier-name">
+                                {verifierName}
                                 {verifier?.trusted && (
-                                    <img
-                                        src={TrustedIcon}
-                                        alt=""
-                                        className="h-3 w-3 shrink-0"
-                                        data-testid="no-matching-verifier-trusted-badge"
-                                        aria-hidden
-                                    />
-                                )}
-                            </div>
+                                <img
+                                    src={TrustedIcon}
+                                    alt=""
+                                    className="h-3 w-3 shrink-0 inline ml-1"
+                                    data-testid="no-matching-verifier-trusted-badge"
+                                    aria-hidden
+                                />
+                            )}
+                            </p>
                         </div>
                     </div>
                     <p className={styles.verifierHelp}>{t("verifierHelp")}</p>
