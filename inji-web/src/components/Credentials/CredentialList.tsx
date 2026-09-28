@@ -100,7 +100,7 @@ export const CredentialList: React.FC<CredentialListProps> = ({state}) => {
                 content={t("containerHeading")}
                 subContent={t("containerSubHeading")}
             />
-            <div className="flex flex-wrap gap-3 p-4 pb-20 justify-start">
+           <div className="col-span-full flex flex-wrap gap-3 p-4 pb-20 justify-start">
                 {filteredCredentialsWithLangSupport.map(
                     (
                         credentialConfig: CredentialConfigurationObject,
