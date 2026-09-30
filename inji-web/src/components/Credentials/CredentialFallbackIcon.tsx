@@ -13,7 +13,6 @@ export const CredentialFallbackIcon: React.FC<CredentialFallbackIconProps> = ({
             src={FallbackLogo}
             alt="Default credential icon"
             className={className}
-            role="img"
             aria-label="Default credential icon"
         />
     );

@@ -178,6 +178,16 @@ public class BaseTest {
         throw new SkipException("[KNOWN ISSUE] " + runnerfiles.Runner.knownIssues.get(scenario.getName()));
     }
 
+    @Before(value = "@walletCreation", order = 60)
+    public void cleanupStaleWalletBeforeCreation(Scenario scenario) {
+        try {
+            logger.info("Cleaning up any stale wallet before wallet-creation scenario '{}'", scenario.getName());
+            HttpUtils.cleanupWallets();
+        } catch (Exception e) {
+            throw new IllegalStateException("Wallet cleanup failed before scenario: " + scenario.getName(), e);
+        }
+    }
+
     @Before
     public void beforeAll(Scenario scenario) throws MalformedURLException {
 
@@ -735,7 +745,7 @@ public class BaseTest {
             keyMap.put("wallet.passcode.maxFailedAttemptsAllowedPerCycle", "maxFailedAttempts");
             keyMap.put("wallet.passcode.maxLockCyclesAllowed", "maxLockCycles");
 
-            walletPasscodeSettingsCache = InjiWebUtil.getActuatorValues(keyMap);
+            walletPasscodeSettingsCache = InjiWebUtil.getActuatorValuesFromSource(keyMap,"mimoto-default.properties");
         }
         return walletPasscodeSettingsCache;
     }

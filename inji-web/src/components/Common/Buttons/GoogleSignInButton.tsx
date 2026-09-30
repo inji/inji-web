@@ -11,6 +11,7 @@ export const GoogleSignInButton:React.FC<GoogleSignInButtonProps> = (props) => {
 
   return (
     <button
+      type="button"
       onClick={onClickHandler}
       disabled={isLoading}
       data-testid="google-login-button"

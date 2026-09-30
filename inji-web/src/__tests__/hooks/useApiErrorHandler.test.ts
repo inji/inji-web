@@ -401,13 +401,13 @@ describe('useApiErrorHandler', () => {
 
         it('should prevent multiple concurrent retries', async () => {
             const error = new Error('Retryable error');
-            // Use a promise that resolves after a small delay to simulate async operation
-            const mockRetryFn = jest.fn().mockImplementation(() => 
+            let resolveRetry: (value: {ok: () => boolean}) => void = () => undefined;
+            const mockRetryFn = jest.fn().mockImplementation(() =>
                 new Promise((resolve) => {
-                    setTimeout(() => resolve({ ok: () => true }), 100);
+                    resolveRetry = resolve;
                 })
             );
-            
+
             mockStandardizeError.mockReturnValue({
                 code: ERROR_TYPES.API_CLIENT,
                 message: 'Client error',
@@ -420,22 +420,20 @@ describe('useApiErrorHandler', () => {
                 result.current.handleApiError(error, 'testContext', mockRetryFn);
             });
 
-            // Start first retry
-            const retry1Promise = result.current.onRetry?.();
-            
-            // Wait for state to update so isRetrying becomes true
-            await waitFor(() => {
-                expect(result.current.isRetrying).toBe(true);
+            let retry1Promise: Promise<void> | undefined;
+            await act(async () => {
+                retry1Promise = result.current.onRetry?.();
             });
-            
-            // Now start second retry (should be blocked because isRetrying is true)
+
+            expect(result.current.isRetrying).toBe(true);
+
             const retry2Promise = result.current.onRetry?.();
 
             await act(async () => {
+                resolveRetry({ok: () => true});
                 await Promise.all([retry1Promise, retry2Promise]);
             });
 
-            // Should only call the retry function once
             expect(mockRetryFn).toHaveBeenCalledTimes(1);
         });
     });

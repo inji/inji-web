@@ -14,6 +14,7 @@ export const CollapseButton: React.FC<CollapseButtonProps> = ({isCollapsed, onCl
 
     return (
         <button
+            type="button"
             onClick={onClick}
             className={className}
         >

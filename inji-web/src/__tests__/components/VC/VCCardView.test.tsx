@@ -14,6 +14,8 @@ import {KEYS, RequestStatus} from "../../../utils/constants";
 import {mockVerifiableCredentials} from "../../../test-utils/mockObjects";
 import {mockApiResponse, mockUseApi} from "../../../test-utils/setupUseApiMock";
 import {api} from "../../../utils/api";
+import {reduxStore} from "../../../redux/reduxStore";
+import {storeLanguage} from "../../../redux/reducers/commonReducer";
 
 jest.mock('react-toastify', () => {
     return {
@@ -40,6 +42,9 @@ jest.mock("../../../components/VC/VCDetailView", () => ({
         onDownload: () => Promise<void>,
         credential: WalletCredential
     }) => {
+        if (!previewContent) {
+            return null;
+        }
         const content = "Name:Simon";
         return (<div data-testid="vc-detail-view">
             <title>{credential.credentialTypeDisplayName}</title>
@@ -78,6 +83,7 @@ describe('VCCardView Component', () => {
                 language: 'en',
             },
         });
+        reduxStore.dispatch(storeLanguage('en'));
 
         localStorageMock = mockLocalStorage();
         localStorageMock.setItem(KEYS.WALLET_ID, "faa0e18f-0935-4fab-8ab3-0c546c0ca714")
@@ -274,6 +280,117 @@ describe('VCCardView Component', () => {
             expect(screen.getByText("Name:Simon")).toBeInTheDocument()
         })
     })
+
+    it('should refetch preview with updated Accept-Language when language changes while preview is open', async () => {
+        const actualRedux = jest.requireActual('react-redux');
+        const {useSelector} = require('react-redux') as {useSelector: jest.Mock};
+        useSelector.mockImplementation(actualRedux.useSelector);
+
+        mockApiResponse({
+            data: new Blob(['pdf-en'], {type: "application/pdf"}),
+            headers: {"Content-Disposition": 'attachment; filename="credential.pdf"'}
+        });
+        mockApiResponse({
+            data: new Blob(['pdf-fr'], {type: "application/pdf"}),
+            headers: {"Content-Disposition": 'attachment; filename="credential.pdf"'}
+        });
+
+        reduxStore.dispatch(storeLanguage('en'));
+
+        renderWithProvider(
+            <VCCardView
+                refreshCredentials={refreshCredentialsMock}
+                credential={mockCredential}
+            />
+        );
+
+        fireEvent.click(screen.getByTestId("vc-card-view"));
+        await screen.findByTestId("vc-detail-view");
+        expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
+
+        reduxStore.dispatch(storeLanguage('fr'));
+
+        await waitFor(() => {
+            expect(mockUseApi.fetchData).toHaveBeenCalledTimes(2);
+        });
+        expect(mockUseApi.fetchData).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                apiConfig: api.fetchWalletCredentialPreview,
+                headers: expect.objectContaining({
+                    "Accept-Language": "fr",
+                }),
+            })
+        );
+    });
+
+    it('should not refetch preview when language changes if preview is closed', () => {
+        const actualRedux = jest.requireActual('react-redux');
+        const {useSelector} = require('react-redux') as {useSelector: jest.Mock};
+        useSelector.mockImplementation(actualRedux.useSelector);
+
+        reduxStore.dispatch(storeLanguage('en'));
+
+        renderWithProvider(
+            <VCCardView
+                refreshCredentials={refreshCredentialsMock}
+                credential={mockCredential}
+            />
+        );
+
+        reduxStore.dispatch(storeLanguage('fr'));
+
+        expect(mockUseApi.fetchData).not.toHaveBeenCalled();
+    });
+
+    it('should ignore in-flight preview response after preview is closed', async () => {
+        const actualRedux = jest.requireActual('react-redux');
+        const {useSelector} = require('react-redux') as {useSelector: jest.Mock};
+        useSelector.mockImplementation(actualRedux.useSelector);
+
+        mockApiResponse({
+            data: new Blob(['pdf-en'], {type: "application/pdf"}),
+            headers: {"Content-Disposition": 'attachment; filename="credential.pdf"'}
+        });
+
+        let resolveLanguagePreview: (value: unknown) => void;
+        const languagePreviewPromise = new Promise((resolve) => {
+            resolveLanguagePreview = resolve;
+        });
+
+        reduxStore.dispatch(storeLanguage('en'));
+        renderWithProvider(
+            <VCCardView
+                refreshCredentials={refreshCredentialsMock}
+                credential={mockCredential}
+            />
+        );
+
+        fireEvent.click(screen.getByTestId("vc-card-view"));
+        await screen.findByTestId("vc-detail-view");
+
+        mockUseApi.fetchData.mockReturnValueOnce(languagePreviewPromise);
+        reduxStore.dispatch(storeLanguage('fr'));
+
+        await waitFor(() => {
+            expect(mockUseApi.fetchData).toHaveBeenCalledTimes(2);
+        });
+
+        fireEvent.click(screen.getByRole('button', {name: 'Close'}));
+        expect(screen.queryByTestId("vc-detail-view")).not.toBeInTheDocument();
+
+        resolveLanguagePreview!({
+            ok: () => true,
+            data: new Blob(['pdf-fr'], {type: "application/pdf"}),
+            status: 200,
+            error: null,
+            headers: {},
+            state: RequestStatus.DONE
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId("vc-detail-view")).not.toBeInTheDocument();
+        });
+    });
 
     it("should show error when download fails", async () => {
         mockApiResponse({state: RequestStatus.ERROR, status: 500})

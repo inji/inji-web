@@ -9,22 +9,6 @@ exports[`VCCardView Component should match snapshot 1`] = `
     tabindex="0"
   >
     <div
-      data-testid="vc-detail-view"
-    >
-      <title>
-        Drivers License
-      </title>
-      <div>
-        Name:Simon
-      </div>
-      <button>
-        Close
-      </button>
-      <button>
-        download
-      </button>
-    </div>
-    <div
       class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
     >
       <img
@@ -64,6 +48,7 @@ exports[`VCCardView Component should match snapshot 1`] = `
         <button
           class="p-2 hover:bg-gray-100"
           data-testid="icon-mini-view-card-menu"
+          type="button"
         >
           <svg
             color="#707070"

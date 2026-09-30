@@ -30,6 +30,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
         <div data-testid={testId} className={`${InfoTooltipStyles.wrapper} ${className}`}>
 
             <button
+                type="button"
                 onClick={handleToggle}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}

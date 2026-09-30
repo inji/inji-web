@@ -12,6 +12,7 @@ interface MenuItemProps {
 export const MenuItem: React.FC<MenuItemProps> = ({label, onClick, testId, icon, color}) => {
     return (
         <button
+            type="button"
             onClick={(event: React.MouseEvent) => {
                 event.stopPropagation();
                 onClick()

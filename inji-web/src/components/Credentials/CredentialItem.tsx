@@ -32,7 +32,6 @@ export const CredentialItem = memo<CredentialItemProps>(({
                 padding: isSelected ? '1px' : '0px',
                 borderRadius: '8px'
             }}
-            role="listitem"
             aria-label={`Credential: ${credentialName}`}
         >
             <div
@@ -90,14 +89,14 @@ export const CredentialItem = memo<CredentialItemProps>(({
                 </div>
 
                 {/* Checkbox */}
-                <div 
+                <div
                     className={CredentialRequestModalStyles.content.checkboxContainer}
-                    onClick={(e) => e.stopPropagation()}
                 >
                     <input
                         data-testid={`checkbox-${credential.credentialId}`}
                         type="checkbox"
                         checked={isSelected}
+                        onClick={(e) => e.stopPropagation()}
                         onChange={handleToggle}
                         className={`${isSelected ? CredentialRequestModalStyles.content.checkboxSelected : CredentialRequestModalStyles.content.checkbox}`}
                         style={{
@@ -109,7 +108,6 @@ export const CredentialItem = memo<CredentialItemProps>(({
                         }}
                         aria-label={`${isSelected ? 'Deselect' : 'Select'} ${credentialName} credential`}
                         aria-checked={isSelected}
-                        role="checkbox"
                     />
                     {isSelected && (
                         <div

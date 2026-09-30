@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import { CredentialShareHandler } from "../../handlers/CredentialShareHandler";
 import { useApiErrorHandler } from "../../hooks/useApiErrorHandler";
+import { rejectVerifierRequest } from "../../utils/verifierUtils";
 
 const mockFetchData = jest.fn();
 jest.mock("../../hooks/useApi", () => ({
@@ -12,18 +13,22 @@ jest.mock("../../hooks/useApi", () => ({
 jest.mock("../../hooks/useApiErrorHandler");
 const mockUseApiErrorHandler = useApiErrorHandler as jest.Mock;
 
+jest.mock("../../utils/verifierUtils", () => ({
+    rejectVerifierRequest: jest.fn(),
+}));
+
 jest.mock("../../modals/LoaderModal", () => ({
     LoaderModal: ({ isOpen }: { isOpen: boolean }) =>
         isOpen ? <div data-testid="modal-loader-card" /> : null,
 }));
 
 jest.mock("../../modals/ErrorCard", () => ({
-    ErrorCard: ({ isOpen, onClose, onRetry, isRetrying, title, description, testId }: any) => {
+    ErrorCard: ({ isOpen, onClose, onRetry, isRetrying, title, description, testId, closeButtonTitle }: any) => {
         if (!isOpen) return null;
         const isRetryable = !!onRetry;
         const button = isRetryable
             ? <button onClick={onRetry} disabled={isRetrying}>Retry</button>
-            : (onClose ? <button onClick={onClose}>Close</button> : null);
+            : (onClose ? <button onClick={onClose}>{closeButtonTitle || 'Close'}</button> : null);
 
         return (
             <div data-testid={testId}>
@@ -327,6 +332,60 @@ describe("CredentialShareHandler", () => {
             )
         );
         expect(screen.getByText("Close")).toBeInTheDocument();
+    });
+
+    it("treats HTTP 200 with status error as failure and shows Home modal", async () => {
+        mockFetchData.mockResolvedValueOnce({
+            ok: () => true,
+            data: {
+                status: "error",
+                message: "Failed to submit Verifiable Presentation",
+            },
+        });
+
+        mockUseApiErrorHandler.mockImplementation(() => {
+            if (mockHandleApiError.mock.calls.length > 0) {
+                return {
+                    ...mockErrorHandlerReturnValue,
+                    showError: true,
+                    errorTitle: "ErrorCard.shareFailedTitle",
+                    errorDescription: "ErrorCard.shareFailedDescription",
+                    onRetry: undefined,
+                };
+            }
+            return mockErrorHandlerReturnValue;
+        });
+
+        const { rerender } = render(<CredentialShareHandler {...defaultProps} />);
+        await waitFor(() => expect(mockHandleApiError).toHaveBeenCalled());
+        expect(mockHandleApiError).toHaveBeenCalledWith(
+            expect.objectContaining({
+                displayTitle: "ErrorCard.shareFailedTitle",
+                message: "ErrorCard.shareFailedDescription",
+            }),
+            "submitPresentation"
+        );
+        expect(mockOnShareSuccess).not.toHaveBeenCalled();
+        rerender(<CredentialShareHandler {...defaultProps} />);
+        await waitFor(() =>
+            expect(screen.getByTestId("modal-error-card")).toHaveTextContent(
+                "ErrorCard.shareFailedTitle: ErrorCard.shareFailedDescription"
+            )
+        );
+        expect(screen.getByText("Common:goToHome")).toBeInTheDocument();
+
+        (rejectVerifierRequest as jest.Mock).mockResolvedValueOnce(true);
+        fireEvent.click(screen.getByText("Common:goToHome"));
+        await waitFor(() =>
+            expect(rejectVerifierRequest).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    presentationId: defaultProps.presentationId,
+                    fetchData: mockFetchData,
+                    redirectUri: null,
+                })
+            )
+        );
+        expect(mockOnShareSuccess).not.toHaveBeenCalled();
     });
 
     it("shows error card when fetch throws (network/unexpected error)", async () => {

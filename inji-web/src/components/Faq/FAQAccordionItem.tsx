@@ -12,6 +12,7 @@ export const FAQAccordionItem: React.FC<FAQAccordionItemProps> = (props) => {
             data-testid="Faq-Item-Container"
         >
             <button
+                type="button"
                 data-testid="Faq-Item-Title-Button"
                 className={`w-full px-4 sm:px-6 py-6 sm:py-8 text-left font-semibold text-base sm:text-lg text-iw-title flex justify-between items-center hover:bg-iw-faqAccordionHover ${
                     isOpen ? 'hover:rounded-t-md' : 'hover:rounded-md'

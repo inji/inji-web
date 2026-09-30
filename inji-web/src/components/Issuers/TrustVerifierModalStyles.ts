@@ -7,7 +7,7 @@ export const TrustVerifierModalStyles = {
         logoImage: "h-20 w-20 object-contain rounded-full",
         logoPlaceholder: "h-20 w-20 rounded-full bg-gray-100",
 
-        title: "text-xl sm:text-2xl font-semibold text-gray-900 **break-all**",
+        title: "text-xl sm:text-2xl font-semibold text-gray-900 break-all",
         description: "text-gray-600 mt-4 text-base leading-relaxed px-2 sm:px-0 whitespace-pre-line",
 
         list: "text-left text-gray-700 mt-6 mb-8 space-y-4 w-full max-w-sm sm:max-w-md",

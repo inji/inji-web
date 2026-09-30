@@ -13,6 +13,7 @@ export const PageNotFound: React.FC = () => {
         <h3 className={"pt-4"}>{t("subHeading", {pathname: window.location.pathname})}</h3>
         <div className={"p-8"}>
             <button
+                type="button"
                 data-testid="PageNotFound-Home-Button"
                 onClick={() => navigate(ROUTES.ROOT)}
                 className="text-iw-primary font-bold py-2 px-4 rounded-lg border-2 border-iw-primary">

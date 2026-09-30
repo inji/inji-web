@@ -14,6 +14,7 @@ export const TertiaryButton: React.FC<TertiaryButtonProps> = ({
   className = "",
 }) => (
   <button
+    type="button"
     data-testid={`btn-${testId}`}
     className={`text-xs sm:text-sm text-iw-secondary cursor-pointer hover:underline ${className}`}
     onClick={onClick}

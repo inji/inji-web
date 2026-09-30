@@ -39,7 +39,7 @@ export const Header: React.FC<UserHeaderProps> = ({
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const hamburgerMenuRef = useRef<HTMLImageElement>(null);
+    const hamburgerMenuRef = useRef<HTMLButtonElement>(null);
     const {user, removeUser,isLoading} = useUser();
     const displayNameFromLocalStorage = user?.displayName;
     const hasProfilePictureUrl = user?.profilePictureUrl;
@@ -122,7 +122,7 @@ export const Header: React.FC<UserHeaderProps> = ({
         }
     ];
 
-    const toggleProfileDropdown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const toggleProfileDropdown = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation(); // Prevent global click handler from immediately closing the dropdown
         if (disableProfileDropdown) return;
         setIsProfileDropdownOpen(!isProfileDropdownOpen);
@@ -206,14 +206,15 @@ export const Header: React.FC<UserHeaderProps> = ({
                         data-testid="hamburger-menu"
                         className="block sm:hidden"
                     >
-                        <img
+                        <button
+                            type="button"
                             data-testid="icon-hamburger-menu"
                             ref={hamburgerMenuRef}
-                            src={HamburgerMenu}
-                            alt="Hamburger Menu"
                             onClick={toggleHamburgerMenu}
                             className="cursor-pointer"
-                        />
+                        >
+                            <img src={HamburgerMenu} alt="Hamburger Menu" />
+                        </button>
                     </div>
                     <div
                         className={`w-[130px] sm:w-[160px] md:w-[170px] ${
@@ -252,12 +253,13 @@ export const Header: React.FC<UserHeaderProps> = ({
                         <div className="flex items-center space-x-2">
                             {getUserProfileIconWithName()}
                             {!isLoading && user && !disableProfileDropdown && (
-                                <div
+                                <button
+                                type="button"
                                 className="relative inline-block cursor-pointer"
                                 onClick={toggleProfileDropdown}
                                 >
                                 <DropdownArrowIcon isOpen={isProfileDropdownOpen} />
-                                </div>
+                                </button>
                             )}
                         </div>
 
@@ -269,13 +271,14 @@ export const Header: React.FC<UserHeaderProps> = ({
                                 <div className="absolute top-[-0.3rem] right-8 w-3 h-3 bg-white transform rotate-45" />
                                 <div className="py-2">
                                     {dropdownItems.map((item) => (
-                                        <div
+                                        <button
+                                            type="button"
                                             key={item.key}
-                                            className={`px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary`}
+                                            className={`w-full text-left px-4 py-3 text-sm ${item.textColor} cursor-pointer hover:bg-iw-dropdownActiveBg hover:text-iw-primary`}
                                             onClick={item.onClick}
                                         >
                                             {item.label}
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             </div>
@@ -299,12 +302,13 @@ export const Header: React.FC<UserHeaderProps> = ({
                             </div>
                             {!disableProfileDropdown && user && dropdownItems.map((item, index) => (
                                 <React.Fragment key={item.key}>
-                                    <div
-                                        className={`px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium`}
+                                    <button
+                                        type="button"
+                                        className={`w-full text-left px-4 py-2 text-sm ${item.textColor} hover:bg-gray-100 cursor-pointer font-medium`}
                                         onClick={item.onClick}
                                     >
                                         {item.label}
-                                    </div>
+                                    </button>
                                     {index !== dropdownItems.length - 1 && (
                                         <hr className="border-gray-200 my-1 mx-2" />
                                     )}

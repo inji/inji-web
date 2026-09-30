@@ -166,6 +166,10 @@
       "authorizationGrantTypeNotSupportedByWallet": {
         "code": "Erreur d'autorisation du type d'octroi non pris en charge!",
         "message": "Merci pour votre patience ! Nous rencontrons actuellement des difficultés techniques. Veuillez réessayer plus tard ou contacter l'administrateur pour obtenir de l'aide!"
+      },
+      "dpopInitializationFailed": {
+        "code": "L'autorisation sécurisée n'a pas pu être lancée.",
+        "message": "La session de téléchargement sécurisé des identifiants n'a pas pu être démarrée. Veuillez réessayer."
       }
     }
   },
@@ -532,7 +536,9 @@
       "defaultDescription": "Nous n’avons pas pu terminer votre demande. Veuillez fermer et réessayer plus tard.",
       "technicalTitle": "Oups ! Une erreur est survenu.",
       "technicalDescription": "Un problème technique est survenu lors du traitement de votre demande. Vous pouvez réessayer dans un instant.",
-      "closeButton": "Fermer"
+      "closeButton": "Fermer",
+      "shareFailedTitle": "Impossible de partager les cartes",
+      "shareFailedDescription": "Les cartes sélectionnées ne correspondent pas au type de carte demandé. Veuillez vérifier votre sélection et réessayer."
     },
     "RetryCard": {
       "defaultTitle": "Une erreur s’est produite",

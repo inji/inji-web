@@ -166,6 +166,10 @@
       "authorizationGrantTypeNotSupportedByWallet": {
         "code": "Grant type not supported authorization error!",
         "message": "Thanks for your patience! We're experiencing technical difficulties right now. Please try again later or contact the admin for further assistance!"
+      },
+      "dpopInitializationFailed": {
+        "code": "Secure authorization could not be started",
+        "message": "The secure credential download session could not be started. Please try again."
       }
     }
   },
@@ -531,7 +535,9 @@
         "defaultDescription": "We couldn’t complete your request. Please close and try again later.",
         "technicalTitle": "Oops! An Error Occurred.",
         "technicalDescription": "There was a technical issue while processing your request. You can try again in a moment.",
-        "closeButton": "Close"
+        "closeButton": "Close",
+        "shareFailedTitle": "Unable to share cards",
+        "shareFailedDescription": "The selected cards don’t match the requested card type. Please review your selection and try again."
       },
       "RetryCard": {
         "defaultTitle": "Something went wrong",

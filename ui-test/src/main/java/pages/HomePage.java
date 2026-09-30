@@ -5,8 +5,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Arrays;
@@ -20,6 +22,12 @@ public class HomePage extends BasePage {
 
 	public HomePage(WebDriver driver) {
 		this.driver = driver;
+	}
+
+	public boolean isOnHomePage() {
+		return isElementIsVisible(driver,
+				By.xpath("//div[@data-testid='HomeBanner-Content']"),
+				"Verify user is on home page (banner is displayed)");
 	}
 
 	public void clickOnFaq() {
@@ -131,9 +139,17 @@ public class HomePage extends BasePage {
 	}
 
 	public Boolean isSuccessMessageDisplayed() {
-		return isElementIsVisible(driver,
-				By.xpath("//p[@data-testid='title-download-result']"),
-				"Verify download success message is displayed");
+		By successIcon = By.cssSelector("[data-testid='DownloadResult-Success-ShieldIcon']");
+		By titleLocator = By.xpath("//p[@data-testid='title-download-result']");
+		try {
+            WebElement element = new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+					.until(ExpectedConditions.visibilityOfElementLocated(successIcon));
+			logStep("Verify download success state is displayed [title: " + driver.findElement(titleLocator).getText() + "]", successIcon);
+			return true;
+		} catch (Exception e) {
+			logWarning("Download result is not in success state [title: " + driver.findElement(titleLocator).getText() + "]", successIcon);
+			return false;
+		}
 	}
 
 	public Boolean isMosipNationalIdDisplayed() {
@@ -149,8 +165,15 @@ public class HomePage extends BasePage {
 	}
 
 	public void clearIssuersSearchBox() {
-		enterText(driver, By.xpath("//input[@type='text']"), "",
-				"Clear issuer search box");
+		By locator = By.xpath("//input[@type='text']");
+		Duration waitTimeout = Duration.ofSeconds(getConfiguredWaitTimeInSeconds());
+		WebElement element = new WebDriverWait(driver, waitTimeout)
+				.until(ExpectedConditions.presenceOfElementLocated(locator));
+
+		element.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
+
+		new WebDriverWait(driver, waitTimeout)
+				.until(d -> element.getAttribute("value").isEmpty());
 	}
 
 	public void enterIssuersInSearchBox(String string) {

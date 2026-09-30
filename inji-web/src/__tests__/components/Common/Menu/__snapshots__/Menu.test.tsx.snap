@@ -9,6 +9,7 @@ exports[`EllipsisMenu Component renders correctly and matches snapshot 1`] = `
     <button
       class="p-2 hover:bg-gray-100"
       data-testid="icon-test-view-menu"
+      type="button"
     >
       <span
         data-testid="trigger-menu"

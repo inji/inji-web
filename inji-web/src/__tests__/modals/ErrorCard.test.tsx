@@ -102,6 +102,22 @@ describe('ErrorCard', () => {
             expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
 
+        it('should use closeButtonTitle when provided and onRetry is not', () => {
+            const mockOnClose = jest.fn();
+            render(
+                <ErrorCard
+                    {...defaultProps}
+                    onClose={mockOnClose}
+                    closeButtonTitle="Go to Home"
+                />
+            );
+
+            const closeButton = screen.getByTestId('btn-error-card-close');
+            expect(closeButton).toHaveTextContent('Go to Home');
+            fireEvent.click(closeButton);
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
+        });
+
         it('should show Retry button and call onRetry when onRetry is provided', () => {
             const mockOnRetry = jest.fn();
             const propsWithRetry = {

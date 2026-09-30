@@ -76,6 +76,8 @@ describe('Passcode', () => {
     };
 
     beforeEach(() => {
+        mockNavigate.mockClear();
+        mockUseApi.fetchData.mockReset();
         (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
 
         setMockUseSelectorState({
@@ -96,9 +98,8 @@ describe('Passcode', () => {
         mockApiResponse({data: successWalletResponse});
         const {container} = renderWithProviders(<PasscodePage/>);
 
-        await waitFor(() => {
-            expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
-        });
+        expect(await screen.findByTestId("btn-forgot-passcode")).toBeInTheDocument();
+        expect(screen.getByTestId("title-passcode")).toHaveTextContent("Enter Passcode");
 
         expect(container).toMatchSnapshot();
     });
@@ -107,9 +108,8 @@ describe('Passcode', () => {
         mockApiResponse({data: []});
         const {container} = renderWithProviders(<PasscodePage/>);
 
-        await waitFor(() => {
-            expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1);
-        });
+        expect(await screen.findByTestId("confirm-passcode-container")).toBeInTheDocument();
+        expect(screen.getByTestId("title-passcode")).toHaveTextContent("Set Passcode");
 
         expect(container).toMatchSnapshot();
     });

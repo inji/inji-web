@@ -60,6 +60,15 @@ describe('useApi Hook', () => {
 
             expect(result.current.ok()).toBe(false);
         });
+
+        it('should keep fetchData identity stable across rerenders', () => {
+            const { result, rerender } = renderHook(() => useApi());
+            const firstFetchData = result.current.fetchData;
+
+            rerender();
+
+            expect(result.current.fetchData).toBe(firstFetchData);
+        });
     });
 
     describe('Successful API calls', () => {
@@ -90,6 +99,25 @@ describe('useApi Hook', () => {
             await waitFor(() => {
                 expect(result.current.state).toBe(RequestStatus.DONE);
             });
+        });
+
+        it('should keep fetchData identity stable after a request updates hook state', async () => {
+            mockRequest.mockResolvedValue({
+                data: { success: true },
+                status: HTTP_STATUS_CODES.OK,
+                headers: {},
+            });
+
+            const { result } = renderHook(() => useApi());
+            const fetchDataBeforeRequest = result.current.fetchData;
+
+            await act(async () => {
+                await result.current.fetchData({
+                    apiConfig: mockApiConfig,
+                });
+            });
+
+            expect(result.current.fetchData).toBe(fetchDataBeforeRequest);
         });
 
         it('should update state to LOADING during request', async () => {
@@ -479,6 +507,7 @@ describe('useApi Hook', () => {
 
             await waitFor(() => {
                 expect(result.current.state).toBe(RequestStatus.ERROR);
+                expect((result.current.error as any)?.response?.data).toEqual({ error: 'String error' });
             });
 
             // Test string with non-JSON content type
@@ -503,6 +532,7 @@ describe('useApi Hook', () => {
 
                 expect(apiResult.error).toBeDefined();
                 expect(apiResult.state).toBe(RequestStatus.ERROR);
+                expect((apiResult.error as any)?.response?.data).toEqual({ message: 'Plain text error' });
             });
         });
 

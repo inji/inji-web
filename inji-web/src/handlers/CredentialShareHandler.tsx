@@ -8,6 +8,7 @@ import { PresentationCredential } from "../types/components";
 import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
 import { DcqlSelectionEntry, SelectedSdClaimsMap, SubmitPresentationBody } from "../types/data";
 import { DcqlSelectionState } from "../types/dcql";
+import { rejectVerifierRequest } from "../utils/verifierUtils";
 
 export interface CredentialShareSuccessPayload {
     verifierName: string;
@@ -45,10 +46,11 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
                                                                                   onShareSuccess
                                                                               }) => {
     const { fetchData } = useApi();
-    const {t} = useTranslation("ShareHandlerLoadingModal");
+    const { t } = useTranslation(["ShareHandlerLoadingModal", "VerifierTrustPage", "Common"]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const hasSubmittedRef = useRef<boolean>(false);
+    const isLeavingRef = useRef<boolean>(false);
 
     const {
         showError,
@@ -56,7 +58,6 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
         errorTitle,
         errorDescription,
         onRetry,
-        onClose: handleModalClose,
         handleApiError
     } = useApiErrorHandler({ onClose });
 
@@ -113,32 +114,54 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
         try {
             const response = await submitPresentationCallback();
 
-            if (response.ok()) {
-                const responseRedirectUri = response.data?.redirectUri;
-                const finalReturnUrl = responseRedirectUri || returnUrl;
-                onShareSuccess?.({
-                    verifierName,
-                    verifierLogo,
-                    verifierTrusted,
-                    credentials: selectedCredentials,
-                    returnUrl: finalReturnUrl,
-                });
-                setIsSuccess(true);
-            } else {
-                const errorMessage = response.error?.message || 'Failed to submit presentation';
-                const error = response.error || new Error(errorMessage);
-                handleApiError(error, "submitPresentation", submitPresentationCallback, (response) => handleRetrySuccess(response));
+            if (response.ok() && response.data?.status === "error") {
+                handleApiError(
+                    {
+                        message: t("ErrorCard.shareFailedDescription", { ns: "VerifierTrustPage" }),
+                        displayTitle: t("ErrorCard.shareFailedTitle", { ns: "VerifierTrustPage" }),
+                    },
+                    "submitPresentation"
+                );
                 setIsSuccess(false);
+                return;
             }
+
+            if (response.ok()) {
+                handleRetrySuccess(response);
+                return;
+            }
+
+            const errorMessage = response.error?.message || "Failed to submit presentation";
+            const error = response.error || new Error(errorMessage);
+            handleApiError(error, "submitPresentation", submitPresentationCallback, (retryResponse) => handleRetrySuccess(retryResponse));
+            setIsSuccess(false);
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+            const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
             const error = err instanceof Error ? err : new Error(errorMessage);
-            handleApiError(error, "submitPresentation", submitPresentationCallback, (response) => handleRetrySuccess(response));
+            handleApiError(error, "submitPresentation", submitPresentationCallback, (retryResponse) => handleRetrySuccess(retryResponse));
             setIsSuccess(false);
         } finally {
             setIsLoading(false);
         }
-    }, [submitPresentationCallback, handleApiError, handleRetrySuccess, onShareSuccess, returnUrl, selectedCredentials, verifierLogo, verifierName, verifierTrusted]);
+    }, [submitPresentationCallback, handleApiError, handleRetrySuccess, t]);
+
+    const handleGoToHome = useCallback(async () => {
+        if (isLeavingRef.current) {
+            return;
+        }
+        isLeavingRef.current = true;
+
+        const ok = await rejectVerifierRequest({
+            presentationId,
+            fetchData,
+            redirectUri: null,
+            onSuccess: () => onClose?.(),
+        });
+        console.log("rejectVerifierRequest completed with ok:", ok);
+        if (!ok) {
+            isLeavingRef.current = false;
+        }
+    }, [fetchData, onClose, presentationId, returnUrl]);
 
     useEffect(() => {
         if (hasSubmittedRef.current) return;
@@ -153,14 +176,16 @@ export const CredentialShareHandler: React.FC<CredentialShareHandlerProps> = ({
     }
 
     if (showError) {
+        const shareFailedTitle = t("ErrorCard.shareFailedTitle", { ns: "VerifierTrustPage" });
         return (
             <ErrorCard
                 isOpen={true}
                 title={errorTitle}
                 description={errorDescription}
-                onClose={handleModalClose}
+                onClose={() => void handleGoToHome()}
                 onRetry={onRetry}
                 isRetrying={isRetrying}
+                closeButtonTitle={errorTitle === shareFailedTitle ? t("Common:goToHome") : undefined}
                 testId="modal-error-card"
             />
         );

@@ -60,6 +60,7 @@ export const Menu: React.FC<MenuProps> = ({triggerComponent, menuItems, testId})
     return (
         <div className={MenuStyles.menu.container} data-testid={`${testId}-menu`}>
             <button
+                type="button"
                 className={MenuStyles.menu.button}
                 ref={buttonRef}
                 onClick={(event) => {

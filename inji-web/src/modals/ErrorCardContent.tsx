@@ -11,6 +11,7 @@ export interface ErrorCardContentProps {
     onClose?: () => void;
     onRetry?: () => void;
     isRetrying?: boolean;
+    closeButtonTitle?: string;
 }
 
 export const ErrorCardContent: React.FC<ErrorCardContentProps> = ({
@@ -20,6 +21,7 @@ export const ErrorCardContent: React.FC<ErrorCardContentProps> = ({
     testId,
     onRetry,
     isRetrying = false,
+    closeButtonTitle,
 }) => {
     const { t } = useTranslation("VerifierTrustPage");
 
@@ -40,7 +42,7 @@ export const ErrorCardContent: React.FC<ErrorCardContentProps> = ({
 
     const buttonText = isRetryable
         ? t(`${RETRY_KEY_PREFIX}.retryButton`)
-        : t(`${ERROR_KEY_PREFIX}.closeButton`);
+        : (closeButtonTitle || t(`${ERROR_KEY_PREFIX}.closeButton`));
     const buttonAction = isRetryable ? onRetry : onClose;
 
     const styles = ErrorCardStyles.errorCard;

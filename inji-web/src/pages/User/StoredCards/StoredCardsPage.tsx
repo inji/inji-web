@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import {NavBackArrowButton} from '../../../components/Common/Buttons/NavBackArrowButton';
@@ -31,9 +31,11 @@ export const StoredCardsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const language = useSelector((state: RootState) => state.common.language);
     const [error, setError] = useState<string>();
+    const credentialsRequestIdRef = useRef(0);
 
 
     const fetchWalletCredentials = async () => {
+        const requestId = ++credentialsRequestIdRef.current;
         setLoading(true)
         try {
             const fetchWalletCredentials = api.fetchWalletVCs;
@@ -43,10 +45,15 @@ export const StoredCardsPage: React.FC = () => {
                 apiConfig: fetchWalletCredentials
             })
 
+            if (requestId !== credentialsRequestIdRef.current) {
+                return;
+            }
+
             if (response.ok()) {
                 const responseData = response.data!;
                 setCredentials(responseData);
                 setFilteredCredentials(responseData)
+                setError(undefined);
             } else {
                 console.error("Error fetching credentials:", response.status, response.error,  !navigator.onLine);
                 if (response.error?.message === (NETWORK_ERROR_MESSAGE) &&  !navigator.onLine) {
@@ -81,17 +88,22 @@ export const StoredCardsPage: React.FC = () => {
                 }
             }
         } catch (error) {
+            if (requestId !== credentialsRequestIdRef.current) {
+                return;
+            }
             console.error("An unknown error occurred. Failed to fetch credentials:", error);
             setError("unknownError");
         } finally {
-            setLoading(false);
+            if (requestId === credentialsRequestIdRef.current) {
+                setLoading(false);
+            }
         }
     };
 
     useEffect(() => {
         void fetchWalletCredentials();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [language]);
 
     const filterCredentials = (searchText: string) => {
         if (searchText === "") {

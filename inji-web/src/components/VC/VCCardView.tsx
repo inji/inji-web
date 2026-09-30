@@ -1,6 +1,6 @@
 import {ApiRequest, ApiResult, WalletCredential} from "../../types/data";
 import {VCStyles} from "./VCStyles";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Clickable} from "../Common/Clickable";
 import {api} from "../../utils/api";
 import {downloadCredentialPDF} from "../../utils/misc";
@@ -26,6 +26,8 @@ export function VCCardView(props: Readonly<{
     const [error, setError] = useState<string>()
     const [previewContent, setPreviewContent] = useState<Blob>();
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+    const isPreviewOpenRef = useRef(false);
+    const previewRequestIdRef = useRef(0);
     const {t} = useTranslation('StoredCards', {
         keyPrefix: "cardView"
     })
@@ -50,7 +52,8 @@ export function VCCardView(props: Readonly<{
         apiConfig: ApiRequest,
         onSuccess: (response: ApiResult<any>) => Promise<void>,
         apiInstance: ReturnType<typeof useApi>,
-        errorType: string = "downloadError"
+        errorType: string = "downloadError",
+        isCurrent: () => boolean = () => true
     ) => {
         try {
             const response = await apiInstance.fetchData({
@@ -58,6 +61,10 @@ export function VCCardView(props: Readonly<{
                 headers: apiConfig.headers(language),
                 apiConfig: apiConfig,
             })
+
+            if (!isCurrent()) {
+                return;
+            }
 
             if (!response.ok()) {
                 console.error(`Failed to fetch request, got ${errorType} with response - `, response);
@@ -67,21 +74,42 @@ export function VCCardView(props: Readonly<{
 
             await onSuccess(response);
         } catch (error) {
+            if (!isCurrent()) {
+                return;
+            }
             console.error("API request failed:", error);
             setError(errorType);
         }
     };
 
+    const isCurrentPreviewRequest = (requestId: number) =>
+        requestId === previewRequestIdRef.current && isPreviewOpenRef.current;
+
     const preview = async () => {
+        const requestId = ++previewRequestIdRef.current;
+        isPreviewOpenRef.current = true;
+
         await executeCredentialApiRequest(
             api.fetchWalletCredentialPreview,
             async (response) => {
-                const pdfContent: Blob = response.data;
-                setPreviewContent(pdfContent);
+                if (!isCurrentPreviewRequest(requestId)) {
+                    return;
+                }
+                setPreviewContent(response.data);
             },
             previewApi,
+            "downloadError",
+            () => isCurrentPreviewRequest(requestId)
         );
     };
+
+    useEffect(() => {
+        if (!isPreviewOpenRef.current) {
+            return;
+        }
+        void preview();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language]);
 
     const handleDownload = async (event: React.MouseEvent) => {
         event.stopPropagation();
@@ -127,6 +155,8 @@ export function VCCardView(props: Readonly<{
     };
 
     const clearPreview = () => {
+        isPreviewOpenRef.current = false;
+        previewRequestIdRef.current += 1;
         setPreviewContent(undefined);
     }
 

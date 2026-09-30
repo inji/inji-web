@@ -185,16 +185,6 @@ public class StepDefSunbirdCredentials {
 				"Authentication failed message is not displayed.");
 	}
 
-	@Then("User verify Vehicle Insurance displayed")
-	public void user_verify_vehicle_insurance_displayed() {
-		assertTrue(sunbirdCredentials.isVehicleInsuranceDisplayed(), "Vehicle Insurance is not displayed.");
-	}
-
-	@Then("User click on Vehicle Insurance button")
-	public void user_click_on_vehicle_insurance_button() {
-		sunbirdCredentials.clickOnVehicleInsurance();
-	}
-
 	@Then("User verify full name input box header")
 	public void user_verify_full_name_input_box_header() {
 		assertTrue(sunbirdCredentials.isEnterFullNameHeaderDisplayed(),

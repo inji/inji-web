@@ -10,7 +10,7 @@ export const mockUseApi = {
 };
 
 type MockApiResponseOptions = {
-    data?: object;
+    data?: object | any[] | null;
     status?: number | null;
     error?: any;
     headers?: object;

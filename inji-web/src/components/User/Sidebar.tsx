@@ -35,10 +35,11 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     };
 
     return (
-        <div
+        <button
+            type="button"
             className={`relative flex items-center w-full h-12 transition-all duration-200 rounded-lg ${
-                disabled 
-                    ? 'cursor-not-allowed opacity-50' 
+                disabled
+                    ? 'cursor-not-allowed opacity-50'
                     : 'cursor-pointer'
             } ${isRTL(language) ? 'pl-2' : 'pr-2'}`}
             onClick={handleClick}
@@ -70,12 +71,12 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                 <span
                     className={`font-medium text-md ${
                         isActive ? 'text-[#2B011C]' : 'text-[#6F6F6F]'
-                    } flex-1 truncate ${isRTL(language) ? 'text-right' : ''}`}
+                    } flex-1 truncate ${isRTL(language) ? 'text-right' : 'text-left'}`}
                 >
                     {text}
                 </span>
             )}
-        </div>
+        </button>
     );
 };
 

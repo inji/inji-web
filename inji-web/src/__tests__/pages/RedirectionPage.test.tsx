@@ -1,10 +1,17 @@
 import React from 'react';
+import {waitFor} from '@testing-library/react';
 import {RedirectionPage} from '../../pages/RedirectionPage';
 import {getActiveSession} from '../../utils/sessions';
-import {downloadCredentialPDF, getErrorObject} from '../../utils/misc';
+import {
+    downloadCredentialPDF,
+    getCredentialRequestBody,
+    getErrorObject
+} from '../../utils/misc';
 import {mockusei18n, renderWithProvider, renderWithRouter} from '../../test-utils/mockUtils';
 import {mockApiResponse, mockUseApi} from "../../test-utils/setupUseApiMock";
-import {RequestStatus} from "../../utils/constants";
+import {RequestStatus, ROUTES} from "../../utils/constants";
+import {useUser} from '../../hooks/User/useUser';
+import {api} from "../../utils/api";
 
 //todo : extract the local method to mockUtils, which is added to bypass the routing problems
 // Mock the utility functions
@@ -14,17 +21,23 @@ jest.mock('../../utils/sessions', () => ({
 }));
 jest.mock('../../utils/misc', () => ({
     downloadCredentialPDF: jest.fn(),
+    getCredentialRequestBody: jest.fn(),
     getErrorObject: jest.fn(),
-    getTokenRequestBody: jest.fn(),
 }));
 
 jest.mock('../../hooks/useApi.ts', () => ({
     useApi: () => mockUseApi
 }))
 
+jest.mock('../../hooks/User/useUser', () => ({
+    useUser: jest.fn(),
+}));
+
+const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
     useSearchParams: jest.fn(() => [new URLSearchParams('state=sessionId1'), jest.fn()]),
+    useNavigate: () => mockNavigate,
 }));
 
 describe('Testing the Layout of RedirectionPage', () => {
@@ -34,10 +47,13 @@ describe('Testing the Layout of RedirectionPage', () => {
             selectedIssuer: {
                 issuer_id: 'issuer1',
                 display: [{name: 'Test Issuer'}]
-            }
+            },
+            selectedCredentialType: {type: 'CredentialType', displayObj: []},
+            state: 'sessionId1'
         });
+        (useUser as jest.Mock).mockReturnValue({isUserLoggedIn: () => false});
         mockApiResponse({})
-        jest.spyOn(require('react-router-dom'), 'useSearchParams').mockReturnValue([new URLSearchParams('state=sessionId1'), jest.fn()]);
+        jest.spyOn(require('react-router-dom'), 'useSearchParams').mockReturnValue([new URLSearchParams('state=sessionId1&code=auth-code'), jest.fn()]);
 
         const {asFragment} = renderWithRouter(<RedirectionPage/>);
 
@@ -53,15 +69,20 @@ describe('Testing the Functionality of RedirectionPage', () => {
         (getActiveSession as jest.Mock).mockReturnValue({
             selectedIssuer: {
                 issuer_id: 'issuer1',
-                display: [{name: 'Test Issuer'}]
-            }
+                display: [{name: 'Test Issuer'}],
+                credentials_endpoint: 'https://issuer.example/legacy-credentials'
+            },
+            selectedCredentialType: {type: 'CredentialType', displayObj: []},
+            state: 'sessionId1'
         });
+        (useUser as jest.Mock).mockReturnValue({isUserLoggedIn: () => false});
         mockApiResponse()
-        jest.spyOn(require('react-router-dom'), 'useSearchParams').mockReturnValue([new URLSearchParams('state=sessionId1'), jest.fn()]);
+        jest.spyOn(require('react-router-dom'), 'useSearchParams').mockReturnValue([new URLSearchParams('state=sessionId1&code=auth-code'), jest.fn()]);
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+        mockNavigate.mockClear();
     });
 
     test("check if getSession is called with the sessionId from url search params state", () => {
@@ -114,7 +135,84 @@ describe('Testing the Functionality of RedirectionPage', () => {
         expect(asFragment()).toMatchSnapshot();
     });
 
+    test('redirects guest user to home when session is empty or already consumed', async () => {
+        (getActiveSession as jest.Mock).mockReturnValue({});
+        (useUser as jest.Mock).mockReturnValue({isUserLoggedIn: () => false});
+
+        renderWithRouter(<RedirectionPage/>);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith('/');
+        });
+    });
+
+    test('redirects logged-in user to user home when session is empty or already consumed', async () => {
+        (getActiveSession as jest.Mock).mockReturnValue({});
+        (useUser as jest.Mock).mockReturnValue({isUserLoggedIn: () => true});
+
+        renderWithRouter(<RedirectionPage/>);
+
+        await waitFor(() => {
+            expect(mockNavigate).toHaveBeenCalledWith(ROUTES.USER_HOME);
+        });
+    });
+
     test.todo("check if credential download API with right params is called for logged in user")
     test.todo("check if redirects to issuer page after successful download initiation for logged in user")
-    test.todo("check if credential download API with right params is called for guest mode")
+
+    test("calls guest credential download once with state header and code", async () => {
+        const credentialBody = {
+            issuer: "issuer1",
+            credential: "CredentialType",
+            vcStorageExpiryLimitInTimes: "-1",
+            code: "auth-code"
+        };
+        (getCredentialRequestBody as jest.Mock).mockReturnValue(credentialBody);
+        mockUseApi.fetchData.mockReset();
+        mockApiResponse({
+            data: new Blob(["credential"]),
+            status: 200,
+            state: RequestStatus.DONE
+        });
+
+        renderWithRouter(<RedirectionPage/>);
+
+        await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+        expect(getCredentialRequestBody).toHaveBeenCalledWith(
+            "issuer1",
+            "CredentialType",
+            "-1",
+            expect.any(Boolean),
+            {code: "auth-code"}
+        );
+        expect(mockUseApi.fetchData).toHaveBeenCalledWith(expect.objectContaining({
+            apiConfig: api.downloadVC,
+            body: credentialBody,
+            headers: expect.objectContaining({state: "sessionId1"})
+        }));
+        expect(mockUseApi.fetchData).toHaveBeenCalledWith(expect.objectContaining({
+            headers: expect.not.objectContaining({DPoP: expect.anything()})
+        }));
+        expect(downloadCredentialPDF).toHaveBeenCalled();
+    });
+
+    test("does not download PDF when guest credential download fails", async () => {
+        (getCredentialRequestBody as jest.Mock).mockReturnValue({
+            issuer: "issuer1",
+            credential: "CredentialType",
+            vcStorageExpiryLimitInTimes: "-1",
+            code: "auth-code"
+        });
+        mockUseApi.fetchData.mockReset();
+        mockApiResponse({
+            error: true,
+            state: RequestStatus.ERROR,
+            status: 500
+        });
+
+        renderWithRouter(<RedirectionPage/>);
+
+        await waitFor(() => expect(mockUseApi.fetchData).toHaveBeenCalledTimes(1));
+        expect(downloadCredentialPDF).not.toHaveBeenCalled();
+    });
 });

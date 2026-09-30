@@ -15,6 +15,7 @@ exports[`ResponsiveIconButtonWithText Component matches snapshot with default pr
         <button
           class="w-full text-center items-center flex-wrap min-w-0 text-iw-text font-bold px-6 py-2 shadow text-white mr-1 rounded-lg hover:shadow-lg cursor-pointer  bg-gradient-to-r from-iw-primary to-iw-secondary hover:bg-none hover:bg-[#E64E4E] hover:text-white sm:hidden"
           data-testid="btn-responsive-button"
+          type="button"
         >
           <div
             class="flex items-center justify-center gap-1.5 md:gap-1"
@@ -44,6 +45,7 @@ exports[`ResponsiveIconButtonWithText Component matches snapshot with default pr
           aria-label="Gradient Icon Button"
           class="flex items-center justify-center w-10 h-10 rounded-xl shadow border-none bg-[#FBF2EF] transition-all duration-200 ease-in-out "
           data-testid="btn-responsive-button"
+          type="button"
         >
           <div
             data-testid="test-icon"

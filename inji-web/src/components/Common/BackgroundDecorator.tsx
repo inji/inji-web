@@ -23,7 +23,7 @@ export const BackgroundDecorator: React.FC<BackgroundDecoratorProps> = ({
                 className={`absolute`}
                 style={{top: `${topOffset}px`}}
             >
-                {[...Array(circleCount)].map((_, index) => {
+                {[...new Array(circleCount)].map((_, index) => {
                     const radius = baseRadius + index * baseRadius;
                     const opacity = 0.8 - index * 0.1;
                     return (

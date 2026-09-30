@@ -163,7 +163,7 @@ public class InjiWebUtil extends AdminTestUtil {
 		}
 	}
 
-	public static HashMap<String, Integer> getActuatorValues(HashMap<String, String> keyMapping) {
+	public static HashMap<String, Integer> getActuatorValuesFromSource(HashMap<String, String> keyMapping, String sourceName) {
 		HashMap<String, Integer> result = new HashMap<>();
 		String actuatorUrl = ConfigManager.getproperty("apiInternalEndPoint")
 				+ ConfigManager.getproperty("actuatorMimotoEndpoint");
@@ -184,6 +184,11 @@ public class InjiWebUtil extends AdminTestUtil {
 				continue;
 
 			JSONObject src = (JSONObject) srcObj;
+			String name = src.optString("name", "");
+			if (sourceName != null && !sourceName.isEmpty() && !name.contains(sourceName)) {
+				continue;
+			}
+
 			JSONObject props = src.optJSONObject("properties");
 			if (props == null)
 				continue;
@@ -198,8 +203,7 @@ public class InjiWebUtil extends AdminTestUtil {
 						int intValue = Integer.parseInt(rawValue.trim());
 						result.put(resultKey, intValue);
 					} catch (NumberFormatException e) {
-						System.err
-								.println("[WARN] Failed to parse value for key " + actuatorKey + " (" + rawValue + ")");
+						logger.error("[WARN] Failed to parse value for key " + actuatorKey + " (" + rawValue + ")");
 					}
 				}
 			}
