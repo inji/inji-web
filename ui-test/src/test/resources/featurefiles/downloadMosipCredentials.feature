@@ -1,7 +1,7 @@
 Feature: download mosip cridentials
 
   @smoke @VerifyAndDownloadVcViaMosipNatinalId @NeedsUIN
-  Scenario Outline: Mosip Natonal Id by e-Signet
+  Scenario Outline: Mosip Natonal Id by e-Signet with invalid and valid credentials
     Then User gets the title of the page
     Then User click on continue as guest
     And User search the issuers mosip
@@ -15,8 +15,15 @@ Feature: download mosip cridentials
     Then Use click on proceed button
     And User verify login page lables
     And User verify vid input box header
+    And User enter the uin "<invalid uin>"
+    And User click on getOtp button expecting failure
+    Then User verify esignet error message "Unable to send OTP. Please try again."
     And User enter the uin
     And User click on getOtp button
+    And User enter the otp "<invalid otp>"
+    And User click on verify button expecting failure
+    Then User verify esignet error message "Please enter valid OTP."
+    And User clear the otp
     And User enter the otp
     And User click on verify button
     And User verify downloading in progress text
@@ -24,8 +31,8 @@ Feature: download mosip cridentials
     Then User verify Download Success text displayed
 
     Examples:
-      | Validity |
-      | 3        |
+      | Validity | invalid uin  | invalid otp |
+      | 3        | 1234567890   | 123456      |
 
   @smoke @VerifySearchWithInvalidString
   Scenario: Verify Search With Invalid String

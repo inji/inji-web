@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -12,6 +13,7 @@ public class MosipCredentials extends BasePage {
 	private WebDriver driver;
 	public String pdfName;
 	private static final By OTP_INPUT = By.xpath("(//input[@class='pincode-input-text'])[1]");
+	private static final int OTP_LENGTH = 6;
 	private static final By VERIFY_OTP_BUTTON = By.xpath("//button[@id='verify_otp']");
 
 	public MosipCredentials(WebDriver driver) {
@@ -65,6 +67,20 @@ public class MosipCredentials extends BasePage {
 			driver.findElement(By.xpath(locator)).sendKeys(String.valueOf(otpString.charAt(i)));
 		}
 		logStep("Enter OTP digits into pincode input fields", OTP_INPUT);
+	}
+
+	public void clearOtp(WebDriver driver) {
+		for (int i = OTP_LENGTH; i >= 1; i--) {
+			String locator = "(//input[@class='pincode-input-text'])[" + i + "]";
+			driver.findElement(By.xpath(locator)).sendKeys(Keys.BACK_SPACE);
+		}
+		logStep("Clear OTP input fields", OTP_INPUT);
+	}
+
+	public Boolean isEsignetErrorMessageDisplayed(String message) {
+		By errorMessage = By.xpath(String.format("//*[contains(normalize-space(text()), \"%s\")]", message));
+		return isElementIsVisible(driver, errorMessage, getConfiguredWaitTimeInSeconds(),
+				"Verify e-Signet error message is displayed [" + message + "]");
 	}
 
 	public void clickOnMosipNationalId() {

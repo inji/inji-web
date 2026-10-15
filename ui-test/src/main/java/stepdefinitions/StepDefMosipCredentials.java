@@ -69,6 +69,22 @@ public class StepDefMosipCredentials {
 		mosipCredentials.enterVid(UINManager.getUin());
 	}
 
+	@When("User enter the uin {string}")
+	public void user_enter_the_uin(String uin) {
+		mosipCredentials.enterVid(uin);
+	}
+
+	@When("User click on getOtp button expecting failure")
+	public void user_click_on_get_otp_button_expecting_failure() {
+		mosipCredentials.clickOnGetOtpButton();
+	}
+
+	@Then("User verify esignet error message {string}")
+	public void user_verify_esignet_error_message(String message) {
+		assertTrue(mosipCredentials.isEsignetErrorMessageDisplayed(message),
+				"Expected e-Signet error message is not displayed: " + message);
+	}
+
 	@When("User click on getOtp button")
 	public void user_click_on_get_otp_button() {
 		int maxAttempts = 3;
@@ -101,6 +117,16 @@ public class StepDefMosipCredentials {
 	@When("User enter the otp")
 	public void user_enter_the_otp() {
 		mosipCredentials.enterOtp(baseTest.getDriver(), injiWebUtil.uinGetOtp());
+	}
+
+	@When("User enter the otp {string}")
+	public void user_enter_the_otp(String otp) {
+		mosipCredentials.enterOtp(baseTest.getDriver(), otp);
+	}
+
+	@When("User clear the otp")
+	public void user_clear_the_otp() {
+		mosipCredentials.clearOtp(baseTest.getDriver());
 	}
 
 	@When("User click on mosip national id by e-signet button")
