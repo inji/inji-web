@@ -16,6 +16,12 @@ export const TrustVerifierModalStyles = {
 
         buttonsContainer: "flex flex-col w-full max-w-sm sm:max-w-md space-y-3 mt-4 sm:mt-6",
 
+        certIdentitySection: "w-full max-w-sm sm:max-w-md mt-4 mb-2 rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-left space-y-2",
+        certIdentityTitle: "text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1",
+        certIdentityRow: "flex justify-between items-start gap-2",
+        certIdentityLabel: "text-sm text-gray-500 shrink-0",
+        certIdentityValue: "text-sm font-medium text-gray-800 text-right break-all",
+
         trustButton: `
             !bg-[linear-gradient(90deg,_#FF5300_0%,_#FB5103_16%,_#F04C0F_31%,_#DE4322_46%,_#C5363C_61%,_#A4265F_75%,_#7C1389_90%,_#5B03AD_100%)] 
             !shadow-none hover:opacity-90 !py-3 !font-bold !text-base`,
