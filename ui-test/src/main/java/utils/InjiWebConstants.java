@@ -50,4 +50,6 @@ public class InjiWebConstants {
 	public static final String userResetInfo1 = "Reset your wallet to regain access and re-download your cards.";
 	public static final String MisMatchError = "Passcodes do not match. Please ensure both passcode fields match exactly. Re-enter and try again.";
 	public static final String VpVerificationSuccessMessage = "Congratulations, the given credential is valid!";
+	public static final String EsignetSendOtpFailedMessage = "Unable to send OTP. Please try again.";
+	public static final String EsignetInvalidOtpMessage = "Please enter valid OTP.";
 }

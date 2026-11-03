@@ -144,6 +144,14 @@ public class SunbirdCredentials extends BasePage {
 				"Verify authentication-failed error banner is displayed");
 	}
 
+	public void closeErrorMessage() {
+		By errorCloseButton = By.id("error-close-button");
+		clickOnElement(driver, errorCloseButton,
+				"Click on error dialog close button");
+		new WebDriverWait(driver, Duration.ofSeconds(getConfiguredWaitTimeInSeconds()))
+				.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@id='error-banner']")));
+	}
+
 	public boolean waitForLoginFailure(int timeoutInSeconds) {
 		try {
 			new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds))

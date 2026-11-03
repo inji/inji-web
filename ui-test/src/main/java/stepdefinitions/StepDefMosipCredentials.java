@@ -69,6 +69,28 @@ public class StepDefMosipCredentials {
 		mosipCredentials.enterVid(UINManager.getUin());
 	}
 
+	@When("User enter the uin {string}")
+	public void user_enter_the_uin(String uin) {
+		mosipCredentials.enterVid(uin);
+	}
+
+	@When("User click on getOtp button expecting failure")
+	public void user_click_on_get_otp_button_expecting_failure() {
+		mosipCredentials.clickOnGetOtpButton();
+	}
+
+	@Then("User verify unable to send otp error message")
+	public void user_verify_unable_to_send_otp_error_message() {
+		assertTrue(mosipCredentials.isEsignetErrorMessageDisplayed(InjiWebConstants.EsignetSendOtpFailedMessage),
+				"Expected e-Signet error message is not displayed: " + InjiWebConstants.EsignetSendOtpFailedMessage);
+	}
+
+	@Then("User verify invalid otp error message")
+	public void user_verify_invalid_otp_error_message() {
+		assertTrue(mosipCredentials.isEsignetErrorMessageDisplayed(InjiWebConstants.EsignetInvalidOtpMessage),
+				"Expected e-Signet error message is not displayed: " + InjiWebConstants.EsignetInvalidOtpMessage);
+	}
+
 	@When("User click on getOtp button")
 	public void user_click_on_get_otp_button() {
 		int maxAttempts = 3;
@@ -101,6 +123,18 @@ public class StepDefMosipCredentials {
 	@When("User enter the otp")
 	public void user_enter_the_otp() {
 		mosipCredentials.enterOtp(baseTest.getDriver(), injiWebUtil.uinGetOtp());
+	}
+
+	@When("User enter the otp {string}")
+	public void user_enter_the_otp(String otp) {
+		mosipCredentials.enterOtp(baseTest.getDriver(), otp);
+	}
+
+	@When("User clear the otp")
+	public void user_clear_the_otp() {
+		mosipCredentials.clearOtp(baseTest.getDriver());
+		assertTrue(mosipCredentials.isOtpCleared(baseTest.getDriver()),
+				"OTP input fields are not empty after clearing");
 	}
 
 	@When("User click on mosip national id by e-signet button")

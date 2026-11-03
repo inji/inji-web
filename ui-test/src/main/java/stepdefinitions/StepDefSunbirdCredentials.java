@@ -196,8 +196,18 @@ public class StepDefSunbirdCredentials {
 		sunbirdCredentials.enterPolicyNumber(string);
 	}
 
-	@Then("User enter the full name  {string}")
+	@Then("User enter the full name {string}")
 	public void user_enter_the_full_name(String string) {
 		sunbirdCredentials.enterFullName(string);
+	}
+
+	@Then("User click on login button expecting failure")
+	public void user_click_on_login_button_expecting_failure() {
+		sunbirdCredentials.clickOnLogin();
+	}
+
+	@Then("User close the error message")
+	public void user_close_the_error_message() {
+		sunbirdCredentials.closeErrorMessage();
 	}
 }

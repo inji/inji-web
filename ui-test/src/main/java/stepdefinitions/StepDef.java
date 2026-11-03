@@ -127,6 +127,11 @@ public class StepDef {
 				+ " verify attempts", lastException);
 	}
 
+	@When("User click on verify button expecting failure")
+	public void user_click_on_verify_button_expecting_failure() {
+		homePage.clickOnVerify();
+	}
+
 	@Then("User verify Download Success text displayed")
 	public void user_verify_download_success_text_displayed() throws Exception {
 		Assert.assertTrue(homePage.isSuccessMessageDisplayed());
