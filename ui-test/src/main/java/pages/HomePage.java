@@ -118,6 +118,12 @@ public class HomePage extends BasePage {
 				"Click on MOSIP National ID issuer card to start download");
 	}
 
+	public void clickOnIssuerCardByName(String issuerName) {
+		By issuerCard = By.xpath(
+				String.format("//div[@role='menuitem'][.//h3[normalize-space(.)='%s']]", issuerName));
+		clickOnElement(driver, issuerCard, "Click on issuer card: " + issuerName);
+	}
+
 	public Boolean isListOfCredentialsTypeDisplayed() {
 		return isElementIsVisible(driver,
 				By.xpath("//div[@data-testid='HeaderTile-Text']"),
