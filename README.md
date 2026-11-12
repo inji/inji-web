@@ -2,6 +2,7 @@
 >
 > * [W3C VC - Verifiable Credentials Overview](https://www.w3.org/TR/vc-overview/)
 > * [OpenID4VC - OpenID for Verifiable Credential Issuance - draft 13](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-ID1.html)
+> * [OpenID4VC - OpenID for Verifiable Credential Issuance 1.0](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html)
 > * [OpenID4VP - OpenID for Verifiable Presentations - draft 23](https://openid.net/specs/openid-4-verifiable-presentations-1_0-ID3.html)
 > * [OpenID4VP - OpenID for Verifiable Presentations 1.0](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html)
 
@@ -35,14 +36,9 @@ Inji Web adheres to global interoperability standards, including:
 * **OpenID4VCI:** For secure, standardized credential issuance.
 * **OpenID4VP:** For sharing credentials with verifiers.
 * **W3C VC:** Support for JSON-LD (1.1) and VC Data Model 2.0.
-* **IETF SD-JWT:** Support for selective disclosure.
+* **IETF SD-JWT:** Support for selective disclosure on credential issuance and presentation (`dc+sd-jwt`; `vc+sd-jwt` is accepted as a compatibility alias).
+* **ISO/IEC 18013-5 (`mso_mdoc`):** Support for mobile documents, including mDL, for both credential issuance (VC) and presentation (VP).
 * **Claim-169:** Optimized QR code representation.
-
-### Current Limitations
-
-* **OVP Flow Support:** The Verifiable Presentation (OVP) flow is currently limited to **LDP-VC** (JSON-LD) format. Support for **SD-JWT VC** presentation is currently in the pipeline and not yet available.
-* **Passcode Management:** The option to change a passcode after the initial login is currently unavailable.
-
 
 ## Architecture
 
@@ -198,9 +194,7 @@ Refer to the [Postgres Configuration Guide](https://github.com/inji/mimoto/blob/
 
 In the upcoming releases, the following [features](https://docs.inji.io/inji-wallet/inji-web/overview/features#features-in-the-pipeline) are planned:
 
-* **Selective Disclosure (SD-JWT):** Ability to share specific attributes from a credential.
 * **Revocation Status:** Real-time checking of VC validity.
-* **mDoc/mDL Support:** Compatibility with mobile driving license standards.
 * **Backup & Restore:** Enhanced persistent storage options for credentials.
 
 
