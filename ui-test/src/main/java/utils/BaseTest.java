@@ -23,12 +23,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.*;
 import io.mosip.testrig.apirig.testrunner.BaseTestCase;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
@@ -507,12 +509,16 @@ public class BaseTest {
             int leftoverCount = loginpage.getStoredCredentialCardCount();
             for (int i = 0; i < leftoverCount; i++) {
                 loginpage.deleteLastStoredCredentialCard();
+                final int previousCount = leftoverCount - i;
+                new WebDriverWait(driver, Duration.ofSeconds(10))
+                        .until(d -> d.findElements(By.xpath(
+                                "//div[@data-testid='vc-card-view']")).size() < previousCount);
             }
             if (leftoverCount > 0) {
                 logger.warn("'{}' failed — removed {} leftover credential card(s) from the shared wallet",
                         scenario.getName(), leftoverCount);
             }
-        } catch (Exception e) {
+        } catch (Exception | AssertionError e) {
             logger.error("Error cleaning up leftover stored credential cards after failed scenario '{}'",
                     scenario.getName(), e);
         }
