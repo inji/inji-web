@@ -41,6 +41,7 @@ import io.mosip.testrig.apirig.utils.ConfigManager;
 import io.mosip.testrig.apirig.utils.S3Adapter;
 import models.Uin;
 import models.Policy;
+import pages.Loginpage;
 import utils.testdatamanager.UINManager;
 import utils.testdatamanager.PolicyManager;
 
@@ -479,6 +480,41 @@ public class BaseTest {
             String reason = "Interrupted while waiting for wallet-cards semaphore";
             markScenarioSkipped(reason);
             throw new SkipException(reason);
+        }
+    }
+
+    /**
+     * Safety net for @mutatesWalletCards scenarios: if the scenario fails before
+     * reaching its own delete/verify steps (e.g. an assertion fails between the
+     * download and the delete step), any card it added is left in the shared
+     * wallet. That breaks later @mutatesWalletCards scenarios which assume an
+     * empty wallet at the start (e.g. "user verify no cards stored message").
+     * Runs at order=10500 — BEFORE afterScenario() (order=10000, which calls
+     * driver.quit()) — so the browser is still available to clean up.
+     */
+    @After(value = "@mutatesWalletCards", order = 10500)
+    public void cleanupLeftoverWalletCards(Scenario scenario) {
+        if (!scenario.isFailed()) {
+            return;
+        }
+        WebDriver driver = DRIVER.get();
+        if (driver == null) {
+            return;
+        }
+        try {
+            Loginpage loginpage = new Loginpage(driver);
+            loginpage.clickonStoredCredentialsButton();
+            int leftoverCount = loginpage.getStoredCredentialCardCount();
+            for (int i = 0; i < leftoverCount; i++) {
+                loginpage.deleteLastStoredCredentialCard();
+            }
+            if (leftoverCount > 0) {
+                logger.warn("'{}' failed — removed {} leftover credential card(s) from the shared wallet",
+                        scenario.getName(), leftoverCount);
+            }
+        } catch (Exception e) {
+            logger.error("Error cleaning up leftover stored credential cards after failed scenario '{}'",
+                    scenario.getName(), e);
         }
     }
 
