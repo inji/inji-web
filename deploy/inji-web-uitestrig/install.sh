@@ -7,7 +7,7 @@ if [ $# -ge 1 ] ; then
 fi
 
 NS=injiweb-ui-testrig
-CHART_VERSION=1.6.0
+CHART_VERSION=1.0.0-rc.1-develop
 COPY_UTIL=../copy_cm_func.sh
 
 echo Create $NS namespace
