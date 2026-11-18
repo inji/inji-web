@@ -510,9 +510,9 @@ public class BaseTest {
             for (int i = 0; i < leftoverCount; i++) {
                 loginpage.deleteLastStoredCredentialCard();
                 final int previousCount = leftoverCount - i;
-                new WebDriverWait(driver, Duration.ofSeconds(10))
-                        .until(d -> d.findElements(By.xpath(
-                                "//div[@data-testid='vc-card-view']")).size() < previousCount);
+                new WebDriverWait(driver, Duration.ofSeconds(InjiWebConfigManager.getWaitTimeInSeconds()))
+                        .until(d -> d.findElements(By.xpath("//div[@data-testid='loader-credentials']")).isEmpty()
+                                && d.findElements(By.xpath("//div[@data-testid='vc-card-view']")).size() < previousCount);
             }
             if (leftoverCount > 0) {
                 logger.warn("'{}' failed — removed {} leftover credential card(s) from the shared wallet",
