@@ -104,7 +104,7 @@ public class StepDefMockCredentials {
 
 	@When("User enter the mock otp")
 	public void user_enter_the_mock_otp() {
-		mosipCredentials.enterOtp(baseTest.getDriver(), InjiWebConfigManager.getproperty("mockOTP"));
+		mosipCredentials.enterOtp(baseTest.getDriver(), InjiWebConfigManager.getPreConfiguredOtp());
 	}
 
 }
