@@ -517,7 +517,24 @@
         "notTrustButton": "No, I don’t trust this Verifier",
         "cancelButton": "Cancel",
         "infoTooltipButton": "What does trusting mean?",
-        "infoTooltipText": "Trusting a verifier allows them to request your credentials. You’ll still choose which credentials to share in the next step."
+        "infoTooltipText": "Trusting a verifier allows them to request your credentials. You’ll still choose which credentials to share in the next step.",
+        "certIdentityTitle": "Verified by certificate",
+        "certDnsNameLabel": "Verified domain",
+        "certOrganizationLabel": "Organization",
+        "certValidUntilLabel": "Certificate valid until"
+      },
+      "x509Errors": {
+        "CERT_EXPIRED": "The verifier’s certificate has expired. Contact the verifier.",
+        "CERT_NOT_YET_VALID": "The verifier’s certificate is not yet active.",
+        "SAN_MISMATCH": "The verifier’s DNS name does not match its certificate. Request rejected.",
+        "RESPONSE_URI_HOST_MISMATCH": "The response address doesn’t match the verifier’s certificate.",
+        "CLIENT_ID_MISMATCH": "The verifier’s client ID doesn’t match its certificate.",
+        "MISSING_X5C": "The request is missing a certificate chain.",
+        "INVALID_SIGNATURE": "The request signature is invalid.",
+        "UNSUPPORTED_ALGORITHM": "The signing algorithm is not supported.",
+        "NOT_HTTPS": "The verifier’s response URI must use HTTPS.",
+        "MISSING_TRUST_STORE": "No trusted certificate authorities are configured.",
+        "CERT_CHAIN_INVALID": "The verifier’s certificate chain could not be validated."
       },
       "TrustRejectionModal": {
         "title": "Are you sure you don’t want to trust this verifier?",

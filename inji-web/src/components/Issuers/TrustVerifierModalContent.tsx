@@ -5,6 +5,7 @@ import { InfoTooltip } from "../Common/ToolTip/InfoTooltip";
 import { TrustVerifierModalStyles } from "./TrustVerifierModalStyles";
 import LogoIcon from "../../assets/unknown_verifier_logo.png";
 import { BorderedButton } from "../Common/Buttons/BorderedButton";
+import { ClientIdScheme } from "../../types/components";
 
 export interface TrustVerifierModalContentProps {
     logo?: string | null;
@@ -12,6 +13,10 @@ export interface TrustVerifierModalContentProps {
     onTrust: () => void;
     onCancel: () => void;
     testId: string;
+    clientIdScheme?: ClientIdScheme;
+    certVerifiedDnsName?: string;
+    certOrganization?: string;
+    certValidUntil?: string;
 }
 
 export const TrustVerifierModalContent: React.FC<TrustVerifierModalContentProps> = ({
@@ -20,6 +25,10 @@ export const TrustVerifierModalContent: React.FC<TrustVerifierModalContentProps>
     onTrust,
     onCancel,
     testId,
+    clientIdScheme,
+    certVerifiedDnsName,
+    certOrganization,
+    certValidUntil,
 }) => {
     const { t } = useTranslation(["VerifierTrustPage", "Common"]);
     const styles = TrustVerifierModalStyles.trustModal;
@@ -81,6 +90,30 @@ export const TrustVerifierModalContent: React.FC<TrustVerifierModalContentProps>
                     </li>
                 ))}
             </ul>
+
+            {clientIdScheme === "x509_san_dns" && (certVerifiedDnsName || certOrganization || certValidUntil) && (
+                <div data-testid="cert-identity-section" className={styles.certIdentitySection}>
+                    <p className={styles.certIdentityTitle}>{t("modal.certIdentityTitle")}</p>
+                    {certVerifiedDnsName && (
+                        <div className={styles.certIdentityRow}>
+                            <span className={styles.certIdentityLabel}>{t("modal.certDnsNameLabel")}</span>
+                            <span data-testid="cert-dns-name" className={styles.certIdentityValue}>{certVerifiedDnsName}</span>
+                        </div>
+                    )}
+                    {certOrganization && (
+                        <div className={styles.certIdentityRow}>
+                            <span className={styles.certIdentityLabel}>{t("modal.certOrganizationLabel")}</span>
+                            <span data-testid="cert-organization" className={styles.certIdentityValue}>{certOrganization}</span>
+                        </div>
+                    )}
+                    {certValidUntil && (
+                        <div className={styles.certIdentityRow}>
+                            <span className={styles.certIdentityLabel}>{t("modal.certValidUntilLabel")}</span>
+                            <span data-testid="cert-valid-until" className={styles.certIdentityValue}>{certValidUntil}</span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className={styles.buttonsContainer}>
                 <SolidButton

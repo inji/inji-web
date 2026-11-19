@@ -8,7 +8,7 @@ import { TrustRejectionModal } from "../components/Issuers/TrustRejectionModal";
 import { useApi } from "../hooks/useApi";
 import { useNavigate } from 'react-router-dom';
 import {OPENID4VP_AUTHORIZE_PREFIX, ROUTES} from "../utils/constants";
-import { PresentationCredential } from "../types/components";
+import { PresentationCredential, Verifier } from "../types/components";
 import { SelectedSdClaimsMap } from "../types/data";
 import { CredentialShareHandler, CredentialShareSuccessPayload } from "../handlers/CredentialShareHandler";
 import { CredentialShareSuccessView } from "../components/Ovp/CredentialShareSuccessView";
@@ -57,7 +57,7 @@ export const VPAuthorizationPage: React.FC = () => {
     const [isCancelConfirmation, setIsCancelConfirmation] = useState<boolean>(false);
     const [showTrustVerifier, setShowTrustVerifier] = useState<boolean>(false);
     const [showCredentialRequest, setShowCredentialRequest] = useState<boolean>(false);
-    const [verifierData, setVerifierData] = useState<any>(null);
+    const [verifierData, setVerifierData] = useState<Verifier | null>(null);
     const [presentationIdData, setPresentationIdData] = useState<string | null>(null);
     const [selectedCredentialsData, setSelectedCredentialsData] = useState<PresentationCredential[] | null>(null);
     const [shareSuccessPayload, setShareSuccessPayload] =
@@ -108,7 +108,7 @@ export const VPAuthorizationPage: React.FC = () => {
     const handleValidationSuccess = useCallback((response: any) => {
         const data = response.data;
         const presentationId = data?.presentationId;
-        const verifier = data?.verifier;
+        const verifier = data?.verifier as Verifier;
         if (!verifier) {
             throw new Error("Invalid verifier response received.");
         }
@@ -805,6 +805,10 @@ export const VPAuthorizationPage: React.FC = () => {
                 setIsCancelConfirmation(true);
             }}
             testId="modal-trust-verifier"
+            clientIdScheme={verifierData?.clientIdScheme}
+            certVerifiedDnsName={verifierData?.certVerifiedDnsName}
+            certOrganization={verifierData?.certOrganization}
+            certValidUntil={verifierData?.certValidUntil}
         />
     );
 

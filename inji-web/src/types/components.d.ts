@@ -108,6 +108,8 @@ export type IconProps = {
 } & React.SVGProps<SVGSVGElement>;
 
 // Presentation API types
+export type ClientIdScheme = "pre-registered" | "x509_san_dns";
+
 export interface Verifier {
     id: string;
     name: string;
@@ -115,6 +117,11 @@ export interface Verifier {
     redirectUri: string | null;
     trusted: boolean;
     preregisteredWithWallet: boolean;
+    clientIdScheme?: ClientIdScheme;
+    // Present only when clientIdScheme === "x509_san_dns"
+    certVerifiedDnsName?: string;
+    certOrganization?: string;
+    certValidUntil?: string;
 }
 export interface PresentationCredential {
     credentialId: string;
