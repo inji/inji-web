@@ -9,7 +9,7 @@ import { useApi } from "../hooks/useApi";
 import { useNavigate } from 'react-router-dom';
 import {OPENID4VP_AUTHORIZE_PREFIX, ROUTES} from "../utils/constants";
 import { PresentationCredential } from "../types/components";
-import { SelectedSdClaimsMap } from "../types/data";
+import { SelectedSdClaimsMap, WalletCredential } from "../types/data";
 import { CredentialShareHandler, CredentialShareSuccessPayload } from "../handlers/CredentialShareHandler";
 import { CredentialShareSuccessView } from "../components/Ovp/CredentialShareSuccessView";
 import { useApiErrorHandler } from "../hooks/useApiErrorHandler";
@@ -21,7 +21,11 @@ import {
 import MatchingCredentials from "../components/Ovp/MatchingCredentials";
 import DcqlQueryGroups from "../components/Ovp/DcqlQueryGroups";
 import DcqlCredentialSets from "../components/Ovp/DcqlCredentialSets";
-import { isSdJwtCredential } from "../components/Ovp/Dcql/credentialCardUtils";
+import {
+    buildDcqlSelectedSdClaims,
+    buildMdocDefaultSdClaims,
+    isSelectivelyDisclosableCredential,
+} from "../components/Ovp/Dcql/credentialCardUtils";
 import {
     DcqlCredentialSet,
     DcqlCredentialSetSelectionState,
@@ -236,7 +240,7 @@ export const VPAuthorizationPage: React.FC = () => {
                         const autoSdClaims: SelectedSdClaimsMap = {};
                         flatCredentials.forEach((credential) => {
                             if (
-                                isSdJwtCredential(credential) &&
+                                isSelectivelyDisclosableCredential(credential) &&
                                 Array.isArray(credential.sdClaims) &&
                                 credential.sdClaims.length > 0
                             ) {
@@ -275,8 +279,13 @@ export const VPAuthorizationPage: React.FC = () => {
                         setQueryGroupsData([]);
                         setFilteredQueryGroups([]);
                         setDcqlSelection({});
-                        setCredentialsData(data?.availableCredentials ?? []);
-                        setFilteredCredentials(data?.availableCredentials ?? []);
+                        const availableCredentials: WalletCredential[] =
+                            data?.availableCredentials ?? [];
+                        setSelectedSdClaimsByCredential(
+                            buildMdocDefaultSdClaims(availableCredentials)
+                        );
+                        setCredentialsData(availableCredentials);
+                        setFilteredCredentials(availableCredentials);
                         const raw = data?.missingClaims;
                         setMissingClaimsData(
                             Array.isArray(raw) ? raw.map((c: unknown) => String(c)) : []
@@ -473,7 +482,7 @@ export const VPAuthorizationPage: React.FC = () => {
                 );
                 if (
                     credential &&
-                    isSdJwtCredential(credential) &&
+                    isSelectivelyDisclosableCredential(credential) &&
                     Array.isArray(credential.sdClaims) &&
                     credential.sdClaims.length > 0
                 ) {
@@ -491,9 +500,13 @@ export const VPAuthorizationPage: React.FC = () => {
         if (!selectedCredentialsData?.length) {
             return undefined;
         }
+        if (isDcqlPresentation) {
+            const dcqlPayload = buildDcqlSelectedSdClaims(queryGroupsData, dcqlSelection);
+            return Object.keys(dcqlPayload).length > 0 ? dcqlPayload : undefined;
+        }
         const payload: SelectedSdClaimsMap = {};
         selectedCredentialsData.forEach((credential) => {
-            if (!isSdJwtCredential(credential)) {
+            if (!isSelectivelyDisclosableCredential(credential)) {
                 return;
             }
             if (credential.credentialId in selectedSdClaimsByCredential) {
@@ -502,7 +515,7 @@ export const VPAuthorizationPage: React.FC = () => {
             }
         });
         return Object.keys(payload).length > 0 ? payload : undefined;
-    }, [selectedCredentialsData, selectedSdClaimsByCredential]);
+    }, [selectedCredentialsData, selectedSdClaimsByCredential, isDcqlPresentation, queryGroupsData, dcqlSelection]);
 
     useEffect(() => {
         if (!isUserLoggedIn() || fetchingRef.current) {
@@ -601,9 +614,19 @@ export const VPAuthorizationPage: React.FC = () => {
                     delete next[id];
                     return next;
                 });
+                return;
+            }
+            const credential = credentialsData?.find((c) => c.credentialId === id);
+            const mdocDefaults = credential
+                ? buildMdocDefaultSdClaims([credential])
+                : {};
+            if (id in mdocDefaults) {
+                setSelectedSdClaimsByCredential((prev) =>
+                    id in prev ? prev : { ...prev, [id]: mdocDefaults[id] }
+                );
             }
         },
-        []
+        [credentialsData]
     );
 
     const renderSearchBar = () => {
