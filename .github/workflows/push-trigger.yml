@@ -170,7 +170,7 @@ jobs:
 
   pr-gate:
     if: github.event_name != 'release'
-    uses: mosip/kattu/.github/workflows/pr-gate.yml@2d207910e37a0d38284af0e59d2d3e3de70d254f # develop
+    uses: mosip/kattu/.github/workflows/pr-gate.yml@develop
     permissions:
       contents: write
       pull-requests: write
