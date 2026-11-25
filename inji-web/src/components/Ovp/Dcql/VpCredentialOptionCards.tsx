@@ -6,7 +6,7 @@ import CredentialPreviewModal from "../../../modals/CredentialPreviewModal";
 import {
     DcqlCredentialOptionCard,
 } from "./DcqlCredentialOptionCard";
-import { getCredentialActionVariant, isSdJwtCredential } from "./credentialCardUtils";
+import { getCredentialActionVariant, isSelectivelyDisclosableCredential } from "./credentialCardUtils";
 import { DcqlDesignStyles } from "./dcqlDesignStyles";
 
 interface VpCredentialOptionCardsProps {
@@ -34,7 +34,7 @@ export function VpCredentialOptionCards({
         useState(false);
     const [previewCredential, setPreviewCredential] =
         useState<WalletCredential | null>(null);
-    const [selectedSDJWT, setSelectedSDJWT] = useState<WalletCredential | null>(
+    const [selectedCredential, setSelectedCredential] = useState<WalletCredential | null>(
         null
     );
 
@@ -44,8 +44,8 @@ export function VpCredentialOptionCards({
     };
 
     const handleActionClick = (credential: WalletCredential) => {
-        if (isSdJwtCredential(credential)) {
-            setSelectedSDJWT(credential);
+        if (isSelectivelyDisclosableCredential(credential)) {
+            setSelectedCredential(credential);
             setShowSDClaimsSelectionModal(true);
             return;
         }
@@ -70,7 +70,7 @@ export function VpCredentialOptionCards({
                         `matching-credentials-tile-${credentialKey}`;
 
                     const actionVariant = getCredentialActionVariant(credential);
-                    const isSdJwt = isSdJwtCredential(credential);
+                    const hasClaimSelection = isSelectivelyDisclosableCredential(credential);
 
                     return (
                         <DcqlCredentialOptionCard
@@ -79,7 +79,7 @@ export function VpCredentialOptionCards({
                             isSelected={isSelected}
                             onSelect={() => handleCredentialSelect(credential)}
                             actionVariant={actionVariant}
-                            actionLabel={isSdJwt ? t("dcql.selectRequiredClaims") : undefined}
+                            actionLabel={hasClaimSelection ? t("dcql.selectRequiredClaims") : undefined}
                             onActionClick={() => handleActionClick(credential)}
                             testId={testId}
                         />
@@ -89,13 +89,13 @@ export function VpCredentialOptionCards({
 
             {showSDClaimsSelectionModal && (
                 <SDClaimsSelectionModal
-                    key={selectedSDJWT?.credentialId}
-                    seletedSDJWT={selectedSDJWT}
+                    key={selectedCredential?.credentialId}
+                    selectedCredential={selectedCredential}
                     closeModal={setShowSDClaimsSelectionModal}
                     initialSelectedSdClaims={
-                        selectedSDJWT
+                        selectedCredential
                             ? selectedSdClaimsByCredential[
-                                  selectedSDJWT.credentialId
+                                  selectedCredential.credentialId
                               ]
                             : undefined
                     }

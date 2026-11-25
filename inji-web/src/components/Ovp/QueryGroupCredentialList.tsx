@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SelectedSdClaimsMap, WalletCredential } from "../../types/data";
 import { MatchingCredentialsStyles } from "./OvpPageStyles";
 import checkCircle from "../../assets/checkCircleTwo.svg";
-import { isSdJwtCredential } from "./Dcql/credentialCardUtils";
+import { isSelectivelyDisclosableCredential } from "./Dcql/credentialCardUtils";
 import SDClaimsSelectionModal from "../../modals/SDClaimsSelectionModal";
 
 interface QueryGroupCredentialListProps {
@@ -36,7 +36,7 @@ export function QueryGroupCredentialList({
 }: QueryGroupCredentialListProps) {
     const { t } = useTranslation("VerifierTrustPage");
     const [showSDClaimsModal, setShowSDClaimsModal] = useState(false);
-    const [selectedSDJWT, setSelectedSDJWT] = useState<WalletCredential | null>(null);
+    const [selectedCredential, setSelectedCredential] = useState<WalletCredential | null>(null);
 
     const handleCredentialSelect = (credential: WalletCredential) => {
         const isSelected = selectedCredentialIds.includes(credential.credentialId);
@@ -56,8 +56,8 @@ export function QueryGroupCredentialList({
             onCredentialSelect(queryId, credential.credentialId, true);
         }
 
-        if (isSdJwtCredential(credential)) {
-            setSelectedSDJWT(credential);
+        if (isSelectivelyDisclosableCredential(credential)) {
+            setSelectedCredential(credential);
             setShowSDClaimsModal(true);
         }
     };
@@ -130,13 +130,13 @@ export function QueryGroupCredentialList({
             </div>
             {showSDClaimsModal && (
                 <SDClaimsSelectionModal
-                    key={selectedSDJWT?.credentialId}
-                    seletedSDJWT={selectedSDJWT}
+                    key={selectedCredential?.credentialId}
+                    selectedCredential={selectedCredential}
                     closeModal={setShowSDClaimsModal}
                     readOnly={true}
                     initialSelectedSdClaims={
-                        selectedSDJWT
-                            ? selectedSdClaimsByCredential[selectedSDJWT.credentialId]
+                        selectedCredential
+                            ? selectedSdClaimsByCredential[selectedCredential.credentialId]
                             : undefined
                     }
                     onConfirm={() => {}}
