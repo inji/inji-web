@@ -530,8 +530,8 @@ describe('VCCardView Component', () => {
         );
 
         expect(screen.getByTestId("credential-status-label")).toHaveTextContent("Suspended");
-        expect(screen.getByTestId("credential-status-icon")).toHaveStyle({backgroundColor: "#EAB308"});
-        expect(screen.getByTestId("credential-status-icon").querySelector("img")).toHaveAttribute("src", "pending.svg");
+        expect(screen.getByTestId("credential-status-icon")).toHaveAttribute("src", "suspended_Icon.svg");
+        expect(screen.getByTestId("credential-status-icon")).not.toHaveStyle({backgroundColor: "#EAB308"});
     });
 
     it('should show expired status when isExpired is true and the credential is not revoked or suspended', () => {
@@ -584,7 +584,7 @@ describe('VCCardView Component', () => {
         expect(screen.getByTestId("credential-status-popup-icon-valid").querySelector("img")).toHaveAttribute("src", "SelectedTickIcon.svg");
         expect(screen.getByTestId("credential-status-popup-icon-pending").querySelector("img")).toHaveAttribute("src", "pending.svg");
         expect(screen.getByTestId("credential-status-popup-icon-expired").querySelector("img")).toHaveAttribute("src", "close.svg");
-        expect(screen.getByTestId("credential-status-popup-icon-suspended").querySelector("img")).toHaveAttribute("src", "pending.svg");
+        expect(screen.getByTestId("credential-status-popup-icon-suspended")).toHaveAttribute("src", "suspended_Icon.svg");
         expect(screen.getByTestId("credential-status-popup-icon-revoked").querySelector("img")).toHaveAttribute("src", "revoked.svg");
 
         fireEvent.mouseLeave(screen.getByTestId("credential-status-info"));

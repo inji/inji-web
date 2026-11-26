@@ -2,7 +2,7 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import {CredentialCardStatus} from "../../utils/credentialStatus";
 import {VCStyles} from "../VC/VCStyles";
-import {CREDENTIAL_STATUS_ICON, CredentialStatusIcon} from "./CredentialStatusIcon";
+import {CredentialStatusIcon} from "./CredentialStatusIcon";
 
 const POPUP_STATUSES: CredentialCardStatus[] = ["valid", "pending", "expired", "suspended", "revoked"];
 
@@ -25,15 +25,14 @@ export function StatusInformationDropdown(props: Readonly<{
         >
             <div className={VCStyles.cardView.statusInfoCaretOuter} data-testid="credential-status-information-arrow"/>
             <div className={VCStyles.cardView.statusInfoCaretInner}/>
-            <p className={VCStyles.cardView.statusInfoTitle}>{t("status.informationTitle")}</p>
-            <div>
-                {POPUP_STATUSES.map((status) => {
-                    const icon = CREDENTIAL_STATUS_ICON[status];
-                    return (
+            <div className={VCStyles.cardView.statusInfoPopupBody}>
+                <p className={VCStyles.cardView.statusInfoTitle}>{t("status.informationTitle")}</p>
+                <div>
+                    {POPUP_STATUSES.map((status) => (
                         <div key={status} className={VCStyles.cardView.statusInfoItem}>
                             <div className="flex items-center gap-1.5">
                                 <CredentialStatusIcon status={status} testId={`credential-status-popup-icon-${status}`}/>
-                                <span className={VCStyles.cardView.statusInfoItemTitle} style={{color: icon.color}}>
+                                <span className={VCStyles.cardView.statusInfoItemTitle}>
                                     {t(`status.${status}`)}
                                 </span>
                             </div>
@@ -41,8 +40,8 @@ export function StatusInformationDropdown(props: Readonly<{
                                 {t(`status.info.${status}`)}
                             </p>
                         </div>
-                    );
-                })}
+                    ))}
+                </div>
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ export function VCDetailView(props: Readonly<{
     onClose: () => void,
     onDownload: () => Promise<void>,
     onCheckStatus?: () => void,
+    onDelete?: () => void,
     checkingStatus?: boolean,
     credential: WalletCredential
 }>) {
@@ -35,7 +36,7 @@ export function VCDetailView(props: Readonly<{
                   testId={"vc-card-detail-view"}
                   titleTestId={"credential-type-display-name"}
     >
-        {supportsStatus && (
+        {supportsStatus ? (
             <CredentialPreviewStatusBar
                 statusChecks={props.credential.statusChecks}
                 lastCheckedAt={props.credential.lastCheckedAt}
@@ -44,11 +45,17 @@ export function VCDetailView(props: Readonly<{
                     void props.onDownload();
                 }}
                 onCheckStatus={props.onCheckStatus!}
-                checking={props.checkingStatus}
+                onDelete={props.onDelete}
+                checkingStatus={props.checkingStatus}
+            >
+                <PDFViewer
+                    previewContent={props.previewContent}
+                />
+            </CredentialPreviewStatusBar>
+        ) : (
+            <PDFViewer
+                previewContent={props.previewContent}
             />
         )}
-        <PDFViewer
-            previewContent={props.previewContent}
-        />
     </Modal>;
 }

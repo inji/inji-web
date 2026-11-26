@@ -11,7 +11,7 @@ export function CredentialStatusBadge(props: Readonly<{
     statusChecks?: CredentialStatusCheck[] | null;
     lastCheckedAt?: string | null;
     isExpired?: boolean | null;
-    checking?: boolean;
+    checkingStatus?: boolean;
 }>) {
     const {t} = useTranslation("StoredCards", {keyPrefix: "cardView"});
     const status = resolveCredentialStatus(props.statusChecks, props.isExpired, props.lastCheckedAt);
@@ -22,8 +22,8 @@ export function CredentialStatusBadge(props: Readonly<{
     }
 
     return (
-        <div data-testid="credential-status" aria-busy={props.checking || undefined}>
-            {props.checking ? (
+        <div data-testid="credential-status" role="status" aria-busy={props.checkingStatus || undefined}>
+            {props.checkingStatus ? (
                 <CredentialStatusLoading testId="credential-status-loader"/>
             ) : status && (
                 <div className={`${VCStyles.cardView.statusRow} justify-between`}>

@@ -55,11 +55,4 @@ describe("resolveCredentialStatus", () => {
         expect(hasCredentialStatus({})).toBe(false);
     });
 
-    it("returns no status when a check is inconclusive", () => {
-        expect(resolveCredentialStatus(
-            [{purpose: "revocation", valid: null}],
-            false,
-            "2026-11-25T05:09:11.190114Z"
-        )).toBeNull();
-    });
 });

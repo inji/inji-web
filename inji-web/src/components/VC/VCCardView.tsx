@@ -265,10 +265,14 @@ export function VCCardView(props: Readonly<{
     ];
 
     return (
-        <Clickable onClick={preview} testId={"vc-card-view"}
+        <Clickable onClick={() => {
+                       void runMenuAction(preview);
+                   }} testId={"vc-card-view"}
                    className={VCStyles.cardView.container}>
-            <VCDetailView previewContent={previewContent!} onClose={clearPreview} onDownload={download}
+            <VCDetailView previewContent={previewContent!} onClose={clearPreview}
+                          onDownload={() => runMenuAction(download)}
                           onCheckStatus={checkStatus}
+                          onDelete={!isOvpFlow ? handleDelete : undefined}
                           checkingStatus={isCheckingStatus}
                           credential={{
                               ...props.credential,
@@ -315,7 +319,7 @@ export function VCCardView(props: Readonly<{
                             lastCheckedAt={statusOverride
                                 ? statusOverride.lastCheckedAt
                                 : props.credential.lastCheckedAt}
-                            checking={isCheckingStatus}
+                            checkingStatus={isCheckingStatus}
                         />
                     )}
                 </div>

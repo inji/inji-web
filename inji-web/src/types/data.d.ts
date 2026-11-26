@@ -99,7 +99,7 @@ export type LanguageObject = {
 
 export type CredentialStatusCheck = {
     purpose: string;
-    valid?: boolean | null;
+    valid: boolean;
 };
 
 export type CredentialStatusResponse = {
