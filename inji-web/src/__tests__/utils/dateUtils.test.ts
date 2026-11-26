@@ -1,4 +1,31 @@
-import { formatSharedTimestamp } from "../../utils/dateUtils";
+import { formatLastCheckedAt, formatPreviewLastChecked, formatSharedTimestamp } from "../../utils/dateUtils";
+
+describe("formatLastCheckedAt", () => {
+    test("formats a local timestamp as DD/MM/YY hh:mmAM/PM", () => {
+        const iso = new Date(2025, 9, 12, 22, 30, 0).toISOString();
+
+        expect(formatLastCheckedAt(iso)).toBe("12/10/25 10:30PM");
+    });
+
+    test("trims fractional seconds beyond milliseconds", () => {
+        const iso = new Date(2025, 9, 20, 6, 30, 5, 908).toISOString();
+        const withNanoseconds = iso.replace(/(\.\d{3})\d*Z$/, "$1123200Z");
+
+        expect(formatLastCheckedAt(withNanoseconds)).toBe("20/10/25 06:30AM");
+    });
+
+    test("returns an empty string for an invalid timestamp", () => {
+        expect(formatLastCheckedAt("not-a-date")).toBe("");
+    });
+});
+
+describe("formatPreviewLastChecked", () => {
+    test("formats a local timestamp as a long date with time", () => {
+        const iso = new Date(2025, 9, 20, 18, 30, 0).toISOString();
+
+        expect(formatPreviewLastChecked(iso, "en")).toBe("20 October 2025, 06:30PM");
+    });
+});
 
 describe("formatSharedTimestamp", () => {
     const locale = "en-US";

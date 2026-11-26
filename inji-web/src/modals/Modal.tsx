@@ -31,7 +31,7 @@ interface ModalProps {
 export const Modal: React.FC<ModalProps> = ({isOpen, onClose, children, action, title, size, testId, titleTestId}) => {
     if (!isOpen) return null;
 
-    const modalSize = size ? `min-h-${size}` : "h-[83vh] w-[90vw] sm:w-[70vw] sm:h-[80vh]"
+    const modalSize = size ? `min-h-${size}` : "h-[83vh] w-[calc(100vw-1rem)] sm:w-[70vw] sm:h-[80vh]"
 
     return ReactDOM.createPortal(
         <Clickable

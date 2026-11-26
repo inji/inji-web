@@ -97,6 +97,18 @@ export type LanguageObject = {
     value: string;
 };
 
+export type CredentialStatusCheck = {
+    purpose: string;
+    valid: boolean;
+};
+
+export type CredentialStatusResponse = {
+    credentialId: string;
+    statusChecks: CredentialStatusCheck[] | null;
+    lastCheckedAt: string;
+    isExpired?: boolean | null;
+};
+
 export type WalletCredential = {
     issuerDisplayName: string;
     issuerLogo: string;
@@ -106,6 +118,9 @@ export type WalletCredential = {
     format: string;
     claims?: string[];
     sdClaims?: string[];
+    statusChecks?: CredentialStatusCheck[] | null;
+    lastCheckedAt?: string | null;
+    isExpired?: boolean | null;
 };
 
 export type SelectedSdClaimsMap = Record<string, string[]>;

@@ -531,17 +531,17 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
         class="flex-1 pl-4 py-0"
       >
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-full gap-1"
+          class="grid w-full gap-1 grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))]"
           data-testid="credentials"
         >
           <div
-            class="bg-iw-tileBackground grid grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
+            class="bg-iw-tileBackground grid w-full min-w-[min(100%,22rem)] grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
             data-testid="vc-card-view"
             role="menuitem"
             tabindex="0"
           >
             <div
-              class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
+              class="flex items-center gap-2 sm:gap-6 min-w-0 flex-1"
             >
               <img
                 alt="Credential Type Logo"
@@ -549,12 +549,16 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 data-testid="issuer-logo"
                 src="logo1.png"
               />
-              <span
-                class="text-sm font-semibold text-iw-title min-w-0 flex-1 break-words leading-snug"
-                data-testid="credential-type-display-name"
+              <div
+                class="flex min-w-0 flex-1 flex-col gap-1"
               >
-                Drivers License
-              </span>
+                <span
+                  class="text-sm font-semibold text-iw-title break-words leading-snug"
+                  data-testid="credential-type-display-name"
+                >
+                  Drivers License
+                </span>
+              </div>
             </div>
             <div
               class="flex flex-row items-center flex-shrink-0"
@@ -606,13 +610,13 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
             </div>
           </div>
           <div
-            class="bg-iw-tileBackground grid grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
+            class="bg-iw-tileBackground grid w-full min-w-[min(100%,22rem)] grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
             data-testid="vc-card-view"
             role="menuitem"
             tabindex="0"
           >
             <div
-              class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
+              class="flex items-center gap-2 sm:gap-6 min-w-0 flex-1"
             >
               <img
                 alt="Credential Type Logo"
@@ -620,12 +624,16 @@ exports[`Testing of StoredCardsPage -> Layout of StoredCardsPage should check if
                 data-testid="issuer-logo"
                 src="logo2.png"
               />
-              <span
-                class="text-sm font-semibold text-iw-title min-w-0 flex-1 break-words leading-snug"
-                data-testid="credential-type-display-name"
+              <div
+                class="flex min-w-0 flex-1 flex-col gap-1"
               >
-                Health Card
-              </span>
+                <span
+                  class="text-sm font-semibold text-iw-title break-words leading-snug"
+                  data-testid="credential-type-display-name"
+                >
+                  Health Card
+                </span>
+              </div>
             </div>
             <div
               class="flex flex-row items-center flex-shrink-0"

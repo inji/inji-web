@@ -3,13 +3,13 @@
 exports[`VCCardView Component should match snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="bg-iw-tileBackground grid grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
+    class="bg-iw-tileBackground grid w-full min-w-[min(100%,22rem)] grid-cols-[2.5fr_0.5fr] items-center shadow hover:shadow-lg hover:shadow-iw-selectedShadow p-4 m-2 rounded-md cursor-pointer"
     data-testid="vc-card-view"
     role="menuitem"
     tabindex="0"
   >
     <div
-      class="flex items-center gap-6 sm:gap-4 min-w-0 flex-1 overflow-hidden"
+      class="flex items-center gap-2 sm:gap-6 min-w-0 flex-1"
     >
       <img
         alt="Credential Type Logo"
@@ -17,12 +17,16 @@ exports[`VCCardView Component should match snapshot 1`] = `
         data-testid="issuer-logo"
         src="logo1.png"
       />
-      <span
-        class="text-sm font-semibold text-iw-title min-w-0 flex-1 break-words leading-snug"
-        data-testid="credential-type-display-name"
+      <div
+        class="flex min-w-0 flex-1 flex-col gap-1"
       >
-        Drivers License
-      </span>
+        <span
+          class="text-sm font-semibold text-iw-title break-words leading-snug"
+          data-testid="credential-type-display-name"
+        >
+          Drivers License
+        </span>
+      </div>
     </div>
     <div
       class="flex flex-row items-center flex-shrink-0"

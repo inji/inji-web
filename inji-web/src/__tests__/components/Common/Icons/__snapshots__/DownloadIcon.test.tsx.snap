@@ -21,6 +21,8 @@ exports[`DownloadIcon Component matches snapshot with default props (non-gradien
 exports[`DownloadIcon Component matches snapshot with gradient version 1`] = `
 <DocumentFragment>
   <svg
+    aria-label="icon-download"
+    data-testid="icon-download"
     fill="none"
     height="18"
     viewBox="0 0 18 18"

@@ -451,11 +451,33 @@
       "download": "Baixar",
       "menu": {
         "view": "Ver",
+        "checkStatus": "Verificar status do cartão",
         "delete": "Excluir"
+      },
+      "status": {
+        "valid": "Válido",
+        "revoked": "Revogado",
+        "pending": "Pendente",
+        "suspended": "Suspenso",
+        "expired": "Expirado",
+        "informationTitle": "Informações de status",
+        "label": "Status:",
+        "check": "Verificar status",
+        "loading": "A carregar o estado",
+        "lastChecked": "Última verificação: {{time}}",
+        "lastCheckedLabel": "Última verificação:",
+        "info": {
+          "valid": "O cartão está ativo e pode ser usado ou partilhado.",
+          "pending": "O status deste cartão não pode ser verificado neste momento.",
+          "revoked": "O cartão foi permanentemente revogado pelo emissor. Ainda pode ser partilhado, mas os serviços do verificador não podem ser acedidos com este cartão.",
+          "suspended": "O cartão foi temporariamente suspenso pelo emissor. Ainda pode ser partilhado, mas os serviços do verificador não podem ser acedidos com este cartão.",
+          "expired": "O cartão já não é válido porque o seu período de validade terminou."
+        }
       },
       "error": {
         "downloadError": "Download falhou. Por favor, tente novamente.",
-        "deleteError": "Falha ao excluir. Tente novamente."
+        "deleteError": "Falha ao excluir. Tente novamente.",
+        "statusError": "Falha ao verificar o status do cartão. Tente novamente."
       },
       "delete": {
         "confirmation": {
