@@ -451,11 +451,33 @@
       "download": "Télécharger",
       "menu": {
         "view": "Voir",
+        "checkStatus": "Vérifier le statut de la carte",
         "delete": "Supprimer"
+      },
+      "status": {
+        "valid": "Valide",
+        "revoked": "Révoquée",
+        "pending": "En attente",
+        "suspended": "Suspendue",
+        "expired": "Expirée",
+        "informationTitle": "Informations sur le statut",
+        "label": "Statut :",
+        "check": "Vérifier le statut",
+        "loading": "Chargement du statut",
+        "lastChecked": "Dernière vérification : {{time}}",
+        "lastCheckedLabel": "Dernière vérification :",
+        "info": {
+          "valid": "La carte est active et peut être utilisée ou partagée.",
+          "pending": "Le statut de la carte ne peut pas être vérifié pour le moment.",
+          "revoked": "La carte a été définitivement révoquée par l'émetteur. Elle peut toujours être partagée, mais les services du vérificateur ne sont pas accessibles avec cette carte.",
+          "suspended": "La carte a été temporairement suspendue par l'émetteur. Elle peut toujours être partagée, mais les services du vérificateur ne sont pas accessibles avec cette carte.",
+          "expired": "La carte n'est plus valide car sa période de validité est terminée."
+        }
       },
       "error": {
         "downloadError": "Échec du téléchargement. Veuillez réessayer.",
-        "deleteError": "Échec de la suppression. Réessayez."
+        "deleteError": "Échec de la suppression. Réessayez.",
+        "statusError": "Échec de la vérification du statut. Veuillez réessayer."
       },
       "delete": {
         "confirmation": {

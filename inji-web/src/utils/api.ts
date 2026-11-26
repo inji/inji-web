@@ -221,6 +221,24 @@ export class api {
         responseType: "blob"
     };
 
+    static fetchWalletCredentialStatus: ApiRequest = {
+        url: (credentialId: string) => {
+            const walletId = AppStorage.getItem(KEYS.WALLET_ID);
+            return (
+                api.mimotoHost +
+                `/wallets/${walletId}/credentials/${credentialId}/status`
+            );
+        },
+        methodType: MethodType.GET,
+        headers: (locale: string) => {
+            return {
+                "Content-Type": ContentTypes.JSON,
+                "Accept-Language": locale,
+            };
+        },
+        credentials: "include"
+    };
+
     static deleteWalletCredential: ApiRequest = {
         url: (credentialId: string) => {
             const walletId = AppStorage.getItem(KEYS.WALLET_ID);

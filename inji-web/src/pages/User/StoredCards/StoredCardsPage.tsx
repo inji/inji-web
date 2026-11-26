@@ -2,7 +2,7 @@ import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import {NavBackArrowButton} from '../../../components/Common/Buttons/NavBackArrowButton';
-import {ApiError, ErrorType, WalletCredential} from "../../../types/data";
+import {ApiError, CredentialStatusResponse, ErrorType, WalletCredential} from "../../../types/data";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../types/redux";
 import {api} from "../../../utils/api";
@@ -21,6 +21,7 @@ import {TertiaryButton} from "../../../components/Common/Buttons/TertiaryButton"
 import {navigateToUserHome} from "../../../utils/navigationUtils";
 import {HTTP_STATUS_CODES, NETWORK_ERROR_MESSAGE} from "../../../utils/constants";
 import {useApi} from "../../../hooks/useApi";
+import {CredentialCardActionsProvider} from "../../../components/VC/CredentialCardActionsLock";
 
 export const StoredCardsPage: React.FC = () => {
     const {t} = useTranslation('StoredCards');
@@ -122,6 +123,22 @@ export const StoredCardsPage: React.FC = () => {
         await fetchWalletCredentials()
     }
 
+    const applyCredentialStatus = (credentialId: string, status: CredentialStatusResponse) => {
+        const merge = (items: WalletCredential[]) =>
+            items.map((credential) =>
+                credential.credentialId === credentialId
+                    ? {
+                        ...credential,
+                        statusChecks: status.statusChecks,
+                        lastCheckedAt: status.lastCheckedAt,
+                        isExpired: status.isExpired,
+                    }
+                    : credential
+            );
+        setCredentials(merge);
+        setFilteredCredentials(merge);
+    };
+
     const loader =
         <div className={StoredCardsPageStyles.loaderContainer} data-testid={"loader-credentials"}>
             <SpinningLoader/>
@@ -155,6 +172,7 @@ export const StoredCardsPage: React.FC = () => {
                                 key={item.credentialId}
                                 credential={item}
                                 refreshCredentials={refreshCredentials}
+                                onStatusUpdated={applyCredentialStatus}
                             />;
                         }
                         }
@@ -190,30 +208,32 @@ export const StoredCardsPage: React.FC = () => {
                                        title={t('header.addCards')}/>;
 
     return (
-        <div className={StoredCardsPageStyles.container}>
-            <div className={StoredCardsPageStyles.headerContainer} data-testid={"page-title-container"}>
-                <div className={StoredCardsPageStyles.navContainer}>
+        <CredentialCardActionsProvider>
+            <div className={StoredCardsPageStyles.container}>
+                <div className={StoredCardsPageStyles.headerContainer} data-testid={"page-title-container"}>
                     <div className={StoredCardsPageStyles.navContainer}>
-                        <NavBackArrowButton onBackClick={navigateToHome}/>
+                        <div className={StoredCardsPageStyles.navContainer}>
+                            <NavBackArrowButton onBackClick={navigateToHome}/>
+                        </div>
+                        <div className={StoredCardsPageStyles.titleContainer}>
+                            <PageTitle value={t('title')} testId={"stored-credentials"}/>
+                            <TertiaryButton onClick={navigateToHome} title={t('Common:home')} testId={"home"}/>
+                        </div>
                     </div>
-                    <div className={StoredCardsPageStyles.titleContainer}>
-                        <PageTitle value={t('title')} testId={"stored-credentials"}/>
-                        <TertiaryButton onClick={navigateToHome} title={t('Common:home')} testId={"home"}/>
-                    </div>
-                </div>
-                <div className={`${StoredCardsPageStyles.buttonContainer.large}`}>
-                    {addCard()}
-                </div>
-            </div>
-
-            <div className={StoredCardsPageStyles.contentContainer} data-testid={"content-and-action-container"}>
-                {showContent()}
-                {!loading && credentials.length !== 0 &&
-                    <div className={StoredCardsPageStyles.buttonContainer.mobile}>
+                    <div className={`${StoredCardsPageStyles.buttonContainer.large}`}>
                         {addCard()}
                     </div>
-                }
+                </div>
+
+                <div className={StoredCardsPageStyles.contentContainer} data-testid={"content-and-action-container"}>
+                    {showContent()}
+                    {!loading && credentials.length !== 0 &&
+                        <div className={StoredCardsPageStyles.buttonContainer.mobile}>
+                            {addCard()}
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
+        </CredentialCardActionsProvider>
     );
 };

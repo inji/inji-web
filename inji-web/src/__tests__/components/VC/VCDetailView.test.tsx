@@ -73,6 +73,72 @@ describe('VCDetailView', () => {
     });
   });
 
+  it('should show status, last checked, and check status when the credential supports status', () => {
+    const onCheckStatus = jest.fn();
+    render(
+      <VCDetailView
+        {...mockProps}
+        onCheckStatus={onCheckStatus}
+        credential={{
+          ...mockCredential,
+          statusChecks: [{purpose: "revocation", valid: false}],
+          lastCheckedAt: new Date(2025, 9, 20, 18, 30, 0).toISOString(),
+        }}
+      />
+    );
+
+    expect(screen.getByTestId("credential-preview-status-label")).toHaveTextContent("Revoked");
+    expect(screen.getByTestId("credential-preview-status-icon")).toHaveStyle({backgroundColor: "#DC2626"});
+    expect(screen.getByTestId("credential-preview-status-icon").querySelector("img")).toHaveAttribute("src", "revoked.svg");
+    expect(screen.getByTestId("credential-preview-status-info")).toBeInTheDocument();
+    expect(screen.getByTestId("credential-preview-last-checked")).toHaveTextContent("Last Checked:");
+    expect(screen.getByTestId("credential-preview-last-checked")).toHaveTextContent("20 October 2025, 06:30PM");
+    expect(screen.queryByTestId("btn-download")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("btn-preview-download"));
+    expect(mockProps.onDownload).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByTestId("btn-preview-check-status"));
+    expect(onCheckStatus).toHaveBeenCalledTimes(1);
+  });
+
+  it('should show the spinning loader in place of the preview status while checking', () => {
+    render(
+      <VCDetailView
+        {...mockProps}
+        onCheckStatus={jest.fn()}
+        checkingStatus
+        credential={{
+          ...mockCredential,
+          statusChecks: [{purpose: "revocation", valid: false}],
+          lastCheckedAt: new Date(2025, 9, 20, 18, 30, 0).toISOString(),
+        }}
+      />
+    );
+
+    expect(screen.getByTestId("credential-preview-status-loader")).toHaveTextContent("Loading Status");
+    expect(screen.queryByTestId("credential-preview-status-label")).not.toBeInTheDocument();
+    expect(screen.getByTestId("credential-preview-last-checked")).toBeInTheDocument();
+  });
+
+  it('should show valid status in the preview when there is no status list', () => {
+    render(
+      <VCDetailView
+        {...mockProps}
+        onCheckStatus={jest.fn()}
+        credential={{
+          ...mockCredential,
+          statusChecks: [],
+          lastCheckedAt: "2026-11-25T05:09:11.190114Z",
+          isExpired: false,
+        }}
+      />
+    );
+
+    expect(screen.getByTestId("credential-preview-status-label")).toHaveTextContent("Valid");
+    expect(screen.queryByTestId("btn-download")).not.toBeInTheDocument();
+  });
+
   it('should pass credential title to modal', () => {
     render(
       <VCDetailView

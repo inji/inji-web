@@ -6,6 +6,7 @@ import { MatchingCredentialsStyles } from "./OvpPageStyles";
 import checkCircle from "../../assets/checkCircleTwo.svg";
 import { isSdJwtCredential } from "./Dcql/credentialCardUtils";
 import SDClaimsSelectionModal from "../../modals/SDClaimsSelectionModal";
+import { CredentialCardActionsProvider } from "../VC/CredentialCardActionsLock";
 
 interface QueryGroupCredentialListProps {
     queryId: string;
@@ -63,6 +64,7 @@ export function QueryGroupCredentialList({
     };
 
     return (
+        <CredentialCardActionsProvider>
         <>
             <div
                 className={MatchingCredentialsStyles.mainContainer}
@@ -143,5 +145,6 @@ export function QueryGroupCredentialList({
                 />
             )}
         </>
+        </CredentialCardActionsProvider>
     );
 }

@@ -3,7 +3,7 @@
 exports[`FlatList Component should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-full gap-1"
+    class="grid w-full gap-1 grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))]"
     data-testid="flatlist"
   >
     <div>

@@ -451,11 +451,33 @@
       "download": "Download",
       "menu": {
         "view": "View",
+        "checkStatus": "Check Card Status",
         "delete": "Delete"
+      },
+      "status": {
+        "valid": "Valid",
+        "revoked": "Revoked",
+        "pending": "Pending",
+        "suspended": "Suspended",
+        "expired": "Expired",
+        "informationTitle": "Status Information",
+        "label": "Status:",
+        "check": "Check Status",
+        "loading": "Loading Status",
+        "lastChecked": "Last Checked: {{time}}",
+        "lastCheckedLabel": "Last Checked:",
+        "info": {
+          "valid": "The card is active and can be used or shared.",
+          "pending": "The card status cannot be verified right now.",
+          "revoked": "The card has been permanently revoked by the issuer. It can still be shared, but services from the verifier cannot be accessed using this card.",
+          "suspended": "The card has been temporarily suspended by the issuer. It can still be shared, but services from the verifier cannot be accessed using this card.",
+          "expired": "The card is no longer valid because its validity period has ended."
+        }
       },
       "error": {
         "downloadError": "Download failed. Please retry.",
-        "deleteError": "Failed to delete. Try again."
+        "deleteError": "Failed to delete. Try again.",
+        "statusError": "Failed to check card status. Please retry."
       },
       "delete": {
         "confirmation": {

@@ -7,9 +7,10 @@ interface MenuProps {
     triggerComponent: React.ReactNode;
     menuItems: MenuItemType[];
     testId: string;
+    disabled?: boolean;
 }
 
-export const Menu: React.FC<MenuProps> = ({triggerComponent, menuItems, testId}) => {
+export const Menu: React.FC<MenuProps> = ({triggerComponent, menuItems, testId, disabled = false}) => {
     const [isOpen, setIsOpen] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,12 @@ export const Menu: React.FC<MenuProps> = ({triggerComponent, menuItems, testId})
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isOpen]);
+
+    useEffect(() => {
+        if (disabled) {
+            setIsOpen(false);
+        }
+    }, [disabled]);
 
     useEffect(() => {
         if (!isOpen || !menuRef.current) return;
@@ -61,13 +68,18 @@ export const Menu: React.FC<MenuProps> = ({triggerComponent, menuItems, testId})
         <div className={MenuStyles.menu.container} data-testid={`${testId}-menu`}>
             <button
                 type="button"
-                className={MenuStyles.menu.button}
                 ref={buttonRef}
+                data-testid={`icon-${testId}-menu`}
+                disabled={disabled}
+                aria-disabled={disabled || undefined}
+                className={disabled ? `${MenuStyles.menu.button} cursor-not-allowed` : MenuStyles.menu.button}
                 onClick={(event) => {
                     event.stopPropagation();
+                    if (disabled) {
+                        return;
+                    }
                     setIsOpen((prev) => !prev);
                 }}
-                data-testid={`icon-${testId}-menu`}
             >
                 {triggerComponent}
             </button>
